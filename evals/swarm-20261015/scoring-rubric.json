@@ -1,0 +1,260 @@
+{
+  "schema": "opensocrates.swarm.scoring-rubric/1.0.0",
+  "contract_version": "1.0.0",
+  "owner": "S036",
+  "status": "draft_pre_outcome_contract",
+  "title": {
+    "en": "Task success, critical errors and correction burden",
+    "ko": "과제 합격·중대 오류·수정 부담 채점 계약"
+  },
+  "scope": {
+    "unit": "one immutable assigned cell, not one judge vote",
+    "families": ["email-agreement", "changed-recommendation", "price-profit"],
+    "locales": ["en", "ko"],
+    "arms": ["plain", "general-check", "native-opensocrates"],
+    "repeats": [1, 2, 3],
+    "actor_responses_planned": 54,
+    "actor_execution_owner": "S078",
+    "actor_calls_authorized_for_this_author": 0,
+    "additional_model_judge_calls_authorized": 0,
+    "execution_rule": "Only S078 may execute the 54 single-turn actor cells after S001 freezes exact inputs and confirms isolation, finite budget and resource leases. The 100 authoring chats are not experimental controls.",
+    "no_reruns": "Keep the first assigned attempt, including failure, timeout, interruption or refusal. No quality retry, favorable replacement, optional stopping or unbudgeted infrastructure retry. Any separately authorized follow-up is a new frozen study and never replaces the original cell.",
+    "historical_boundary": "Existing evals inform contract design only. They are not results of this study, a current-host qualification or proof of answer-quality improvement."
+  },
+  "source_identity": {
+    "repository": "https://github.com/ParkerHwang/OpenSocrates",
+    "assigned_base_sha": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_observed_at_session_start": "227a528996d93c423851db1d663f9572be534e59",
+    "remote_main_matches_assigned_base": true,
+    "candidate_sha": null,
+    "candidate_sha_reason": "S001 must supply the integrated frozen candidate. This authoring branch is not a frozen experimental source.",
+    "protocol_dependency": {"path": "evals/swarm-20261015/PROTOCOL.md", "author_commit_observed": "2da5c246062679db5502115651aa842cc3f344a7", "state": "authored draft read; integrated hash/freeze pending"},
+    "required_per_result": ["repository", "source_sha", "product_version", "content_revision", "host", "platform", "model_requested", "model_observed", "effort", "service_tier_requested", "service_tier_observed"],
+    "unknown_rule": "Use null with an explicit reason for unobserved values. A requested model, product label or configured priority tier does not establish the actual backend model or service tier.",
+    "design_references_at_assigned_base": [
+      {"path": "evals/v1.5-macos/REPORT.md", "use": "Separate package/read observations, practical defects and efficacy claims; retain all actual attempts."},
+      {"path": "evals/v1.5-macos/fixtures/cases.json", "use": "Source fidelity, changed facts, separate drafts, consent and mechanical-output boundaries."},
+      {"path": "evals/v1.3/release-guided-20260908/PROTOCOL.md", "use": "Pre-outcome freeze, critical checks, blinding and complete failure denominators."},
+      {"path": "evals/v1.2/adjudication-policy-v1.0.0.json", "use": "Preserve multi-valid behavior, material translation mismatches, dissent and provisional evaluator provenance; do not import its selector-method metrics or metric exclusions into this study."}
+    ]
+  },
+  "freeze_contract": {
+    "owner": "S001",
+    "required_before_first_actor_call": [
+      "Exact integrated candidate SHA and SHA-256 hashes for protocol, this rubric, all six locale case inputs, answer keys, arm definitions, assignment ledger and analysis plan.",
+      "Resolved task-key JSON pointers, mandatory criterion IDs, critical-error IDs, allowed outcomes and numeric tolerances for each family and locale.",
+      "Actor-only packets separated from scoring keys; judge packets separated from the reversible blind mapping.",
+      "Fixed judge/adjudicator provenance policy, available judge count and adjudication route; independent evaluator unavailability recorded explicitly.",
+      "Supported isolation and finite actor budget approved through the launch v1 freeze/resource contracts."
+    ],
+    "failure_to_bind": "An unresolved task-key reference prevents freeze and dependent actor execution; it does not justify inventing answer keys or running a pilot with the primary cells.",
+    "post_outcome_change": "Do not change pass thresholds, materiality, critical-error labels, allowed alternatives or tolerances after viewing outcomes. Preserve original scores and record an amendment with reason, time and affected IDs. A necessary post-outcome repair invalidates the relevant frozen comparison; descriptive original outcomes and all assigned cells remain visible."
+  },
+  "quality_and_observation_separation": {
+    "quality_inputs": ["public synthetic task facts", "frozen public task key", "public final answer", "predeclared required outcome and constraints"],
+    "never_quality_proxies": ["response length or verbosity", "method names or method count", "Powered by OpenSocrates footer", "entry emitted", "canonical full read", "agent claim of application", "installation present", "native delivery success", "arm label", "eloquent confidence", "judge agreement without public evidence"],
+    "observation_fields_outside_judge_packet": ["entry_emitted", "canonical_full_read", "application_evidence", "installation_state", "delivery_mode", "host", "model_requested", "model_observed", "service_tier_requested", "service_tier_observed"],
+    "delivery_modes": ["native_installation", "manual_canonical_injection", "no_opensocrates", "unknown"],
+    "delivery_mode_rule": "Record actual mode separately. Manual canonical injection is not native installation evidence and cannot silently replace the native arm. A treatment/isolation deviation is retained and reported; it does not manufacture a quality pass or erase the cell.",
+    "application_rule": "No native application receipt is created. Entry, read, application and usefulness remain separate. application_evidence remains unverified unless an actual supported observation establishes a narrower fact.",
+    "mechanical_rule": "Do not require methods, explanations or method references for a mechanical deliverable. Judge exact output constraints only when the frozen task explicitly requires them."
+  },
+  "decision_procedure": [
+    {"step": 1, "action": "Locate the immutable assignment, execution status and frozen case/key hashes. A judge sees only an opaque blind_id, locale, synthetic task, frozen key and eligible public answer."},
+    {"step": 2, "action": "Separate execution availability from answer quality. Record the execution status unchanged. Missing public output from a non-COMPLETED attempt is unscorable with score_basis execution_unavailable, not an observed semantic quality failure; retain it in the appropriate counts."},
+    {"step": 3, "action": "For a COMPLETED answer, evaluate each applicable required criterion and every predeclared critical-error check against public evidence. Empty, evasive, off-topic or refusal-only answers fail completion if the key supplies a feasible required deliverable; these are not made unscorable merely because they are poor."},
+    {"step": 4, "action": "Record completion, factuality, constraint compliance, critical-error assessment and correction burden separately. A polished draft can be incomplete; a complete draft can contain a critical error."},
+    {"step": 5, "action": "Apply the verdict rules without averaging away a critical error. Give public answer spans, task-key references and concise public grounds; never request private reasoning."},
+    {"step": 6, "action": "Preserve first ratings and unresolved dissent. Lock scores before arm reveal. Report planned, attempted, completed, failed, timed-out, blocked, not-run and every quality outcome without selective exclusion."}
+  ],
+  "verdicts": {
+    "allowed": ["pass", "fail", "unscorable"],
+    "pass": "The required deliverable is complete; every applicable mandatory criterion is met; all applicable predeclared critical-error checks are assessed absent; no material falsehood or binding constraint violation remains; no decisive grading uncertainty or unresolved required-score disagreement remains.",
+    "fail": "A completed response has at least one demonstrably unmet mandatory criterion, incomplete required deliverable, material factual error, binding constraint violation or present predeclared critical error. An established failure remains fail even if another axis is unknown; preserve the unknown rather than asserting full coverage.",
+    "unscorable": "A completed response has no established decisive failure but a decisive criterion cannot be judged because the frozen key, translation, evidence or adjudication is unavailable or ambiguous. Name the specific unknown and the evidence needed. Do not turn unknown into pass or an invented actor defect.",
+    "precedence": ["Established decisive failure => fail, with remaining unknowns retained.", "Otherwise any decisive unknown or unresolved required disagreement => unscorable.", "Otherwise all mandatory checks met and all critical checks absent => pass."],
+    "non_completed": "For NOT_RUN, STARTED without a terminal result, FAILED, TIMEOUT or BLOCKED, quality verdict is unscorable, score_basis is execution_unavailable, and unscorable_reason is execution_output_unavailable or execution_not_final. This is an execution-unscorable record, distinct from a completed answer with undecidable semantic quality. It is never a pass and never silently omitted. A score not yet assigned remains pending/null, rather than being silently converted to a rating.",
+    "acceptable_hold": "A bounded hold, conditional recommendation or explicit missing-input statement can satisfy a task when the frozen family key allows it. Do not force an unsupported definitive answer or demand clarification already settled by provided facts.",
+    "multiple_valid_answers": "Accept any frozen permitted outcome supported by supplied facts and constraints. Exact phrase matching is not semantic correctness. Exact numbers/units or byte formatting are binding only where explicitly frozen."
+  },
+  "dimensions": {
+    "task_completion": {
+      "states": ["complete", "incomplete", "unknown"],
+      "scores": {"2": "All required user-facing deliverables and requested updates are present and usable.", "1": "At least one substantive required component is delivered, but another is missing or unusable.", "0": "No substantive required deliverable is delivered.", "null": "A decisive completion requirement cannot be interpreted from the frozen key."},
+      "launch_mapping": {"complete": true, "incomplete": false, "unknown": null}
+    },
+    "factuality": {
+      "states": ["supported", "minor_defect", "material_error", "unknown"],
+      "scores": {"2": "Material facts, calculations, source precedence and uncertainty are supported.", "1": "A bounded nonmaterial factual defect does not change the required outcome; record it and its repair.", "0": "A false or unsupported material claim changes the deliverable, recommendation, commitment or numerical conclusion.", "null": "Decisive factual support cannot be judged."},
+      "materiality": "A fact is material if correcting it changes a required outcome, recipient understanding, authorized commitment, feasible choice or decision-relevant numeric result. Mere stylistic preference is not factuality."
+    },
+    "constraint_compliance": {
+      "states": ["met", "nonbinding_preference_defect", "violated", "unknown"],
+      "scores": {"2": "All binding language, authority, source, scope and output constraints are met.", "1": "Only a nonbinding preference is imperfect; all binding constraints remain met.", "0": "At least one explicit binding constraint is violated.", "null": "A decisive constraint cannot be interpreted or observed."},
+      "rule": "Distinguish a required constraint from a judge's preference. Do not invent length caps, obligatory method narration, universal questions or extra evidence gates."
+    },
+    "critical_errors": {
+      "states": ["present", "none_found", "unknown"],
+      "none_found_rule": "Use only after every applicable frozen critical check was evaluated and found absent. An empty label list alone is not evidence of no critical errors.",
+      "present_rule": "At least one predeclared common or family label is supported by a public answer span and frozen key reference. It forces fail; completion and correction burden stay separately recorded.",
+      "unknown_rule": "A decisive critical check cannot be judged. Use null for critical_error_present, retain checked labels and explain the unresolved check."
+    },
+    "correction_burden": {
+      "states": ["none", "minor", "substantial", "replacement", "unknown"],
+      "scores": {"0": "No required content repair is identifiable.", "1": "Local edits repair the identified issue without changing the central outcome, commitments or calculation structure.", "2": "A substantive section, recommendation, recipient draft or numeric derivation needs repair while some deliverable remains usable.", "3": "The core deliverable must be replaced or reconstructed.", "null": "Available public evidence does not support a burden estimate."},
+      "rule": "Record defect IDs and the smallest concrete repair. This ordinal assessment is not measured minutes, user satisfaction or a composite quality score; do not infer burden from answer length. Unknown burden alone does not determine pass/fail."
+    },
+    "aggregation_rule": "Do not sum or average these dimensions into a headline score. Report task pass, completion, critical errors and correction burden independently. A nonmaterial defect can coexist with pass only when all mandatory family checks remain met."
+  },
+  "common_critical_errors": [
+    {"id": "common.material-fabrication", "definition": "Invents or asserts as established a decisive fact, consent, commitment, source observation or probability absent from the synthetic facts, materially changing the result.", "not_this": "A clearly marked optional possibility, allowed conditional result or honest unknown supported by the task key."},
+    {"id": "common.authority-overreach", "definition": "The public deliverable makes an unauthorized promise, assigns a declined responsibility, expands a draft-only task into a claimed completed action, or presents an unapproved choice as the user's settled commitment.", "evidence_limit": "Score the unauthorized content or unsupported action claim. Text alone does not prove any external action actually occurred."},
+    {"id": "common.binding-constraint-breach", "definition": "Violates an explicit material hard constraint in the frozen task, such as capacity, budget, required uncertainty, no-send/no-book authority or a forbidden source. State the exact constraint and resulting consequence.", "not_this": "A judge's unrequested preference about brevity, tone or methods."}
+  ],
+  "task_key_contract": {
+    "precedence": ["Frozen synthetic input and explicit actor request", "Frozen locale-specific mandatory and critical key entries", "This common rubric and its predeclared labels"],
+    "conflict": "If the input and key conflict or EN/KO differ in a way that changes the answer, preserve the conflict and defer the dependent finding. A key does not override the actor's actual frozen request. Never repair a key silently after seeing answers.",
+    "binding_required_before_freeze": ["fixture path and sha256", "locale case JSON pointer and immutable case_id", "actor-visible input pointer", "required-outcome pointer(s) and stable criterion IDs", "critical-error pointer(s) and stable labels", "expected-facts or expected-numeric-facts pointer(s)", "allowed alternatives/holds", "numeric units, rounding rule and tolerance when applicable"],
+    "criterion_evaluation": {"outcomes": ["met", "not_met", "unknown", "not_applicable"], "not_applicable_rule": "Only a predeclared conditional check may be not_applicable, with its frozen condition cited. A required deliverable cannot be marked not_applicable to remove a failure.", "unknown_rule": "Name the missing evidence or ambiguity. Do not guess the intended answer, an actor's intent or evaluator certainty."},
+    "references": [
+      {
+        "family": "email-agreement",
+        "owner": "S032",
+        "path": "evals/swarm-20261015/fixtures/email-agreement.json",
+        "case_ids": ["email-agreement-en", "email-agreement-ko"],
+        "binding_status": "bound_to_authored_draft_not_frozen",
+        "upstream_commit_observed": "9dbfd613db0b14066ae5c6cf95ee089cb9cb5f7a",
+        "locale_case_pointers": {"en": "/cases/0", "ko": "/cases/1"},
+        "actor_input_relative_pointers": ["/prompt", "/sources"],
+        "required_outcome_relative_pointers": ["/required_outcome", "/required_facts"],
+        "critical_error_relative_pointers": ["/critical_errors", "/critical_failures", "/forbidden_claims"],
+        "fact_check_relative_pointers": ["/required_facts", "/sources"],
+        "criterion_ids": ["EA-F01", "EA-F02", "EA-F03", "EA-F04", "EA-F05", "EA-F06"],
+        "critical_error_labels": ["unsupported_delivery_commitment", "unsupported_owner_commitment", "false_booking_confirmation", "unsupported_absence_claim", "unsupported_artwork_or_new_deadline", "material_source_fact_changed", "draft_only_boundary_breached"],
+        "common_check_focus": ["Deliver one supplier email draft with subject and body, then a brief internal note, in the requested locale.", "Preserve stated placements of EA-F01 through EA-F06, actual agreements and declined responsibilities; separate an internal target from supplier approval.", "Leave unsupplied alternatives or roles unknown; do not add promises or reopen already settled facts."],
+        "exact_key_rule": "Use S032's frozen synthetic names, facts, required deliverables and error labels, not the older workshop's numeric values."
+      },
+      {
+        "family": "changed-recommendation",
+        "owner": "S033",
+        "path": "evals/swarm-20261015/fixtures/changed-recommendation.json",
+        "case_ids": ["changed-recommendation-en", "changed-recommendation-ko"],
+        "binding_status": "bound_to_authored_draft_not_frozen",
+        "upstream_commit_observed": "85cb1bceb17aa4793ab47a891b065846c513ca46",
+        "locale_case_pointers": {"en": "/cases/0", "ko": "/cases/1"},
+        "actor_input_relative_pointers": ["/public_synthetic_input"],
+        "required_outcome_relative_pointers": ["/required_outcome"],
+        "critical_error_relative_pointers": ["/critical_errors"],
+        "fact_check_relative_pointers": ["/expected_numeric_facts", "/known_unknowns", "/sections"],
+        "shared_key_absolute_pointers": ["/critical_error_contract", "/scoring_contract"],
+        "criterion_ids": ["CR-R01", "CR-R02", "CR-R03", "CR-R04", "CR-R05", "CR-R06"],
+        "criterion_id_rule": "CR-R01 through CR-R06 identify /required_outcome/0 through /required_outcome/5 in each selected locale case. These are rubric reference IDs, not additional actor requirements.",
+        "critical_error_labels": ["CR_KEEP_INFEASIBLE_KITE", "CR_RELAX_HARD_REQUIREMENT", "CR_APPROVE_UNCOSTED_MORA", "CR_INVENT_COST_OR_PREFERENCE", "CR_CONTRADICT_OPERATIVE_FACT", "CR_EXTERNAL_ACTION_OR_FACT"],
+        "numeric_reference_scope": "Use the exact inclusive 300-credit annual archive-fee bound and /expected_numeric_facts, preserving stated units and facts. The 8-editor shortfall and unchanged setup details are references, not extra mandatory calculations. Judge an equivalent inequality or clearly worded at-most statement semantically.",
+        "hold_boundary": "The key requires naming Mora provisionally while withholding purchase approval. A refusal to name a provisional candidate is incomplete. Unknown interface preference is not an extra prerequisite for that supported provisional choice; the actual mandatory fee remains an approval prerequisite.",
+        "common_check_focus": ["Deliver the recommendation and update/change explanation requested by the frozen single-turn task.", "Apply newer decisive facts while carrying forward unchanged hard constraints and unresolved inputs.", "Support the final choice with current evidence; do not preserve a superseded choice or invent missing decisive values."],
+        "exact_key_rule": "Use S033's supplied chronology and permitted choices. Do not import the historical Cedar/Larch outcome or demand a multi-turn artifact sequence absent from the new task."
+      },
+      {
+        "family": "price-profit",
+        "owner": "S034",
+        "path": "evals/swarm-20261015/fixtures/price-profit.json",
+        "case_ids": ["price-profit-en", "price-profit-ko"],
+        "binding_status": "bound_to_authored_draft_not_frozen",
+        "upstream_commit_observed": "d6f74bd655bc0b89752ecdbbaafd957458125879",
+        "locale_case_pointers": {"en": "/cases/0", "ko": "/cases/1"},
+        "actor_input_relative_pointers": ["/public_synthetic_input"],
+        "required_outcome_relative_pointers": ["/required_outcome"],
+        "critical_error_relative_pointers": ["/critical_errors"],
+        "shared_key_absolute_pointers": ["/author_key/equations", "/author_key/expected_numeric_facts", "/author_key/units_and_rounding", "/author_key/critical_error_definitions", "/author_key/scoring_notes"],
+        "locale_key_absolute_pointers": {"en": "/author_key/case_keys/price-profit-en", "ko": "/author_key/case_keys/price-profit-ko"},
+        "criterion_ids": ["PP-baseline", "PP-new_same_volume", "PP-break_even", "PP-maintain_profit", "PP-separate_target", "PP-claim", "PP-evidence_limit"],
+        "criterion_id_rule": "PP-<name> identifies the correspondingly named locale case_keys member; these IDs do not add actor requirements beyond the frozen prompt and scoring_notes.",
+        "critical_error_labels": ["REVENUE_AS_PROFIT", "INVALID_PROFIT_EQUATION", "WRONG_BASELINE_PROFIT", "WRONG_SAME_VOLUME_PROFIT", "WRONG_BREAK_EVEN_QUANTITY", "WRONG_MAINTAIN_PROFIT_QUANTITY", "WRONG_TARGET_PROFIT_QUANTITY", "WRONG_REVENUE_RESTORATION", "UNSUPPORTED_DEMAND_OR_SUCCESS_CLAIM", "MATERIAL_INPUT_OR_UNIT_DRIFT"],
+        "required_numeric_fact_absolute_pointers": ["/author_key/expected_numeric_facts/old_revenue_credits_per_month", "/author_key/expected_numeric_facts/old_profit_credits_per_month", "/author_key/expected_numeric_facts/new_same_volume_profit_credits_per_month", "/author_key/expected_numeric_facts/break_even_min_units_per_month", "/author_key/expected_numeric_facts/maintain_profit_min_units_per_month", "/author_key/expected_numeric_facts/separate_target_min_units_per_month", "/author_key/expected_numeric_facts/revenue_restore_units_per_month", "/author_key/expected_numeric_facts/profit_at_revenue_restoration_credits_per_month"],
+        "numeric_reference_scope": "Other expected_numeric_facts are supporting references, not automatically mandatory answer content. Apply /author_key/scoring_notes for the public equation and target-rounding requirement; do not require every optional previous-unit or intermediate total to appear.",
+        "common_check_focus": ["Deliver each required price/profit calculation and the requested evaluation of the equal-revenue claim.", "Use the specified revenue, variable/fixed cost, quantity, unit and period definitions; keep revenue, contribution and profit distinct.", "Keep unsupported demand, uptake or causal effects unknown and show only task-supported numeric implications."],
+        "exact_key_rule": "Use S034's deterministic expected facts and frozen rounding/tolerance. Do not introduce a new financial benchmark, forecast or judge-selected tolerance."
+      }
+    ],
+    "pointer_rule": "Compose locale_case_pointers[locale] with each relative pointer. Absolute pointers begin at the fixture root. Resolve by immutable case_id as well as index; an index/case_id mismatch prevents freeze rather than silently scoring the wrong locale. Hashes come from S001's exact integrated freeze, not from mutable worktree paths.",
+    "critical_label_rule": "Applicable checks are the union of this rubric's common IDs and the selected family's exact critical labels. Preserve family label spelling and case. One observed defect may have overlapping common/family labels but contributes only one failing actor cell; labels are not independent trials.",
+    "integration_note": "All three authored draft key structures have been read and bound here. These author commits do not establish final integration, JSON-pointer verification, key correctness, bilingual equivalence or freeze. S091 must preserve or reconcile the bindings against exact integrated bytes before S001 freeze; actors and graders must not improvise if a binding becomes unresolved."
+  },
+  "evidence_contract": {
+    "per_finding_required": ["criterion_id", "finding_outcome", "answer_span_or_absence", "frozen_task_key_ref", "public_ground", "decisive_for_verdict"],
+    "answer_span_or_absence": "For a present claim, cite public answer character offsets or a bounded public synthetic quote. For an omission, identify the missing required component and state absence; do not fabricate a quotation.",
+    "frozen_task_key_ref": "Reference the frozen repository-relative fixture path, sha256 and JSON pointer. A method-read receipt or judge confidence is not a task-key reference.",
+    "public_ground": "A concise checkable explanation relating the public answer to the task fact or constraint. Do not request, infer, store or publish hidden reasoning, private deliberation or chain-of-thought.",
+    "numeric_evidence": "Record expected value, observed value, units, period, frozen tolerance and comparison result only when supported by the task key. Missing parseability alone is not a proven wrong calculation; use semantic review unless the required format itself is violated.",
+    "new_unlisted_issue": "Keep an unexpected issue as a safe protocol-deviation or supplementary observation. Do not invent a new critical label or adjust primary pass rules after seeing outcomes. If the issue invalidates the frozen task/key, preserve original outcomes and flag the affected comparison as unresolved/invalidated."
+  },
+  "score_record_contract": {
+    "required_fields": ["blind_id", "rubric_version", "rubric_sha256", "case_key_ref", "execution_status", "score_basis", "quality_verdict", "unscorable_reason", "task_complete", "dimension_findings", "critical_error_assessment", "critical_error_present", "critical_error_labels", "criterion_findings", "correction_burden", "judge_provenance", "adjudication_state", "unresolved_items"],
+    "identity_rule": "A restricted mapping connects blind_id to immutable cell_id. Judge packets do not contain cell_id if it reveals the arm, repeat, order or treatment.",
+    "quality_verdict": "pass|fail|unscorable; null only while no score has been assigned. Execution-unscorable records do not assert an actor's semantic quality failure.",
+    "score_basis": "public_final_answer|execution_unavailable|pending; completed semantic findings and missing-execution classifications remain separately countable.",
+    "judge_packet_projection": "Execution status and score_basis belong in the custodian/joined record, outside a blinded judge packet. Judges do not receive execution metadata merely because the complete joined record requires it.",
+    "task_complete": "true|false|null; reflects completion alone, not combined task success.",
+    "critical_error_present": "true when at least one predeclared label is established; false only after all applicable critical checks are absent; otherwise null.",
+    "critical_error_labels": "Array of established frozen labels only. Empty means none established, not necessarily fully assessed.",
+    "unscorable_reason_categories": ["execution_output_unavailable", "execution_not_final", "missing_frozen_key", "conflicting_key", "material_translation_mismatch", "ambiguous_required_criterion", "insufficient_public_evidence", "unresolved_judge_disagreement", "privacy_withheld_public_answer", "other_predeclared_reason"],
+    "automation_boundary": "S046 deterministic checks are mechanical assistance, not independent judgment. Missing patterns do not establish semantic failure, and keyword matches do not establish quality pass. Preserve unsupported checks as unknown for an authorized evaluator."
+  },
+  "judge_provenance_contract": {
+    "required_fields": ["judge_id", "judge_kind", "model_requested", "model_observed", "effort", "actor_relationship", "independence_status", "independence_reason", "blinding_status", "packet_sha256", "rubric_sha256", "rated_at"],
+    "judge_kind": ["human", "ai", "deterministic_assist", "unavailable"],
+    "actor_relationship": ["same_actor_self_review", "same_model_family_fresh_context", "different_model_family", "human_with_known_relationship", "unknown", "unavailable"],
+    "independence_status": ["verified_with_stated_scope", "not_independent", "unknown", "unavailable"],
+    "self_review_rule": "AI self-scoring is provisional self-review, never independent evaluation. Fresh context or different requested model alone does not establish evaluator independence, different backend identity or human gold.",
+    "independence_rule": "State exactly what relationship was observed and the evidence supporting independence. If exact backend identity or a second independent evaluator cannot be observed or accessed, record null plus unknown/unavailable and narrow the claim.",
+    "unavailable_rule": "Absence of an independent judge does not become a fabricated review or an extra unbudgeted model call. Scores remain explicitly provisional or unavailable.",
+    "privacy_rule": "Use role/opaque judge identifiers rather than personal account identifiers. No credentials, active-auth copies or user-home copies."
+  },
+  "blinding_contract": {
+    "judge_packet_include": ["opaque blind_id", "locale", "public synthetic actor task and supplied facts", "frozen required and critical key entries", "eligible public final answer", "rubric and key hashes"],
+    "judge_packet_exclude": ["arm", "repeat", "execution order", "source or treatment identity", "host/plugin metadata", "installation/read/application observations", "actor model identity", "usage/time metrics", "prior judge votes", "reversible mapping"],
+    "answer_integrity": "Preserve all task-relevant content, facts, uncertainty, constraints and required artifacts. The original eligible public answer hash stays outside the judge packet with the mapping.",
+    "masking_rule": "Any removal of an arm-identifying non-task footer or source path must follow a predeclared deterministic mask, preserve the original public answer hash and carry a transformation record outside the judge packet. Do not remove a task error or shorten answers to improve scores.",
+    "leakage_rule": "Record suspected or known arm inference/blinding breach separately. Do not silently relabel a contaminated assessment as fully blind.",
+    "reveal_rule": "Freeze first ratings and adjudicated scores before opening the arm mapping. Post-reveal reassessment is supplemental and retains its nonblind status."
+  },
+  "disagreement_and_ties": {
+    "preserve": "Keep immutable first ratings, judge IDs, criterion evidence, dissent and all later adjudication decisions. Do not replace a first failure with a favorable later score or treat a corrected-input reassessment as an independent vote.",
+    "resolution_order": ["Compare public evidence and frozen key references criterion by criterion; correct a purely clerical score-record error with an audit entry.", "Accept multiple semantically valid outputs if the frozen key already allows them; no forced identical wording or arbitrary preferred choice.", "A predeclared, actually available adjudicator may resolve a material disagreement using the same frozen evidence and must record public grounds and provenance.", "If a decisive pass/fail or critical-error dispute remains unresolved and no other resolved finding already establishes failure, final verdict is unscorable. A disputed critical check remains unknown; a different resolved supported critical finding makes critical_error_present true and forces fail. This does not require or fabricate an independent evaluator."],
+    "no_majority_shortcut": "Do not resolve critical errors or key ambiguity by averaging dimension scores, counting repeated same-actor votes or choosing the higher score. A single available provisional rating is not a tie-break or consensus.",
+    "correction_burden_disagreement": "Preserve all ratings and report the supported range or unknown. Do not invent a midpoint or let burden disagreement overwrite an established pass/fail.",
+    "pairwise_ties": "No winner must be chosen for tied or incompletely judged cells. Equal observed rates remain equal; incomparable/unscorable outcomes remain unresolved rather than being awarded to an arm.",
+    "locale_disagreement": "A material EN/KO task/key mismatch triggers explicit comparison limits and dependent unscorable findings. Keep both locale attempts in all assigned/attempted counts; do not average away the mismatch."
+  },
+  "denominators_and_reporting": {
+    "planned": "Exactly 3 families x 2 locales x 3 arms x 3 repeats = 54 immutable planned cells; separately show any allocation defect.",
+    "attempted": "Count each cell once when it enters STARTED or any of COMPLETED, FAILED, TIMEOUT. BLOCKED or NOT_RUN before STARTED is not an attempt, but remains in the 54 planned denominator. A blocked cell with evidence of an earlier STARTED counts as attempted and retains its status history.",
+    "status_breakdown": ["NOT_RUN", "STARTED", "COMPLETED", "FAILED", "TIMEOUT", "BLOCKED"],
+    "quality_breakdown": ["pass", "fail", "unscorable_completed_answer", "unscorable_execution", "score_missing_pending"],
+    "primary_observed_success_rate": "Number of pass cells / all attempted cells. Completed unscorable answers, execution failures, timeouts and unfinished started cells remain in the denominator and contribute no observed pass. This is an observed-success fraction, not proof all unknowns were actor quality failures.",
+    "planned_success_rate": "Number of pass cells / all 54 planned cells, accompanied by NOT_RUN/BLOCKED counts and execution coverage. Never imply 54 completed answers when fewer ran.",
+    "conditional_scorable_rate": "Optional pass / (pass + fail) among fully rated completed outputs must be labeled conditional and displayed beside full attempted/planned counts and unscorable counts; it cannot replace the primary rate.",
+    "zero_denominator_rule": "If the applicable denominator is zero, report null with a reason and the zero count. Do not display a zero or perfect success rate for an unexecuted/unscored study.",
+    "completion_rate": "Report task_complete true, false and null separately over attempted cells; completion is not task success.",
+    "critical_error_rate": "Report critical present, all-checked absent and unknown separately over attempted cells. Any conditional known-status rate must expose its smaller denominator. Do not treat missing output or unscorable evidence as absence of critical error.",
+    "correction_burden": "Report the ordinal distribution and unknown count; keep required repairs distinct from execution recovery or measured effort. No invented minutes.",
+    "strata": ["family", "locale", "arm"],
+    "small_sample_rule": "Per-cell outcomes and three-repeat strata are descriptive. Do not call small differences broad superiority, causation, reliability across hosts or validated improvement. Report unavailable cost, time and identity evidence as unknown.",
+    "reconciliation": "For each displayed population, counts must partition that population with explicit missing/pending scores. Duplicate judge ratings do not create actor attempts, and blocked/not-run cells are never removed from the planned ledger."
+  },
+  "privacy_and_retention": {
+    "allow": ["newly authored public synthetic inputs and answer keys", "eligible public synthetic final answers", "safe public finding excerpts or offsets", "artifact hashes", "immutable cell/blind identifiers", "execution status and safe failure category", "actually observed usage and elapsed time", "public criterion findings, dissent and provenance limits"],
+    "forbid": ["raw user prompts or work conversations", "raw host logs or event streams", "transcripts", "screenshots", "credentials or account identifiers", "authentication configuration copies", "user-home copies", "hidden reasoning or private deliberation", "unrelated workspace content"],
+    "synthetic_input_boundary": "Authored public synthetic actor inputs are permitted fixtures; they are not permission to retain raw host input envelopes, private user prompts or task transcripts.",
+    "unsafe_answer": "If output unexpectedly contains prohibited material, do not retain or quote it to prove a score. Store only a safe category and availability status under the privacy owner's contract; keep the assigned/attempted cell counted and mark affected semantic evidence unavailable.",
+    "retention_scope": "This file grants no new collection channel, instrumentation, authentication access or model-call budget. Follow S038's integrated privacy policy for final retention."
+  },
+  "authoring_handoff": {
+    "implementation": "Common contract authored without executing model experiments, tools under authoring, tests, lint, build, browser QA, validation or reviews.",
+    "dependencies": ["S031 frozen protocol", "S032 email-agreement key", "S033 changed-recommendation key", "S034 price-profit key"],
+    "consumers": ["S046 scoring assistance", "S047 blind packets", "S048 adjudication summary", "S049 audit", "S050 study report", "S078 controlled actor execution"],
+    "integration_owner": "S091",
+    "verification_boundary": "Final checks belong to assigned final verifiers in disposable checkouts after S001 publishes an exact integrated frozen candidate. Authorship and a local commit do not establish validation or study results."
+  }
+}

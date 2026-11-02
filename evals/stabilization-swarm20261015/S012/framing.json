@@ -1,0 +1,1234 @@
+{
+  "schema_version": 1,
+  "fixture_id": "opensocrates.stabilization.S012.framing.v1",
+  "purpose": "Source-derived synthetic run_decision one-shot and NDJSON framing expectations. Data only: no new launcher or test runner.",
+  "identity": {
+    "repository": "https://github.com/ParkerHwang/OpenSocrates",
+    "source_sha": "197b317b4aeca4928fabe515dbfef6a98803e568",
+    "product_version": "1.5.2",
+    "content_revision": 5,
+    "host": "run_decision TextIO contract",
+    "platform": null,
+    "model_requested": null,
+    "model_observed": null,
+    "effort": null,
+    "service_tier_requested": "priority",
+    "service_tier_observed": null
+  },
+  "identity_unknowns": {
+    "platform": "No execution environment qualified by this fixture.",
+    "model_requested": "No actor/model experiment requested or run.",
+    "model_observed": "No actor/model experiment run.",
+    "effort": "No actor/model experiment run; parent settings unchanged.",
+    "service_tier_observed": "Server processing tier is not observable; priority is requested only."
+  },
+  "evidence_level": "AUTHORED_SOURCE_EXPECTATIONS_NOT_EXECUTED",
+  "runtime_disposition": "NO_CHANGE",
+  "execution": {
+    "status": "NOT_RUN",
+    "observed_return_code": null,
+    "observed_stdout": null,
+    "observed_at": null,
+    "reason": "S012 authors fixtures only; final execution belongs to a frozen integrated candidate and its verification owners."
+  },
+  "contract": {
+    "entrypoint": "src/opensocrates/cli/decision.py:run_decision",
+    "max_request_characters": 16384,
+    "read_size_characters": 16385,
+    "input_unit": "Python TextIO characters; not UTF-8 byte count",
+    "eof_after_input": true,
+    "input_segments": "Concatenate each text repeated repeat times, in listed order. No interpolation, external file read, or implicit newline. The surrounding framing.json file newline is not stdin.",
+    "fresh_invocation_per_case": true,
+    "stream_session": "A single DecisionSession is constructed before reading any input and reused across frames until return. Reset requests intentionally invoke its explicit reset operation.",
+    "stdout_format": "One JSON object plus newline per response. Compare parsed row objects; serialized key order is not an assertion.",
+    "response_sequence": "Ordered keys into response_expectations; every listed expected response is source-derived, never observed.",
+    "input_position_scope": "Consumed/unread counts describe a seekable TextIO such as StringIO after return. They do not assert OS pipe, decoder, or buffered-reader file-descriptor positions.",
+    "canonical_content_available": "Use the exact candidate canonical content pair and response policy; no content mutation.",
+    "canonical_content_unavailable": "A future isolated unit test may patch sys._MEIPASS to a guaranteed nonexistent synthetic root. Do not remove installed content or modify an active host. This is a conditional setup, not an observed package failure.",
+    "fail_open": "Specified controlled failures return 0 and retain continue_ordinary_work plus constraints_remain_binding. This is not a promise to catch arbitrary I/O/encoding exceptions or broken stdout.",
+    "oversize": "Emit request_too_large once and return 0 immediately, without draining the current line tail or processing later frames. The current volatile session cannot continue in that invocation.",
+    "malformed_json": "Emit invalid_decision_request/request/invalid_json; in stream mode continue with the same session on the next bounded line. In one-shot mode return after the single parse attempt.",
+    "initialization_failure": "Emit canonical_content_unavailable once before reading any input and return 0, including for EOF. The startup error branch has no explicit stdout.flush; do not infer immediate delivery on an open pipe."
+  },
+  "response_expectations": {
+    "reset": {
+      "comparison": "exact_object",
+      "object": {
+        "status": "reset",
+        "context_eviction": false
+      }
+    },
+    "invalid-json": {
+      "comparison": "exact_object",
+      "object": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "request",
+        "error": "invalid_json",
+        "repair": "correct_field_once",
+        "expected": "one JSON object with exactly the documented keys for its operation"
+      }
+    },
+    "invalid-type": {
+      "comparison": "exact_object",
+      "object": {
+        "status": "unavailable",
+        "reason": "invalid_decision_request",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true,
+        "field": "request",
+        "error": "invalid_type",
+        "repair": "correct_field_once",
+        "expected": "one JSON object with exactly the documented keys for its operation"
+      }
+    },
+    "request-too-large": {
+      "comparison": "exact_object",
+      "object": {
+        "status": "unavailable",
+        "reason": "request_too_large",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true
+      }
+    },
+    "canonical-content-unavailable": {
+      "comparison": "exact_object",
+      "object": {
+        "status": "unavailable",
+        "reason": "canonical_content_unavailable",
+        "applied": "unverified",
+        "continue_ordinary_work": true,
+        "constraints_remain_binding": true
+      }
+    }
+  },
+  "source_evidence": [
+    {
+      "id": "cli-initialization",
+      "path": "src/opensocrates/cli/decision.py",
+      "lines": [
+        19,
+        39
+      ],
+      "supports": "Canonical session initialization before any read; fixed content root; fail-open initialization return."
+    },
+    {
+      "id": "cli-read-loop",
+      "path": "src/opensocrates/cli/decision.py",
+      "lines": [
+        40,
+        63
+      ],
+      "supports": "Bounded read/readline, EOF, oversize termination, parse fault, one response per payload, explicit per-frame flush, one-shot return."
+    },
+    {
+      "id": "reset-or-type",
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        125,
+        154
+      ],
+      "supports": "Object type rejection; explicit reset response; input fault recovery and busy cleanup."
+    },
+    {
+      "id": "fault-envelope",
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        46,
+        83
+      ],
+      "supports": "Closed expected text and repair envelope; does not echo submitted values."
+    },
+    {
+      "id": "failure-envelope",
+      "path": "src/opensocrates/selector/decision.py",
+      "lines": [
+        156,
+        172
+      ],
+      "supports": "Fail-open flags; explicit session reset clears volatile state."
+    },
+    {
+      "id": "existing-oversize-check",
+      "path": "tools/check_decision_points.py",
+      "lines": [
+        366,
+        378
+      ],
+      "supports": "Existing oversize and unavailable-content checks; S012 does not rerun them or duplicate their runtime implementation."
+    },
+    {
+      "id": "existing-oneshot-check",
+      "path": "tools/check_decision_points.py",
+      "lines": [
+        499,
+        532
+      ],
+      "supports": "Existing pretty-document and multiple-document one-shot tests; definitions inspected, not executed."
+    },
+    {
+      "id": "existing-stream-check",
+      "path": "tools/check_decision_points.py",
+      "lines": [
+        711,
+        726
+      ],
+      "supports": "Existing three-frame NDJSON test definition; inspected, not executed."
+    }
+  ],
+  "related_work": [
+    {
+      "url": "https://github.com/ParkerHwang/OpenSocrates/issues/91",
+      "state_at_preparation": "CLOSED",
+      "relationship": "Existing one-shot bounded EOF / stream NDJSON contract; do not reimplement."
+    },
+    {
+      "url": "https://github.com/ParkerHwang/OpenSocrates/issues/129",
+      "state_at_preparation": "OPEN",
+      "relationship": "Recovery schema tracking issue, already implemented in the assigned PR head."
+    },
+    {
+      "url": "https://github.com/ParkerHwang/OpenSocrates/pull/130",
+      "state_at_preparation": "OPEN",
+      "head_sha_at_preparation": "197b317b4aeca4928fabe515dbfef6a98803e568",
+      "relationship": "Assigned recovery base. New fixtures retain its invalid_json repair labels without rewriting implementation."
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "oneshot-eof",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [],
+      "expected": {
+        "response_sequence": [],
+        "response_count": 0,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 0,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "stream-eof",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [],
+      "expected": {
+        "response_sequence": [],
+        "response_count": 0,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 0,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "oneshot-blank-line",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 1,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "stream-blank-line",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 1,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "stream-blank-then-valid",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json",
+          "reset"
+        ],
+        "response_count": 2,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 23,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "A blank line is a malformed frame; it is not skipped and does not terminate this session."
+    },
+    {
+      "case_id": "oneshot-valid-no-newline",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 21,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "oneshot-valid-trailing-newline",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 22,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "stream-valid-no-newline",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 21,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "The final frame is delivered at EOF even without a trailing newline; an open pipe without newline or EOF is outside this finite-input fixture."
+    },
+    {
+      "case_id": "stream-valid-trailing-newline",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 22,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "A single terminating newline does not create an extra empty frame at EOF."
+    },
+    {
+      "case_id": "stream-valid-then-empty-line",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset",
+          "invalid-json"
+        ],
+        "response_count": 2,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 23,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "The second newline is an actual blank frame and receives its own response."
+    },
+    {
+      "case_id": "stream-two-json-lines",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset",
+          "reset"
+        ],
+        "response_count": 2,
+        "return_code": 0,
+        "handle_call_count": 2,
+        "textio_characters_consumed": 44,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "stream-two-objects-same-line",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 43,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "There is one physical frame, containing invalid extra JSON data; no object is dispatched."
+    },
+    {
+      "case_id": "oneshot-two-json-lines",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 44,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "One-shot mode parses the entire bounded document once, not one line at a time."
+    },
+    {
+      "case_id": "oneshot-two-objects-no-separator",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 42,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "oneshot-pretty-json",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\n  \"operation\": \"reset\"\n}\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 27,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "stream-pretty-json-fragments",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\n  \"operation\": \"reset\"\n}\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json",
+          "invalid-json",
+          "invalid-json"
+        ],
+        "response_count": 3,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 27,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "Pretty-printing is valid for one-shot mode but these three physical lines are three malformed NDJSON frames."
+    },
+    {
+      "case_id": "stream-malformed-then-valid-final-frame",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{broken}\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json",
+          "reset"
+        ],
+        "response_count": 2,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 30,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "Malformed JSON does not call handle and does not recreate the session; the next unterminated valid frame is processed at EOF."
+    },
+    {
+      "case_id": "oneshot-malformed-then-valid",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{broken}\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-json"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 31,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "No recovery-by-line in one-shot mode; there is a single parse attempt and one fault response."
+    },
+    {
+      "case_id": "stream-valid-malformed-valid",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n{broken}\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset",
+          "invalid-json",
+          "reset"
+        ],
+        "response_count": 3,
+        "return_code": 0,
+        "handle_call_count": 2,
+        "textio_characters_consumed": 53,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "oneshot-exact-character-limit",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": " ",
+          "repeat": 16363
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 16384,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "stream-exact-limit-no-newline",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": " ",
+          "repeat": 16363
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 16384,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ]
+    },
+    {
+      "case_id": "stream-limit-including-newline-then-valid",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": " ",
+          "repeat": 16362
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset",
+          "reset"
+        ],
+        "response_count": 2,
+        "return_code": 0,
+        "handle_call_count": 2,
+        "textio_characters_consumed": 16406,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "First frame including newline is exactly 16384 characters; the following valid frame is processed."
+    },
+    {
+      "case_id": "stream-newline-pushes-over-limit",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": " ",
+          "repeat": 16363
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "request-too-large"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 16385,
+        "textio_characters_unread": 22,
+        "termination": "request-too-large"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "failure-envelope",
+        "existing-oversize-check"
+      ],
+      "note": "The JSON plus spaces is 16384 characters but its newline makes 16385; the next valid line remains unread and this call terminates."
+    },
+    {
+      "case_id": "stream-oversize-tail-then-valid",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "x",
+          "repeat": 17000
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "request-too-large"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 16385,
+        "textio_characters_unread": 638,
+        "termination": "request-too-large"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "failure-envelope",
+        "existing-oversize-check"
+      ],
+      "note": "615 characters of the oversized line plus its newline and the next 22-character line remain unread at the TextIO layer. No draining, resynchronization, or later handle call."
+    },
+    {
+      "case_id": "oneshot-oversize-tail-then-valid",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "x",
+          "repeat": 17000
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "request-too-large"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 16385,
+        "textio_characters_unread": 638,
+        "termination": "request-too-large"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "failure-envelope",
+        "existing-oversize-check"
+      ],
+      "note": "The same document-wide cap terminates one-shot mode before JSON parsing."
+    },
+    {
+      "case_id": "stream-valid-oversize-valid",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "x",
+          "repeat": 17000
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "reset",
+          "request-too-large"
+        ],
+        "response_count": 2,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 16407,
+        "textio_characters_unread": 638,
+        "termination": "request-too-large"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "failure-envelope",
+        "existing-oversize-check"
+      ],
+      "note": "A previously successful response does not make oversize input repairable in this invocation; the later valid line is not processed."
+    },
+    {
+      "case_id": "oneshot-multibyte-character-bound",
+      "stream": false,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "\"",
+          "repeat": 1
+        },
+        {
+          "text": "가",
+          "repeat": 16382
+        },
+        {
+          "text": "\"",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-type"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 16384,
+        "textio_characters_unread": 0,
+        "termination": "single-document-complete"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "Exactly 16384 Python text characters, though 49148 UTF-8 bytes. This is a JSON string, so request type is rejected after parsing; it is not request_too_large."
+    },
+    {
+      "case_id": "stream-multibyte-character-bound",
+      "stream": true,
+      "canonical_content": "available",
+      "input_segments": [
+        {
+          "text": "\"",
+          "repeat": 1
+        },
+        {
+          "text": "가",
+          "repeat": 16382
+        },
+        {
+          "text": "\"",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "invalid-type"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 1,
+        "textio_characters_consumed": 16384,
+        "textio_characters_unread": 0,
+        "termination": "eof"
+      },
+      "evidence": [
+        "cli-read-loop",
+        "reset-or-type",
+        "fault-envelope"
+      ],
+      "note": "Same text-character cap in stream mode at EOF; this case does not claim binary or invalid-UTF-8 behavior."
+    },
+    {
+      "case_id": "unavailable-content-stream-eof",
+      "stream": true,
+      "canonical_content": "unavailable",
+      "input_segments": [],
+      "expected": {
+        "response_sequence": [
+          "canonical-content-unavailable"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 0,
+        "textio_characters_unread": 0,
+        "termination": "canonical-content-unavailable"
+      },
+      "evidence": [
+        "cli-initialization",
+        "failure-envelope"
+      ],
+      "note": "Canonical initialization precedes the first read, so even empty input receives one unavailable response in this precondition."
+    },
+    {
+      "case_id": "unavailable-content-stream-two-lines",
+      "stream": true,
+      "canonical_content": "unavailable",
+      "input_segments": [
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        },
+        {
+          "text": "{\"operation\":\"reset\"}",
+          "repeat": 1
+        },
+        {
+          "text": "\n",
+          "repeat": 1
+        }
+      ],
+      "expected": {
+        "response_sequence": [
+          "canonical-content-unavailable"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 0,
+        "textio_characters_unread": 44,
+        "termination": "canonical-content-unavailable"
+      },
+      "evidence": [
+        "cli-initialization",
+        "failure-envelope"
+      ],
+      "note": "One initialization failure response total, not one response per line; the entire supplied TextIO input remains unread."
+    },
+    {
+      "case_id": "unavailable-content-oneshot-eof",
+      "stream": false,
+      "canonical_content": "unavailable",
+      "input_segments": [],
+      "expected": {
+        "response_sequence": [
+          "canonical-content-unavailable"
+        ],
+        "response_count": 1,
+        "return_code": 0,
+        "handle_call_count": 0,
+        "textio_characters_consumed": 0,
+        "textio_characters_unread": 0,
+        "termination": "canonical-content-unavailable"
+      },
+      "evidence": [
+        "cli-initialization",
+        "failure-envelope"
+      ]
+    }
+  ]
+}
