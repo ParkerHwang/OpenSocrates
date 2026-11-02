@@ -1,8 +1,21 @@
-# OpenSocrates v1.5.3 release baseline
+# OpenSocrates v1.5.3 package and source inventory
 
-[English index](README.md) · [한국어 색인](README.ko.md) · [Backlog item B01](IMPLEMENTATION_BACKLOG.md) · [v1.5.3 maintenance note](../v1.5.3.md)
+[English index](README.md) · [한국어 색인](README.ko.md) · [Backlog item B01 (partial)](IMPLEMENTATION_BACKLOG.md) · [v1.5.3 maintenance note](../v1.5.3.md)
 
 This inventory freezes what the published v1.5.3 release contains and which guidance each package is built to supply. It is an input to later 2.0 work. It does not mark a host qualified, a method applied, or a feature complete.
+
+## Scope and B01 status
+
+Backlog item B01 has two parts. This document completes only the first.
+
+| B01 part | Status |
+| --- | --- |
+| Inventory v1.5.3 host packages and ten-language content; retain unknowns and exact versions | Recorded here, from published release assets, the npm package, the SBOM and tag-identical source |
+| Inspect initial guidance and actual delivered tokens per accessible host | **Not done.** No Codex, Claude, or Antigravity process ran during this inspection, so nothing here was observed in a model context |
+
+B01 stays open until the second part is measured on each accessible host, with inaccessible hosts recorded as such. That measurement is required before any comparison against v1.5.3 (including B02 evaluation runs), and before any claim about what a host delivers, reads, or applies, or about effect or cost.
+
+Live measurement is not required to accept this document because the document makes no such claim. Every value comes from a published artifact or from source identical to tag `v1.5.3`. Every statement about host behavior is marked not observed. The sizes and estimated tokens below describe text present in a package or returned by tag-identical code; they are not delivered context. If a later edit adds a delivery, application, effect or cost claim, that edit needs the live evidence.
 
 Inspection date: 2026-11-02. The measurements below come from the public GitHub release, the npm package, the published SBOM, and source files that are byte-identical to tag `v1.5.3`. No Claude, Codex, or Antigravity process was available in this Linux inspection, so no live model context was captured.
 
@@ -314,7 +327,7 @@ The same zip is the Mac and Windows content archive named by the release. The li
 
 ## Unknowns retained
 
-- Live model-context tokens, billed tokens, and latency on Claude, Codex, and Antigravity. No host process ran.
+- Live model-context tokens, billed tokens, and latency on Claude, Codex, and Antigravity. No host process ran. This is the open part of B01 described under [Scope and B01 status](#scope-and-b01-status).
 - Whether Codex or Claude Code place `SKILL.md`, `rigor`, or `trace` in the initial context in addition to, or instead of, hook `additionalContext`.
 - The exact Claude hook byte count on a real install path.
 - Stdout of the published PyInstaller binaries. Hook text was read from tag-identical Python, not from the frozen executable.

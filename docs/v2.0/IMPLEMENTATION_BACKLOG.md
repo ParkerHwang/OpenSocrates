@@ -6,7 +6,7 @@ Use the work items below as the current planning backlog. The former parent issu
 
 | ID | Work | Deliverable and acceptance | Dependencies |
 | --- | --- | --- | --- |
-| B01 | Freeze actual release baseline | Inventory v1.5.3 host packages and ten language content; inspect initial guidance and actual delivered tokens per accessible host; retain unknowns and exact versions. Recorded in [the v1.5.3 baseline](RELEASE_BASELINE_1.5.3.md). | None |
+| B01 | Freeze actual release baseline | Inventory v1.5.3 host packages and ten language content; inspect initial guidance and actual delivered tokens per accessible host; retain unknowns and exact versions. **Partial.** The package and source inventory is recorded in [the v1.5.3 package and source inventory](RELEASE_BASELINE_1.5.3.md). Actual delivered context per accessible host is not yet measured; it is required before B02 comparisons and before any delivery, application, effect or cost claim. | None |
 | B02 | Prepare evaluation | Freeze synthetic inputs, actual prompts, model and host settings, blinded reader rubric, all attempted runs, timing and error capture. Include long-session and language cases. No user or private transcript retention. | B01 |
 | B03 | Define task contract | Version objective, audience, artifacts, user permissions, facts and constraints, material uncertainty and completion conditions. Tests distinguish accepted/proposed and important/nonimportant missing inputs. | B01, B02 |
 | B04 | Logical lifecycle | Define start, changed judgment, artifact preparation and continuation semantics independently of host hook names. Empty method selection and unavailable host events continue ordinary work. | B03 |
