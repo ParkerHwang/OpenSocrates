@@ -130,6 +130,7 @@ These cases are to be run after implementation. Their expectations apply to each
 | HOST-17 | A real session must start or resume after the intake turn, with a filled composer, wrong destination or absent return path | Observe new-conversation opening, sending, execution of the model turn, destination binding, layer-mediated round trip and user receipt separately. Do not count a filled composer as sent. Do not send sensitive content to an uncertain destination; continue evaluating other permitted routes. |
 | HOST-18 | Another conversation's report arrives when the host can start a turn, add in-flight input or accept a tool result | Distinguish the source and authority of a direct user instruction, agent report and tool output. Matching the active turn and destination ID alone does not establish authority or application. Separately verify host and program retention and authority, result delivery and the connection to the actual app conversation. |
 | HOST-19 | A Claude cloud task continues while the local program or app connection is unavailable and user settings, guides or external effects may change | Distinguish cloud inference, local connection, instructions actually delivered by the user, accessible current settings and effects that may already have happened. On reconnection reassess the affected parts using permitted evidence and authority; do not pretend to have heard offline changes or assume cancellation or non-send. Assess host copies and processing separately from product retention. |
+| HOST-20 | A chart execution session and a Word integration session use different file spaces, and only the result path is delivered | Do not infer actual access, read authority or attribution of the correct result merely from receiving a path. Check host-permitted access and delivery routes; hold only the affected integration if access is unavailable or unknown. Separately assess host retention of file copies and user authority. |
 | DELEGATE-01 | The chart assignment and two conversations share the same mistaken metric assumption | Distinguish count ratios supported by monthly totals from same-person retention requiring overlap. Do not establish meaning by arithmetic or majority alone; when needed for the decision, inspect authorized sources and definitions or ask a concrete question. Guide/context delivery and return pass through the layer. |
 | DELEGATE-02 | A chart opens but source access, editability or current version is partly unknown | Check opening, source and calculations, actual chart editing, Word figures/captions and application of delayed older results separately. Distinguish unknown checks from independent work that can proceed and appropriately communicate limitations material to interpreting a shared Word document. Specific needed checks may be delegated through the layer to an authorized tool or real conversation. |
 | GUIDE-01 | A new user has no generated guides | Use an applicable guide from the initial 48. Missing personal guidance does not block ordinary work. |
@@ -204,14 +205,14 @@ This mapping aids traceability; a documented case is not an executed or passing 
 | --- | --- |
 | REQ-01–02 interpretation, consultation, format | USER-01, USER-03 |
 | REQ-03–04 intake and real execution conversations | HOST-01, HOST-06 |
-| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12–19, DELEGATE-01–02, GUIDE-04 |
+| REQ-05–07 layer mediation, dynamic delegation, selection | HOST-02, HOST-03, HOST-05, HOST-12–20, DELEGATE-01–02, GUIDE-04 |
 | REQ-08 guidance and context for each judging conversation | HOST-07, HOST-08, HOST-12, GUIDE-07 |
 | REQ-09 personal-guide preference and baseline fallback | GUIDE-01–03, GUIDE-08–15 |
 | REQ-10 context selection and branching | CONTEXT-01–06 |
 | REQ-11 important decisions and authority | USER-02–03, TRUST-01–04 |
 | REQ-12 learning from experience and in-flight use | LEARN-01–04, LEARN-07–08, LEARN-10, LEARN-12–21 |
 | REQ-13 interruption and resumption of learning | LEARN-05–06, LEARN-09–11, LEARN-14–16, STORE-04 |
-| REQ-14–15 files, folders and external change | FILE-01–07, STORE-05 |
+| REQ-14–15 files, folders and external change | HOST-20, FILE-01–07, STORE-05 |
 | REQ-16 a team that does not make the user relay messages | HOST-02, HOST-06–07, HOST-13–19 and user-burden measurement |
 
 Roadmap P14 installation, migration and operations maps to representative cases `INSTALL-01–02`, `HOST-08` and `STORE-01–02`. Actual host recovery and distribution evidence must be obtained separately.

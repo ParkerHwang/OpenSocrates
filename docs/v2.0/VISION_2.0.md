@@ -10,6 +10,19 @@ Each person's OpenSocrates creates and develops reasoning guides from actual wor
 
 The user wants real, user-visible conversations across different apps to work as one team. That is distinct from a universal technical claim that no subagent can do anything similar. The user also chose task/expected-result prompts and reasoning guides without a predefined role roster because fixed role definitions may constrain capable models. The general effect of role prompts and the quality advantage of this choice need separate evaluation; this does not prohibit describing the capabilities, tools and results a particular assignment needs.
 
+## Operation and outstanding evidence at a glance
+
+This is the **target experience**, not a claim that the connections or quality already work.
+
+| What the user experiences | What OpenSocrates is intended to do | What development must establish |
+| --- | --- | --- |
+| Make an imperfect request in a familiar app and discuss deliverable format when useful. | Clarify purpose, choices and authority in the intake conversation; prepare suitable guidance and context. | Are settled choices preserved without repeated questions? Does intake avoid producing the actual artifact? |
+| Focus on the result and consequential decisions. | Delegate work to a separate real conversation. Open additional conversations when useful and connect requests and replies through the layer. | Can each app/mode/OS create real conversations, identify recipients, deliver guidance/context and exchange results? |
+| Explain less over time while retaining the ability to change choices and return to an earlier direction. | Develop personal guides from permitted experience and combine or reassemble them where suitable. Also use applicable guidance from the initial 48. | Does personalization actually help? Do in-flight application and learning pause/resume respect current choices? |
+| Receive a usable result in the chosen format and continue working with existing files when needed. | Return execution-session results and manage relevant file and context state. Check outside changes at the next related task. | Can the file actually be opened and edited as requested? Can outside changes, concurrent writes and user access be assessed? |
+
+When a connection is unavailable, continue feasible consultation and unrelated work while distinguishing unconfirmed starts, receipt and completion from success. Preserve current policy against copying raw conversations or workspace content into the program's persistent store. Continue with the [system structure](SYSTEM_2.0.md) for flows and failure boundaries, the [development roadmap](ROADMAP_2.0.md) for starting and integration, and the [validation plan](VALIDATION_2.0.md) for evidence and comparisons.
+
 ## Confirmed scope and deferred work
 
 | Item | First 2.0 development scope |

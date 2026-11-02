@@ -8,6 +8,8 @@ First-version targets are **the ChatGPT desktop app's Chat, Work, and Codex expe
 
 ## Current plan: reading order
 
+For the product overview, begin with **Operation and outstanding evidence at a glance** in item 1. For development, read the real-session round trip in item 2 together with **Development streams and integration seams to start now** in item 3, then use item 4 for the evidence relevant to the work. The Korean HTML combines the four source documents in the same order.
+
 1. [Product vision and requirements](VISION_2.0.md): user experience and chosen scope.
 2. [System architecture and data flow](SYSTEM_2.0.md): communication layer, real app work sessions, guide/context delivery and personal learning.
 3. [Development roadmap and handoff](ROADMAP_2.0.md): work breakdown, dependencies, open decisions and first scenario.
