@@ -42,7 +42,7 @@ recomendación. El método aporta esa estructura junto con tu solicitud habitual
 ## Empieza con tu aplicación
 
 Elige dónde quieres usar OpenSocrates.
-[Descarga v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2).
+[Descarga v1.5.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.3).
 
 <details>
 <summary><strong>Claude Chat & Cowork</strong> — sube una skill y empieza una conversación</summary>
@@ -50,7 +50,7 @@ Elige dónde quieres usar OpenSocrates.
 Para Claude web, Desktop Chat y Cowork:
 
 1. En **Settings → Capabilities**, activa **Code execution and file creation**. Si tu organización gestiona la cuenta, confirma que su política permite Skills y ejecución de código.
-2. Descarga el [ZIP de la skill de cuenta](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) y su [archivo SHA-256](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256).
+2. Descarga el [ZIP de la skill de cuenta](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip) y su [archivo SHA-256](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip.sha256).
 3. Abre **Customize → Skills → + → Create skill → Upload a skill**, sube el ZIP y actívalo. Haz una copia de seguridad de una skill OpenSocrates existente antes de reemplazarla.
 4. Añade la [instrucción de cuenta que se configura una sola vez](docs/setup-guide.md#claude-standing-instructions) a cada cuenta Claude que uses, conservando tus instrucciones actuales. Empieza una conversación nueva y describe tu tarea.
 
@@ -67,8 +67,8 @@ y una cuenta Claude con sesión iniciada. Funciona con Claude Code en la termina
 y Code local de Claude Desktop. Ejecuta en **Terminal**:
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 diagnose --host claude
+npx --yes opensocrates@1.5.3 install --host claude
+npx --yes opensocrates@1.5.3 diagnose --host claude
 ```
 
 Confirma `enabled: true`, `integrity: verified` y `registration: confirmed`.
@@ -84,8 +84,8 @@ Necesitas [Node.js 20 o posterior](https://nodejs.org/en/download) y Codex. El e
 nativo viene incluido en el paquete. Ejecuta en **Terminal en Mac** o **PowerShell en Windows**:
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host codex
-npx --yes opensocrates@1.5.2 status --host codex
+npx --yes opensocrates@1.5.3 install --host codex
+npx --yes opensocrates@1.5.3 status --host codex
 ```
 
 Abre Codex interactivo y escribe `/hooks` en el campo de entrada. Revisa las siete
@@ -96,7 +96,7 @@ después empieza una conversación nueva.
 Para actualizar una instalación Codex existente:
 
 ```sh
-npx --yes opensocrates@1.5.2 update --host codex
+npx --yes opensocrates@1.5.3 update --host codex
 ```
 
 </details>
@@ -109,7 +109,7 @@ de trabajo y sustituye el ejemplo por la ruta completa de una carpeta que ya
 exista. Ejecuta en **Terminal en Mac** o **PowerShell en Windows**:
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.3 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
 En Windows, usa una ruta de unidad local entre comillas, como `"C:\Work\Reading Workshop"`.

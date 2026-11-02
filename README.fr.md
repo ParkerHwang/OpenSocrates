@@ -44,7 +44,7 @@ habituelle.
 ## Commencer avec votre application
 
 Choisissez où vous souhaitez utiliser OpenSocrates.
-[Télécharger v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2).
+[Télécharger v1.5.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.3).
 
 <details>
 <summary><strong>Claude Chat et Cowork</strong> — téléverser une compétence et commencer une conversation</summary>
@@ -52,7 +52,7 @@ Choisissez où vous souhaitez utiliser OpenSocrates.
 Pour Claude web, Desktop Chat et Cowork :
 
 1. Dans **Settings → Capabilities**, activez **Code execution and file creation**. Pour un compte géré par une organisation, vérifiez que sa politique autorise les Skills et l’exécution de code.
-2. Téléchargez le [ZIP de la compétence de compte](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) et son [fichier SHA-256](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256).
+2. Téléchargez le [ZIP de la compétence de compte](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip) et son [fichier SHA-256](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip.sha256).
 3. Ouvrez **Customize → Skills → + → Create skill → Upload a skill**, téléversez le ZIP et activez la compétence. Sauvegardez toute compétence OpenSocrates existante avant de la remplacer.
 4. Ajoutez la [consigne de compte à configurer une seule fois](docs/setup-guide.md#claude-standing-instructions) à chaque compte Claude utilisé, sans effacer vos consignes existantes. Commencez une nouvelle conversation et décrivez votre tâche.
 
@@ -70,8 +70,8 @@ dans le terminal et le mode Code local de Claude Desktop. Exécutez dans le
 **Terminal** :
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 diagnose --host claude
+npx --yes opensocrates@1.5.3 install --host claude
+npx --yes opensocrates@1.5.3 diagnose --host claude
 ```
 
 Vérifiez `enabled: true`, `integrity: verified` et `registration: confirmed`.
@@ -88,8 +88,8 @@ Codex. Le moteur natif est fourni avec le paquet. Exécutez dans le **Terminal s
 Mac** ou dans **PowerShell sous Windows** :
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host codex
-npx --yes opensocrates@1.5.2 status --host codex
+npx --yes opensocrates@1.5.3 install --host codex
+npx --yes opensocrates@1.5.3 status --host codex
 ```
 
 Ouvrez Codex en mode interactif et saisissez `/hooks` dans le champ de saisie.
@@ -100,7 +100,7 @@ vous faites confiance, puis commencez une nouvelle conversation.
 Pour mettre à jour une installation Codex existante :
 
 ```sh
-npx --yes opensocrates@1.5.2 update --host codex
+npx --yes opensocrates@1.5.3 update --host codex
 ```
 
 </details>
@@ -114,7 +114,7 @@ dossier existant. Exécutez dans le **Terminal sur Mac** ou dans **PowerShell so
 Windows** :
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.3 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
 Sous Windows, utilisez un chemin de lecteur local entre guillemets, comme

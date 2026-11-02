@@ -43,7 +43,7 @@ OpenSocrates は、**Claude、Codex、Antigravity** で繰り返し使える思�
 ## 使うアプリから始める
 
 OpenSocrates を使いたいアプリを選んでください。
-[v1.5.2 を入手する](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2)
+[v1.5.3 を入手する](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.3)
 
 <details>
 <summary><strong>Claude Chat・Cowork</strong> — スキルをアップロードして会話を始める</summary>
@@ -51,7 +51,7 @@ OpenSocrates を使いたいアプリを選んでください。
 Claude Web、Desktop Chat、Cowork での設定：
 
 1. **Settings → Capabilities** で **Code execution and file creation** を有効にします。組織で管理されているアカウントの場合は、組織のポリシーで Skills とコード実行が許可されていることを確認してください。
-2. [アカウント用スキル ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) と [SHA-256 ファイル](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256) をダウンロードします。
+2. [アカウント用スキル ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip) と [SHA-256 ファイル](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip.sha256) をダウンロードします。
 3. **Customize → Skills → + → Create skill → Upload a skill** を開き、ZIP をアップロードして有効にします。既存の OpenSocrates スキルを置き換える場合は、先にバックアップしてください。
 4. 使う Claude アカウントごとに、既存の指示を維持しながら[アカウント用の指示を一度追加](docs/setup-guide.md#claude-standing-instructions)します。新しい会話を開き、課題を説明してください。
 
@@ -68,8 +68,8 @@ Claude アカウントが必要です。ターミナルの Claude Code と Claud
 ローカル Code で使えます。**ターミナル**で実行してください。
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 diagnose --host claude
+npx --yes opensocrates@1.5.3 install --host claude
+npx --yes opensocrates@1.5.3 diagnose --host claude
 ```
 
 `enabled: true`、`integrity: verified`、`registration: confirmed` を確認してください。
@@ -86,8 +86,8 @@ npx --yes opensocrates@1.5.2 diagnose --host claude
 **Mac のターミナル**または **Windows の PowerShell** で実行してください。
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host codex
-npx --yes opensocrates@1.5.2 status --host codex
+npx --yes opensocrates@1.5.3 install --host codex
+npx --yes opensocrates@1.5.3 status --host codex
 ```
 
 対話型 Codex の入力欄に `/hooks` を入力します。OpenSocrates の 7 個のフック定義を
@@ -97,7 +97,7 @@ npx --yes opensocrates@1.5.2 status --host codex
 既存の Codex インストールを更新する場合：
 
 ```sh
-npx --yes opensocrates@1.5.2 update --host codex
+npx --yes opensocrates@1.5.3 update --host codex
 ```
 
 </details>
@@ -110,7 +110,7 @@ npx --yes opensocrates@1.5.2 update --host codex
 **Mac のターミナル**または **Windows の PowerShell** で実行します。
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.3 install --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
 Windows では `"C:\Work\Reading Workshop"` のように引用符で囲んだローカルドライブの

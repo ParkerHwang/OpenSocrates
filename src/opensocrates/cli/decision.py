@@ -49,8 +49,9 @@ def run_decision(stdin: TextIO, stdout: TextIO, *, stream: bool = False) -> int:
             return 0
         try:
             request = json.loads(payload)
-        except ValueError:
+        except (ValueError, RecursionError):
             # Malformed input (often shell quoting) is repairable; it is not runtime unavailability.
+            # Unclosed nesting can exhaust the decoder before it reports a syntax error.
             response = fault_response("request", "invalid_json")
         else:
             try:
