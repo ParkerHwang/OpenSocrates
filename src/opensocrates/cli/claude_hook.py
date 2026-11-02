@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import TextIO
 
 from ..hosts.claude.adapter import build_entry_response
-from ..hosts.claude.native import MAX_PAYLOAD_CHARS, parse_claude_event
+from ..hosts.claude.native import MAX_SUBMIT_BYTES, parse_claude_event
 from ..hosts.claude.responses import serialize_response
 
 
@@ -30,7 +30,7 @@ def run_claude_hook(stdin: TextIO, stdout: TextIO, *, plugin_root: Path | None =
     """Return zero with literal empty stdout on every unavailable/error path."""
 
     try:
-        raw = stdin.read(MAX_PAYLOAD_CHARS + 1)
+        raw = stdin.read(MAX_SUBMIT_BYTES + 1)
         event = parse_claude_event(raw)
         if event is None:
             return 0

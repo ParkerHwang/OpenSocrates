@@ -299,6 +299,34 @@ def _readme_errors(path: Path, host: str = "codex", target: str | None = None) -
     return errors
 
 
+def _living_guide_version_errors(root: Path) -> list[str]:
+    version_file = root / "VERSION"
+    if not version_file.is_file():
+        return []
+    version = version_file.read_text(encoding="utf-8").strip()
+    if not version:
+        return ["living_guide_version_file_empty"]
+    guides = (
+        ("setup_guide_en", root / "docs" / "setup-guide.md"),
+        ("setup_guide_ko", root / "docs" / "setup-guide.ko.md"),
+        ("agent_discovery_en", root / "docs" / "agent-discovery.md"),
+        ("agent_discovery_ko", root / "docs" / "agent-discovery.ko.md"),
+    )
+    errors: list[str] = []
+    for label, path in guides:
+        if not path.is_file():
+            errors.append(f"{label}_missing")
+            continue
+        text = path.read_text(encoding="utf-8")
+        npx_pins = re.findall(r"opensocrates@(\d+\.\d+\.\d+)", text)
+        tag_pins = re.findall(r"releases/tag/v(\d+\.\d+\.\d+)", text)
+        if not npx_pins or set(npx_pins) != {version}:
+            errors.append(f"{label}_npx_version_mismatch")
+        if not tag_pins or set(tag_pins) != {version}:
+            errors.append(f"{label}_release_tag_version_mismatch")
+    return errors
+
+
 def check_root(root: Path) -> dict[str, Any]:
     readmes = list(_package_readmes(root))
     present_hosts = {host for host, _label, _path, _target in readmes}
@@ -322,6 +350,12 @@ def check_root(root: Path) -> dict[str, Any]:
         "error_codes": boundary_errors,
     }
     errors.extend(boundary_errors)
+    guide_errors = _living_guide_version_errors(root)
+    documents["living_guides"] = {
+        "status": "fail" if guide_errors else "pass",
+        "error_codes": guide_errors,
+    }
+    errors.extend(guide_errors)
     return {
         "status": "fail" if errors else "pass",
         "documents": documents,

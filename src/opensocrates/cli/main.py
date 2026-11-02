@@ -307,7 +307,7 @@ def main(  # noqa: C901  # Branch-explicit contract; reviewed for v1.0.
             from .control import run_control
 
             return run_control(stdin or sys.stdin, output_stream, application)
-    if args.command == "diagnose":
+    elif args.command == "diagnose":
         result = render_diagnose(_diagnose(runtime, args.host), output=args.output or "json")  # type: ignore[arg-type]  # Closed runtime boundary validates this value.
     elif args.command == "rigor":
         repository = getattr(runtime, "settings_store", None)

@@ -9,18 +9,18 @@ bootstrap:
 	@if command -v uv >/dev/null 2>&1; then uv lock --check && uv sync --locked --no-install-project; else "$(PYTHON)" -m mypy --version && "$(PYTHON)" -m ruff --version; fi
 
 format:
-	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format src tools; else "$(PYTHON)" -m ruff format src tools; fi
+	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format src tools docs/experiments/office-81; else "$(PYTHON)" -m ruff format src tools docs/experiments/office-81; fi
 
 format-check:
-	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format --check src tools; else "$(PYTHON)" -m ruff format --check src tools; fi
+	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff format --check src tools docs/experiments/office-81; else "$(PYTHON)" -m ruff format --check src tools docs/experiments/office-81; fi
 
 lint: typecheck
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_import_boundaries.py
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) tools/check_generated_contract.py
-	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff check src tools; else "$(PYTHON)" -m ruff check src tools; fi
+	@if command -v uv >/dev/null 2>&1; then uv run --locked --no-sync ruff check src tools docs/experiments/office-81; else "$(PYTHON)" -m ruff check src tools docs/experiments/office-81; fi
 
 typecheck:
-	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m compileall -q src tools
+	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m compileall -q src tools docs/experiments/office-81
 	@if command -v uv >/dev/null 2>&1; then MYPYPATH=$(PYTHONPATH) uv run --locked --no-sync mypy src; else MYPYPATH=$(PYTHONPATH) "$(PYTHON)" -m mypy src; fi
 
 generate:
@@ -82,9 +82,21 @@ docs-check:
 		--path README.es.md \
 		--path README.pt.md \
 		--path README.th.md \
+		--path docs/v1.5.3.md \
+		--path docs/v1.5.3.ko.md \
 		--path docs/v1.5.2.md \
 		--path docs/v1.5.2.ko.md \
 		--path docs/v1.5.2-language-review.md \
+		--path docs/clean-machine-acceptance.md \
+		--path docs/clean-machine-acceptance.ko.md \
+		--path docs/codex-large-submission-entry.md \
+		--path docs/codex-large-submission-entry.ko.md \
+		--path docs/windows-support.md \
+		--path docs/windows-support.ko.md \
+		--path docs/v2.0 \
+		--path docs/work-facts \
+		--path docs/experiments/office-81 \
+		--path evals/office-work-v1 \
 		--path docs/settings.md \
 		--path docs/settings.ko.md \
 		--path docs/v1.5.1.md \
@@ -127,6 +139,16 @@ docs-check:
 		--path evals/v1.2/ADJUDICATION_GUIDE.md \
 		--path evals/v1.2/ADJUDICATION_AI_AMENDMENT.md \
 		--path .github/release-notes \
+		--path docs/v2.0/README.md \
+		--path docs/v2.0/README.ko.md \
+		--path docs/v2.0/RELEASE_BASELINE_1.5.3.md \
+		--path docs/v2.0/IMPLEMENTATION_BACKLOG.md \
+		--path docs/v2.0/MASTER_PLAN.md \
+		--path docs/v2.0/START_HERE.md \
+		--path docs/v2.0/ARCHITECTURE_AND_MIGRATION.md \
+		--path docs/v2.0/EVALUATION_CASES.md \
+		--path docs/v2.0/HOSTS_AND_BOTS.md \
+		--path docs/v2.0/PRODUCT_AND_EVALUATION.md \
 		--report build/evidence/links.json
 
 governance-check:
@@ -161,6 +183,7 @@ smoke: evaluation-lab-check
 	@PYTHONPATH="$(PYTHONPATH):tools" "$(PYTHON)" tools/check_swarm_study_audit.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/smoke_product.py
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_selector.py
+	@"$(PYTHON)" -m unittest discover -s docs/experiments/office-81 -p 'test_*.py'
 
 installer-check:
 	@npm test
