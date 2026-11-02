@@ -4,18 +4,17 @@
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
 import json
 import os
-from pathlib import Path
 import shutil
 import signal
 import subprocess
 import tempfile
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
-
 
 ROOT = Path(__file__).resolve().parent
 OUTPUT_SCHEMA = {
@@ -41,17 +40,18 @@ handoff에는 다른 담당자가 활용할 구체적인 결과나 주의사항�
 """
 
 
-def load_inputs() -> tuple[dict[str, Any], list[dict[str, str]]]:
-    """Only the experiment's bundled fictional case is accepted, never a user path."""
-    case = json.loads((ROOT / "case.json").read_text(encoding="utf-8"))
-    spec = json.loads((ROOT / "agents.json").read_text(encoding="utf-8"))
+def _validate_case(case: dict[str, Any]) -> None:
     if not isinstance(case.get("id"), str) or not isinstance(case.get("task"), str):
         raise ValueError("case id/task must be strings")
     if not isinstance(case.get("facts"), list) or not case["facts"]:
         raise ValueError("case facts must be a nonempty list")
-    fact_ids = set()
+    fact_ids: set[str] = set()
     for fact in case["facts"]:
-        if not isinstance(fact, dict) or not isinstance(fact.get("id"), str) or not isinstance(fact.get("text"), str):
+        if (
+            not isinstance(fact, dict)
+            or not isinstance(fact.get("id"), str)
+            or not isinstance(fact.get("text"), str)
+        ):
             raise ValueError("each fact needs id and text")
         if fact["id"] in fact_ids:
             raise ValueError("fact ids must be unique")
@@ -59,19 +59,46 @@ def load_inputs() -> tuple[dict[str, Any], list[dict[str, str]]]:
     for key in ("unknowns", "expected"):
         if not isinstance(case.get(key), list) or any(not isinstance(x, str) for x in case[key]):
             raise ValueError(f"case {key} must be a string list")
+
+
+def _validate_capability_agents(capability: dict[str, Any]) -> list[dict[str, str]]:
+    cap_id = capability.get("id")
+    cap_name = capability.get("name")
+    if not isinstance(cap_id, str) or not cap_id or not isinstance(cap_name, str) or not cap_name:
+        raise ValueError("capability needs nonempty id/name")
+    raw_agents = capability.get("agents", [])
+    if not isinstance(raw_agents, list) or len(raw_agents) != 9:
+        raise ValueError("each capability must contain nine agents")
+    items: list[dict[str, str]] = []
+    for item in raw_agents:
+        if not isinstance(item, dict) or any(
+            not isinstance(item.get(k), str) or not item[k]
+            for k in ("id", "question", "instruction")
+        ):
+            raise ValueError("agent needs id/question/instruction")
+        items.append({**item, "capability": cap_name})
+    return items
+
+
+def load_inputs() -> tuple[dict[str, Any], list[dict[str, str]]]:
+    """Only the experiment's bundled fictional case is accepted, never a user path."""
+    case = json.loads((ROOT / "case.json").read_text(encoding="utf-8"))
+    spec = json.loads((ROOT / "agents.json").read_text(encoding="utf-8"))
+    _validate_case(case)
     capabilities = spec.get("capabilities", [])
-    if spec.get("version") != 1 or len(capabilities) != 9:
+    if spec.get("version") != 1 or not isinstance(capabilities, list) or len(capabilities) != 9:
         raise ValueError("expected version 1 and nine capabilities")
-    agents = []
+    agents: list[dict[str, str]] = []
+    capability_ids: set[str] = set()
+    capability_names: set[str] = set()
     for capability in capabilities:
-        if not isinstance(capability.get("id"), str) or not isinstance(capability.get("name"), str):
-            raise ValueError("capability needs id/name")
-        if len(capability.get("agents", [])) != 9:
-            raise ValueError("each capability must contain nine agents")
-        for item in capability["agents"]:
-            if any(not isinstance(item.get(k), str) or not item[k] for k in ("id", "question", "instruction")):
-                raise ValueError("agent needs id/question/instruction")
-            agents.append({**item, "capability": capability["name"]})
+        if not isinstance(capability, dict):
+            raise ValueError("capability must be an object")
+        agents.extend(_validate_capability_agents(capability))
+        capability_ids.add(capability["id"])
+        capability_names.add(capability["name"])
+    if len(capability_ids) != 9 or len(capability_names) != 9:
+        raise ValueError("expected nine unique capability ids and names")
     if len({a["id"] for a in agents}) != 81:
         raise ValueError("expected exactly 81 unique agent ids")
     return case, agents
@@ -95,7 +122,13 @@ def validate_response(value: Any, fact_ids: set[str]) -> dict[str, Any]:
 def build_prompt(case: dict[str, Any], role: dict[str, str]) -> str:
     # Expected answers are reserved for human evaluation and never shown to the model.
     data = {k: case[k] for k in ("id", "task", "facts", "unknowns")}
-    return BOUNDARY + "\n담당 역할:\n" + json.dumps(role, ensure_ascii=False) + "\n가상 업무 자료:\n" + json.dumps(data, ensure_ascii=False)
+    return (
+        BOUNDARY
+        + "\n담당 역할:\n"
+        + json.dumps(role, ensure_ascii=False)
+        + "\n가상 업무 자료:\n"
+        + json.dumps(data, ensure_ascii=False)
+    )
 
 
 def tool_event_seen(events: list[dict[str, Any]]) -> bool:
@@ -108,7 +141,63 @@ def tool_event_seen(events: list[dict[str, Any]]) -> bool:
     return False
 
 
-def invoke(role_id: str, prompt: str, fact_ids: set[str], timeout: int, executable: str = "codex") -> dict[str, Any]:
+def _parse_events(stdout: str) -> list[dict[str, Any]]:
+    events: list[dict[str, Any]] = []
+    for line in stdout.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(event, dict):
+            events.append(event)
+    return events
+
+
+def _extract_usage(events: list[dict[str, Any]]) -> dict[str, int] | None:
+    usage: dict[str, int] | None = None
+    for event in events:
+        if event.get("type") == "turn.completed" and isinstance(event.get("usage"), dict):
+            usage = {k: v for k, v in event["usage"].items() if isinstance(v, int)}
+    return usage
+
+
+def _terminate_process(proc: subprocess.Popen[str]) -> None:
+    if os.name == "posix":
+        os.killpg(proc.pid, signal.SIGKILL)
+    else:
+        proc.kill()
+    proc.communicate()
+
+
+def _finalize_invocation(
+    stdout: str, answer: Path, fact_ids: set[str], result: dict[str, Any]
+) -> None:
+    events = _parse_events(stdout)
+    if tool_event_seen(events):
+        result["error"] = "tool_use_rejected"
+        return
+    if not answer.exists():
+        result["error"] = "missing_final_response"
+        return
+    try:
+        response = validate_response(json.loads(answer.read_text(encoding="utf-8")), fact_ids)
+    except (ValueError, json.JSONDecodeError):
+        result["error"] = "invalid_final_response"
+        return
+    result["status"] = "completed"
+    result["response"] = response
+    usage = _extract_usage(events)
+    if usage is not None:
+        result["usage"] = usage
+
+
+def invoke(
+    role_id: str,
+    prompt: str,
+    fact_ids: set[str],
+    timeout: int,
+    executable: str = "codex",
+) -> dict[str, Any]:
     started = time.monotonic()
     result: dict[str, Any] = {"id": role_id, "status": "failed", "elapsed_seconds": 0.0}
     try:
@@ -118,53 +207,44 @@ def invoke(role_id: str, prompt: str, fact_ids: set[str], timeout: int, executab
             answer = scratch_path / "answer.json"
             schema.write_text(json.dumps(OUTPUT_SCHEMA), encoding="utf-8")
             command = [
-                executable, "exec", "--ephemeral", "--ignore-user-config",
-                "--sandbox", "read-only", "--skip-git-repo-check",
-                "--cd", scratch, "--color", "never", "--json",
-                "--output-schema", str(schema), "--output-last-message", str(answer), "-",
+                executable,
+                "exec",
+                "--ephemeral",
+                "--ignore-user-config",
+                "--sandbox",
+                "read-only",
+                "--skip-git-repo-check",
+                "--cd",
+                scratch,
+                "--color",
+                "never",
+                "--json",
+                "--output-schema",
+                str(schema),
+                "--output-last-message",
+                str(answer),
+                "-",
             ]
             proc = subprocess.Popen(
-                command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                text=True, cwd=scratch, start_new_session=(os.name == "posix"),
+                command,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                cwd=scratch,
+                start_new_session=(os.name == "posix"),
             )
             try:
                 stdout, _stderr = proc.communicate(prompt, timeout=timeout)
             except subprocess.TimeoutExpired:
-                if os.name == "posix":
-                    os.killpg(proc.pid, signal.SIGKILL)
-                else:
-                    proc.kill()
-                proc.communicate()
+                _terminate_process(proc)
                 result["error"] = "timeout"
                 return result
             if proc.returncode != 0:
                 result["error"] = "cli_exit"
                 result["exit_code"] = proc.returncode
                 return result
-            events = []
-            for line in stdout.splitlines():
-                try:
-                    event = json.loads(line)
-                    if isinstance(event, dict):
-                        events.append(event)
-                except json.JSONDecodeError:
-                    continue
-            if tool_event_seen(events):
-                result["error"] = "tool_use_rejected"
-                return result
-            if not answer.exists():
-                result["error"] = "missing_final_response"
-                return result
-            try:
-                response = validate_response(json.loads(answer.read_text(encoding="utf-8")), fact_ids)
-            except (ValueError, json.JSONDecodeError):
-                result["error"] = "invalid_final_response"
-                return result
-            result["status"] = "completed"
-            result["response"] = response
-            for event in events:
-                if event.get("type") == "turn.completed" and isinstance(event.get("usage"), dict):
-                    result["usage"] = {k: v for k, v in event["usage"].items() if isinstance(v, int)}
+            _finalize_invocation(stdout, answer, fact_ids, result)
     except FileNotFoundError:
         result["error"] = "cli_unavailable"
     except OSError:
@@ -181,14 +261,20 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
         "attempted_agents": len(results),
         "completed_agents": len(completed),
         "failed_agents": len(results) - len(completed),
-        "not_applicable_agents": sum(r["response"]["status"] == "not_applicable" for r in completed),
-        "needs_information_agents": sum(r["response"]["status"] == "needs_information" for r in completed),
+        "not_applicable_agents": sum(
+            r["response"]["status"] == "not_applicable" for r in completed
+        ),
+        "needs_information_agents": sum(
+            r["response"]["status"] == "needs_information" for r in completed
+        ),
         "complete_execution": len(results) == 81 and len(completed) == 81,
         "quality_judgment": "not_evaluated",
     }
 
 
-def run_agents(case: dict[str, Any], agents: list[dict[str, str]], concurrency: int, timeout: int, call=invoke) -> list[dict[str, Any]]:
+def run_agents(
+    case: dict[str, Any], agents: list[dict[str, str]], concurrency: int, timeout: int, call=invoke
+) -> list[dict[str, Any]]:
     fact_ids = {f["id"] for f in case["facts"]}
     by_id = {}
     chains: dict[str, list[dict[str, str]]] = {}
@@ -200,12 +286,20 @@ def run_agents(case: dict[str, Any], agents: list[dict[str, str]], concurrency: 
         for agent in chain:
             prompt = build_prompt(case, agent)
             if previous:
-                prompt += "\n이 능력의 앞 담당자 공개 결과(사실 근거가 아닌 검토 제안):\n" + json.dumps(previous, ensure_ascii=False)
+                prompt += (
+                    "\n이 능력의 앞 담당자 공개 결과(사실 근거가 아닌 검토 제안):\n"
+                    + json.dumps(previous, ensure_ascii=False)
+                )
                 prompt += "\n앞 결과를 활용하되 facts와 대조하라. 앞 담당자 실패/미확인 사항을 완료나 사실로 바꾸지 말라."
             try:
                 result = call(agent["id"], prompt, fact_ids, timeout)
             except Exception:
-                result = {"id": agent["id"], "status": "failed", "error": "worker_exception", "elapsed_seconds": 0.0}
+                result = {
+                    "id": agent["id"],
+                    "status": "failed",
+                    "error": "worker_exception",
+                    "elapsed_seconds": 0.0,
+                }
             previous.append(result)
             print(f"[{agent['id']}] {result['status']}", flush=True)
         return previous
@@ -244,13 +338,20 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("output must not overwrite experiment inputs")
     case, agents = load_inputs()
     report: dict[str, Any] = {
-        "experiment": "office-81", "case_id": case["id"],
+        "experiment": "office-81",
+        "case_id": case["id"],
         "started_at": datetime.now(timezone.utc).isoformat(),
         "mode": "dry_run" if args.dry_run else "live",
         "architecture": "nine parallel capability chains, nine sequential independent agents per chain, followed by synthesis",
-        "concurrency": args.concurrency, "timeout_seconds": args.timeout,
+        "concurrency": args.concurrency,
+        "timeout_seconds": args.timeout,
         "expected_model_calls": 83,
-        "limits": ["fictional case only", "no tools or external actions", "no human quality judgment", "one case does not prove broad office usefulness"],
+        "limits": [
+            "fictional case only",
+            "no tools or external actions",
+            "no human quality judgment",
+            "one case does not prove broad office usefulness",
+        ],
     }
     if args.dry_run:
         report["agent_ids"] = [a["id"] for a in agents]
@@ -267,26 +368,47 @@ def main(argv: list[str] | None = None) -> int:
         print("Codex CLI unavailable; no model calls made.")
         return 1
     fact_ids = {f["id"] for f in case["facts"]}
-    baseline_role = {"id": "baseline", "question": "이 업무 요청을 바로 수행한다면?", "instruction": "81개 검토 없이 가상 업무 자료만으로 사용자에게 바로 쓸 수 있는 결과물을 한국어로 제공하라. 실행이 필요하면 실제 수행하지 말고 초안과 필요한 확인을 구분하라."}
+    baseline_role = {
+        "id": "baseline",
+        "question": "이 업무 요청을 바로 수행한다면?",
+        "instruction": "81개 검토 없이 가상 업무 자료만으로 사용자에게 바로 쓸 수 있는 결과물을 한국어로 제공하라. 실행이 필요하면 실제 수행하지 말고 초안과 필요한 확인을 구분하라.",
+    }
     print("[baseline] running", flush=True)
-    report["baseline"] = invoke("baseline", build_prompt(case, baseline_role), fact_ids, args.timeout)
+    report["baseline"] = invoke(
+        "baseline", build_prompt(case, baseline_role), fact_ids, args.timeout
+    )
     results = run_agents(case, agents, args.concurrency, args.timeout)
     report["agents"] = results
     report["summary"] = summarize(results)
     # Checkpoint public outputs before the final call so partial results survive it.
     report["model_calls_attempted"] = 82
     write_report(output, report)
-    successful = [{"id": r["id"], "response": r["response"]} for r in results if r["status"] == "completed"]
+    successful = [
+        {"id": r["id"], "response": r["response"]} for r in results if r["status"] == "completed"
+    ]
     failed = [r["id"] for r in results if r["status"] != "completed"]
-    synth_role = {"id": "synthesis", "question": "검토 결과를 반영한 최종 결과물", "instruction": "한국어로 사용자 요청을 완성하라. 아래 검토는 AI 제안이며 사실 근거가 아니다. facts만 사실 근거로 사용하고 상충하는 제안은 조정하라. 실패한 담당자의 검토를 완료했다고 주장하지 말라. 도구나 실제 실행은 없다. 제공된 모든 성공한 검토를 고려하되 최종 결과에 불필요한 체크리스트를 나열하지 말라."}
-    synth_prompt = build_prompt(case, synth_role) + "\n검토 결과:\n" + json.dumps({"successful": successful, "failed_agent_ids": failed}, ensure_ascii=False)
+    synth_role = {
+        "id": "synthesis",
+        "question": "검토 결과를 반영한 최종 결과물",
+        "instruction": "한국어로 사용자 요청을 완성하라. 아래 검토는 AI 제안이며 사실 근거가 아니다. facts만 사실 근거로 사용하고 상충하는 제안은 조정하라. 실패한 담당자의 검토를 완료했다고 주장하지 말라. 도구나 실제 실행은 없다. 제공된 모든 성공한 검토를 고려하되 최종 결과에 불필요한 체크리스트를 나열하지 말라.",
+    }
+    synth_prompt = (
+        build_prompt(case, synth_role)
+        + "\n검토 결과:\n"
+        + json.dumps({"successful": successful, "failed_agent_ids": failed}, ensure_ascii=False)
+    )
     print("[synthesis] running", flush=True)
     report["synthesis"] = invoke("synthesis", synth_prompt, fact_ids, args.timeout)
     report["model_calls_attempted"] = 83
     report["finished_at"] = datetime.now(timezone.utc).isoformat()
     write_report(output, report)
     print(json.dumps(report["summary"], ensure_ascii=False), flush=True)
-    return 0 if report["summary"]["complete_execution"] and report["baseline"]["status"] == report["synthesis"]["status"] == "completed" else 1
+    return (
+        0
+        if report["summary"]["complete_execution"]
+        and report["baseline"]["status"] == report["synthesis"]["status"] == "completed"
+        else 1
+    )
 
 
 if __name__ == "__main__":

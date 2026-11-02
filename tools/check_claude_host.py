@@ -24,6 +24,7 @@ from opensocrates.hosts.claude.adapter import REFERENCE_PATHS  # noqa: E402
 from opensocrates.hosts.claude.commands import build_hooks  # noqa: E402
 from opensocrates.hosts.claude.native import (  # noqa: E402
     MAX_PAYLOAD_CHARS,
+    MAX_SUBMIT_BYTES,
     parse_claude_event,
 )
 from opensocrates.hosts.claude.responses import entry_response  # noqa: E402
@@ -165,15 +166,34 @@ class ClaudeContractTests(unittest.TestCase):
             with self.subTest(raw=raw):
                 self.assertEqual(self.call(raw), "")
 
+    def test_large_user_prompt_submit_emits_entry_without_retaining_prompt(self) -> None:
+        large_prompt = "synthetic-large-submission-" + ("x" * 96_732)
+        raw = _payload("UserPromptSubmit", prompt=large_prompt)
+        response = self.call(raw)
+        parsed = json.loads(response)
+        self.assertEqual(parsed["hookSpecificOutput"]["hookEventName"], "UserPromptSubmit")
+        self.assertIn(ENTRY_GUIDANCE, parsed["hookSpecificOutput"]["additionalContext"])
+        self.assertNotIn("synthetic-large-submission", response)
+
     def test_excessive_input(self) -> None:
-        self.assertEqual(
-            self.call(_payload("UserPromptSubmit", prompt="x" * MAX_PAYLOAD_CHARS)), ""
-        )
+        self.assertEqual(self.call(_payload("SessionStart", extra="x" * MAX_PAYLOAD_CHARS)), "")
+        self.assertEqual(self.call(_payload("Stop", extra="x" * MAX_PAYLOAD_CHARS)), "")
+        self.assertEqual(self.call(_payload("UserPromptSubmit", prompt="x" * MAX_SUBMIT_BYTES)), "")
+
+    def test_submit_limit_is_utf8_bytes_including_envelope(self) -> None:
+        prefix = '{"hook_event_name":"UserPromptSubmit","prompt":"'
+        suffix = '"}'
+        padding = MAX_SUBMIT_BYTES - len((prefix + suffix).encode("utf-8"))
+        at_limit = prefix + ("x" * (padding - 3)) + "한" + suffix
+        self.assertEqual(len(at_limit.encode("utf-8")), MAX_SUBMIT_BYTES)
+        self.assertIsNotNone(parse_claude_event(at_limit))
+        self.assertTrue(self.call(at_limit))
+        self.assertEqual(self.call(at_limit.replace("한", "한x")), "")
 
     def test_bounded_read(self) -> None:
         class BoundedStream(io.StringIO):
             def read(self, size: int = -1) -> str:
-                if size != MAX_PAYLOAD_CHARS + 1:
+                if size != MAX_SUBMIT_BYTES + 1:
                     raise AssertionError("unbounded native input read")
                 return super().read(size)
 

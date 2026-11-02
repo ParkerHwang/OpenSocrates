@@ -4,9 +4,9 @@ import contextlib
 import importlib.util
 import io
 import json
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 SPEC = importlib.util.spec_from_file_location("office81_run", Path(__file__).with_name("run.py"))
@@ -15,7 +15,13 @@ SPEC.loader.exec_module(harness)
 
 
 def response():
-    return {"status": "ready", "answer": "A public result", "evidence_ids": ["F1"], "unknowns": [], "handoff": []}
+    return {
+        "status": "ready",
+        "answer": "A public result",
+        "evidence_ids": ["F1"],
+        "unknowns": [],
+        "handoff": [],
+    }
 
 
 class HarnessTests(unittest.TestCase):
@@ -30,8 +36,17 @@ class HarnessTests(unittest.TestCase):
             harness.validate_response(value, {"F1"})
 
     def test_partial_failure_is_not_complete_execution(self):
-        agents = [{"id": f"agent_{i}", "capability": f"c{i // 9}", "question": "q", "instruction": "i"} for i in range(81)]
-        case = {"id": "synthetic", "task": "draft", "facts": [{"id": "F1", "text": "fiction"}], "unknowns": [], "expected": ["secret evaluator answer"]}
+        agents = [
+            {"id": f"agent_{i}", "capability": f"c{i // 9}", "question": "q", "instruction": "i"}
+            for i in range(81)
+        ]
+        case = {
+            "id": "synthetic",
+            "task": "draft",
+            "facts": [{"id": "F1", "text": "fiction"}],
+            "unknowns": [],
+            "expected": ["secret evaluator answer"],
+        }
 
         def fake_call(agent_id, prompt, fact_ids, timeout):
             self.assertNotIn("secret evaluator answer", prompt)
@@ -52,8 +67,14 @@ class HarnessTests(unittest.TestCase):
         self.assertEqual([r["id"] for r in results], [a["id"] for a in agents])
 
     def test_tool_execution_is_rejected(self):
-        self.assertTrue(harness.tool_event_seen([{"type": "item.completed", "item": {"type": "command_execution"}}]))
-        self.assertFalse(harness.tool_event_seen([{"type": "item.completed", "item": {"type": "agent_message"}}]))
+        self.assertTrue(
+            harness.tool_event_seen(
+                [{"type": "item.completed", "item": {"type": "command_execution"}}]
+            )
+        )
+        self.assertFalse(
+            harness.tool_event_seen([{"type": "item.completed", "item": {"type": "agent_message"}}])
+        )
 
     def test_invocation_is_ephemeral_and_uses_isolated_cwd(self):
         captured = {}
@@ -68,14 +89,24 @@ class HarnessTests(unittest.TestCase):
 
             def communicate(self, prompt=None, timeout=None):
                 self.answer.write_text(json.dumps(response()), encoding="utf-8")
-                return '{"type":"turn.completed","usage":{"input_tokens":3}}\n', "private diagnostics"
+                return (
+                    '{"type":"turn.completed","usage":{"input_tokens":3}}\n',
+                    "private diagnostics",
+                )
 
         with patch.object(harness.subprocess, "Popen", FakeProcess):
             result = harness.invoke("test", "synthetic prompt", {"F1"}, 30)
         self.assertEqual(result["status"], "completed")
-        for flag in ("--ephemeral", "--ignore-user-config", "--output-schema", "--skip-git-repo-check"):
+        for flag in (
+            "--ephemeral",
+            "--ignore-user-config",
+            "--output-schema",
+            "--skip-git-repo-check",
+        ):
             self.assertIn(flag, captured["command"])
-        self.assertEqual(captured["command"][captured["command"].index("--sandbox") + 1], "read-only")
+        self.assertEqual(
+            captured["command"][captured["command"].index("--sandbox") + 1], "read-only"
+        )
         self.assertNotIn("shell", captured["options"])
         scratch = captured["options"]["cwd"]
         self.assertNotEqual(Path(scratch).resolve(), harness.ROOT)
@@ -86,7 +117,11 @@ class HarnessTests(unittest.TestCase):
         case = {"id": "synthetic"}
         agents = [{"id": f"a{i}"} for i in range(81)]
         with tempfile.TemporaryDirectory() as folder:
-            with patch.object(harness, "ROOT", Path(folder)), patch.object(harness, "load_inputs", return_value=(case, agents)), patch.object(harness, "invoke") as invoke:
+            with (
+                patch.object(harness, "ROOT", Path(folder)),
+                patch.object(harness, "load_inputs", return_value=(case, agents)),
+                patch.object(harness, "invoke") as invoke,
+            ):
                 live = Path(folder) / "results/run.json"
                 live.parent.mkdir()
                 live.write_text("existing live result")
@@ -98,6 +133,21 @@ class HarnessTests(unittest.TestCase):
                 self.assertEqual(code, 0)
                 self.assertEqual(report["model_calls_attempted"], 0)
                 self.assertFalse(report["summary"]["complete_execution"])
+
+    def test_bundled_inputs_load_and_reject_duplicate_capability_names(self):
+        case, agents = harness.load_inputs()
+        self.assertEqual(len(agents), 81)
+        self.assertTrue(case["facts"])
+        spec = json.loads((harness.ROOT / "agents.json").read_text(encoding="utf-8"))
+        spec["capabilities"][1]["name"] = spec["capabilities"][0]["name"]
+        with tempfile.TemporaryDirectory() as folder:
+            temp_root = Path(folder)
+            (temp_root / "case.json").write_text(
+                (harness.ROOT / "case.json").read_text(encoding="utf-8"), encoding="utf-8"
+            )
+            (temp_root / "agents.json").write_text(json.dumps(spec), encoding="utf-8")
+            with patch.object(harness, "ROOT", temp_root), self.assertRaises(ValueError):
+                harness.load_inputs()
 
 
 if __name__ == "__main__":
