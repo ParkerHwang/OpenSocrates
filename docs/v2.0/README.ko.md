@@ -5,6 +5,7 @@
 - [English start guide](README.md)
 - [마스터 플랜과 작업 분해](MASTER_PLAN.md)
 - [구현 작업 목록](IMPLEMENTATION_BACKLOG.md)
+- [v1.5.3 패키지·소스 목록](RELEASE_BASELINE_1.5.3.md) (B01 일부: 호스트별 실제 전달량은 아직 측정하지 않음)
 - [제품 요구사항과 평가](PRODUCT_AND_EVALUATION.md)
 - [초기 가상 평가 사례](EVALUATION_CASES.md)
 - [호스트 및 Bot 조사](HOSTS_AND_BOTS.md)
