@@ -1,0 +1,56 @@
+name: Portable office evaluation lab
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+
+jobs:
+  portable-lab:
+    name: Lab / ${{ matrix.os }} / Python ${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-14, windows-2025]
+        python: ["3.12", "3.14"]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYTHONUTF8: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Exercise synthetic engine, HTTP boundaries and portable packaging
+        run: |
+          python tools/check_evaluation_lab.py
+          python tools/check_evaluation_lab_http.py
+          python tools/check_evaluation_lab_package.py
+      - name: Fetch pinned public content for the portable kit
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release download v1.5.3 --repo ParkerHwang/OpenSocrates
+          --pattern '*-claude-chat-skills.zip' --pattern '*-antigravity-plugin.zip'
+          --dir build/lab-payloads
+      - name: Verify public payload parity and build portable kit
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        run: |
+          python tools/check_evaluation_lab_package.py --payloads-dir build/lab-payloads
+          python tools/build_evaluation_lab.py --payloads-dir build/lab-payloads --output build/opensocrates-office-evaluation-lab.zip
+          sha256sum build/opensocrates-office-evaluation-lab.zip > build/opensocrates-office-evaluation-lab.zip.sha256
+      - name: Upload exact-source portable kit
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
+        uses: actions/upload-artifact@v7
+        with:
+          name: office-evaluation-lab-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            build/opensocrates-office-evaluation-lab.zip
+            build/opensocrates-office-evaluation-lab.zip.sha256
+          if-no-files-found: error
