@@ -8,14 +8,17 @@ printed.
 
 from __future__ import annotations
 
+import io
 import json
 from dataclasses import dataclass
+from types import SimpleNamespace
 
 from opensocrates.application.change_settings import decide_rigor
 from opensocrates.application.delete_records import DeleteRequest, RecordHandle, delete_records
 from opensocrates.application.handle_stop import StopInput, handle_stop
 from opensocrates.application.start_task import issue_turn_state
 from opensocrates.application.status import project_status
+from opensocrates.cli.main import main as cli_main
 from opensocrates.cli.runtime import BundleRepository, discover_bundle_path
 from opensocrates.content.loader import load_compiled_bundle
 from opensocrates.domain.enums import (
@@ -247,6 +250,17 @@ def run() -> dict[str, object]:
         "delete_count": deleted.receipt.count,
         "trace_projection": "not_recorded",
     }
+    cli_stdout = io.StringIO()
+    exit_code = cli_main(
+        ["control", "--host", "codex"],
+        services=SimpleNamespace(control_application=None),
+        stdin=io.StringIO(""),
+        stdout=cli_stdout,
+    )
+    control_payload = json.loads(cli_stdout.getvalue())
+    if exit_code != 0 or control_payload.get("error_code") != "control_application_unavailable":
+        raise AssertionError("control command lost control_application_unavailable error code")
+    scenarios["cli_control_unavailable"] = control_payload
     return results
 
 

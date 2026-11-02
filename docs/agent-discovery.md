@@ -27,8 +27,8 @@ establish equivalence between models or subscription plans.
 
 ## Identify the released package and host
 
-The current installation target is [v1.5.2](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.2),
-with source identified by its [release tag](https://github.com/ParkerHwang/OpenSocrates/tree/v1.5.2).
+The current installation target is [v1.5.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.3),
+with source identified by its [release tag](https://github.com/ParkerHwang/OpenSocrates/tree/v1.5.3).
 Before installing, confirm the release is actually published and the chosen
 host's assets and checksums are present. The commands and links in this guide
 are not publication evidence by themselves.
@@ -53,7 +53,7 @@ The Skills CLI observation below retains its exact account ZIP version.
 | Claude web / Desktop Chat / Cowork | Executable-free account skill ZIP; export on Mac or Windows | Correct account's upload, capability, enabled state and standing instruction |
 | Antigravity conversation application | Modular rule and skill; Apple-silicon Mac or Windows x64 | One chosen workspace or global scope |
 
-v1.5.2 adds no native Windows Claude Code, Windows ARM64, Intel Mac or Linux
+v1.5.3 adds no native Windows Claude Code, Windows ARM64, Intel Mac or Linux
 native qualification. Claude account content does not install native Code.
 The default and `--host all` select Codex only; select every other host explicitly.
 
@@ -87,9 +87,9 @@ For Antigravity workspace scope, replace the example with the existing absolute
 directory and keep that same scope on every lifecycle command:
 
 ```sh
-npx --yes opensocrates@1.5.2 status --host codex
-npx --yes opensocrates@1.5.2 status --host claude
-npx --yes opensocrates@1.5.2 status --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.3 status --host codex
+npx --yes opensocrates@1.5.3 status --host claude
+npx --yes opensocrates@1.5.3 status --host antigravity --workspace "/absolute/path/to/workspace"
 ```
 
 Choose `install` for a missing integration or `update` for an existing owned one.
@@ -99,11 +99,11 @@ On Windows use a quoted absolute local-drive directory such as
 `"C:\Work\Reading Workshop"`.
 
 ```sh
-npx --yes opensocrates@1.5.2 install --host codex
-npx --yes opensocrates@1.5.2 install --host claude
-npx --yes opensocrates@1.5.2 install --host antigravity --workspace "/absolute/path/to/workspace"
+npx --yes opensocrates@1.5.3 install --host codex
+npx --yes opensocrates@1.5.3 install --host claude
+npx --yes opensocrates@1.5.3 install --host antigravity --workspace "/absolute/path/to/workspace"
 # Example: update an existing Codex integration
-npx --yes opensocrates@1.5.2 update --host codex
+npx --yes opensocrates@1.5.3 update --host codex
 ```
 
 For Claude account content, export to a new absolute ZIP filename in an existing
@@ -112,7 +112,7 @@ no account `status`, `install` or `update` action. Before replacing a skill, bac
 up its files and enabled state.
 
 ```sh
-npx --yes opensocrates@1.5.2 export --host claude-chat --output "/absolute/path/to/opensocrates-1.5.2-account.zip"
+npx --yes opensocrates@1.5.3 export --host claude-chat --output "/absolute/path/to/opensocrates-1.5.3-account.zip"
 ```
 
 Then follow the [setup guide](setup-guide.md) for the selected host: Codex hook
@@ -122,21 +122,21 @@ account instructions. Login, organization policy and host trust remain their
 own steps; do not fabricate approvals or lower security settings. Start a fresh
 conversation after changes. The [Mac](macos-v1.5.md) and
 [Windows](windows-v1.5.md) guides cover recovery and local archives; their dated
-v1.5.0 commands and observations remain historical. Use 1.5.2 commands here.
+v1.5.0 commands and observations remain historical. Use 1.5.3 commands here.
 
 ## Inspectable release downloads
 
-Without local asset flags, the pinned installer downloads the host's v1.5.2
+Without local asset flags, the pinned installer downloads the host's v1.5.3
 archive and matching checksum from GitHub Releases. The links below target
 the complete host packages for that release:
 
 | Package | Archive | SHA-256 file |
 | --- | --- | --- |
-| Codex, Apple-silicon Mac | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-codex-plugin.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-codex-plugin.zip.sha256) |
-| Codex, Windows x64 | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-codex-plugin-windows-x64.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-codex-plugin-windows-x64.zip.sha256) |
-| Native Claude, Apple-silicon Mac | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-plugin.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-plugin.zip.sha256) |
-| Claude account content | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-claude-chat-skills.zip.sha256) |
-| Antigravity | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-antigravity-plugin.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.2/opensocrates-1.5.2-antigravity-plugin.zip.sha256) |
+| Codex, Apple-silicon Mac | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-codex-plugin.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-codex-plugin.zip.sha256) |
+| Codex, Windows x64 | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-codex-plugin-windows-x64.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-codex-plugin-windows-x64.zip.sha256) |
+| Native Claude, Apple-silicon Mac | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-plugin.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-plugin.zip.sha256) |
+| Claude account content | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-claude-chat-skills.zip.sha256) |
+| Antigravity | [ZIP](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-antigravity-plugin.zip) | [Checksum](https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.3/opensocrates-1.5.3-antigravity-plugin.zip.sha256) |
 
 A checksum verifies byte agreement with the published checksum. It does not by
 itself establish publisher authenticity, safe behavior or host activation.
@@ -149,7 +149,7 @@ On October 13, 2026, a list-only probe using `skills@1.7.2` on Node.js 24.21.0
 found one `opensocrates` skill in the released Claude account ZIP. This CLI
 version requires Node.js 22.20.0 or later, separately from OpenSocrates's Node.js
 20+ requirement. This observation used the v1.5.1 account ZIP; it is not a
-rerun against v1.5.2. The exact probe was:
+rerun against v1.5.3. The exact probe was:
 
 ```sh
 DISABLE_TELEMETRY=1 DO_NOT_TRACK=1 npm exec --yes --package=skills@1.7.2 -- skills add https://github.com/ParkerHwang/OpenSocrates/releases/download/v1.5.1/opensocrates-1.5.1-claude-chat-skills.zip --list

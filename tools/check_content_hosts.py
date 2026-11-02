@@ -45,18 +45,56 @@ def _reject(action: Callable[[], Any], message: str) -> None:
     raise AssertionError(message)
 
 
+def _skill_sections(text: str) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    current = ""
+    lines: list[str] = []
+    for line in text.splitlines():
+        if line.startswith("## "):
+            if current:
+                sections[current] = "\n".join(lines)
+            current = line.strip()
+            lines = []
+        elif current:
+            lines.append(line)
+    if current:
+        sections[current] = "\n".join(lines)
+    return sections
+
+
 def _check_attribution(skill: Path, footer: str) -> None:
     """All host controllers and all ten decision guides use the runtime's footer."""
 
-    paths = [skill / "SKILL.md"] + [
-        skill / f"references/decision/guide.{locale}.md" for locale in LOCALES
-    ]
+    skill_path = skill / "SKILL.md"
+    paths = [skill_path] + [skill / f"references/decision/guide.{locale}.md" for locale in LOCALES]
     for path in paths:
         text = path.read_text(encoding="utf-8")
         _require(f"`{footer}`" in text, f"unified attribution missing: {path.name}")
         _require(
             "OpenSocrates grounding:" not in text,
             f"old visible footer remains in active guidance: {path.name}",
+        )
+    sections = _skill_sections(skill_path.read_text(encoding="utf-8"))
+    grounding = sections.get("## Mandatory grounding gate") or sections.get(
+        "## Complete canonical grounding", ""
+    )
+    _require(
+        f"`{footer}`" in grounding and "한국어 접지 규칙:" in grounding,
+        "grounding section lacks English/Korean unified attribution",
+    )
+    for heading in (
+        "## 简体中文指南",
+        "## 日本語ガイド",
+        "## Français",
+        "## Deutsch",
+        "## Italiano",
+        "## Español",
+        "## Português",
+        "## ไทย",
+    ):
+        _require(
+            f"`{footer}`" in sections.get(heading, ""),
+            f"localized controller section lacks unified attribution: {heading}",
         )
 
 
