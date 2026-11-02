@@ -85,6 +85,7 @@ function errorText(code) {
     invalid_host_version: ["앱 버전에는 영문자·숫자·점·하이픈 등 버전 표기만 입력하세요.", "Enter only a version label using ASCII letters, numbers and version punctuation."],
     criteria_locked: ["이미 고정한 기준입니다. 새 답변에 맞춰 덮어쓸 수 없습니다.", "Criteria are already frozen and cannot be overwritten."],
     approval_required: ["가상 업무 내용만 보관하도록 먼저 승인하세요.", "Approve retention of synthetic-task content first."],
+    study_locked: ["다른 실험실 프로세스가 이 연구 폴더를 사용 중입니다. 잠시 후 다시 시도하세요.", "Another lab process is accessing this study folder. Wait a moment and try again."],
   };
   const item = descriptions[code];
   return item ? tr(...item) : tr("진행할 수 없습니다. 상태와 입력을 확인하세요. 코드: ", "Unable to continue. Check the state and fields. Code: ") + String(code || "unavailable");

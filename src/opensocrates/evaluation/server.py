@@ -57,6 +57,7 @@ def _reject_constant(value: str) -> None:
 class _Server(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
+    request_queue_size = 32
 
     def __init__(self, lab: Lab, port: int) -> None:
         self.lab = lab
