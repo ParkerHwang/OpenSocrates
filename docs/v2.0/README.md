@@ -15,6 +15,12 @@ First-version targets are **the ChatGPT desktop app's Chat, Work, and Codex expe
 5. [한국어 문서](README.ko.md).
 6. [Standalone Korean HTML plan](PLAN_2.0.ko.html). This is a snapshot of the four Korean planning documents. Refresh it separately after source changes and recheck its content and links.
 
+Rebuild the HTML snapshot from the four Korean source documents at the repository root with the pinned renderer, then inspect the regenerated content and links:
+
+```sh
+uv run --no-project --with 'markdown-it-py==4.2.0' python tools/render_v2_plan.py
+```
+
 The packet records proposed behavior and unresolved decisions. Internal model alignment, improved personalized quality, and automatic host-to-host delivery have not been established. The user's request session handles consultation and coordination; new sessions perform actual deliverable work. All inter-agent communications pass through the OpenSocrates layer.
 
 ## Earlier plans and preserved evidence

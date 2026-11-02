@@ -102,6 +102,8 @@ At the user's request, the meeting continued past its first cross-examination to
 
 After both models reread the four `e21b396` sources, they identified missing delivery paths for intake/learning guidance and common generation instructions; the trust boundary between 1.x and personal guides; provenance of user instructions versus worker reports; races involving pending guidance after a pause; baseline procedures exceeding input limits; a conflict between an unresolved partial-fit policy and its test; and deleted derived guides and concurrent file writes. This revision adds corrections and representative validation cases. The new contracts still require implementation and actual host verification.
 
+Both models then reviewed `73e5b20`. This revision keeps the applicable portion of a partly fitting personal guide as an option, distinguishes unverified model reports from task judgment inside existing authority, and clarifies learning-stop state, actual application holds for affected derived guides, and pending file-write conflicts. It also addresses partial delivery of the common generator instructions and resending results whose retention is prohibited. This review remains adversarial examination of a plan, not evidence of product completion.
+
 See the [system design §§12–14](SYSTEM_2.0.md) for draft instructions and state contracts, and the [validation plan](VALIDATION_2.0.md) for the synthetic demonstration and comparison experiments. Claude's and Grok's differing proposals are design input, not evidence of real-world effectiveness.
 
 ## Handoff and completion
