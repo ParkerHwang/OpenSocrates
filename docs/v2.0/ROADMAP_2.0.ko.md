@@ -126,6 +126,14 @@ app-server나 SDK를 쓴다는 사실만으로 모델 제공자 API 기반 별�
 
 구체적인 반례로, [ChatGPT 계정 OAuth를 사용하는 app-server 설정 안내](https://developers.openai.com/siwc/token-sharing-open-source/codex-app-server)는 **별도 앱이 사용자 계정으로 인증한 뒤 Responses API에 추론 요청을 보내는 구성**을 설명한다. 인증 수단이 ChatGPT 계정이라는 사실이 그 구성을 사용자가 제외한 모델 API 기반 독자 앱 범위에서 꺼내 주지는 않는다. 이 특정 구성은 현재 2.0의 대체 실행 경로로 채택하지 않는다. 반대로 이 문서는 모든 app-server 사용이 같은 인증·실행 경로라는 증거가 아니며, 기존 데스크톱 대화에 연결되는 다른 경로는 각각 조사해야 한다. 이 자료를 확인하면서 자격증명을 수집하거나 해당 구성을 실행하지 않았다.
 
+### 학습 신호의 진입점: 문서상 후보와 실제 관찰
+
+[Codex 훅 문서](https://learn.chatgpt.com/docs/hooks)는 `UserPromptSubmit`에 제출될 `prompt`가 포함되고 추가 맥락을 전달할 수 있다고 설명한다. [플러그인 문서](https://developers.openai.com/plugins/build/plugins)는 수동 설치된 Codex 데스크톱 플러그인의 훅이 Work와 Codex에서 실행될 수 있으나 실행 환경에 스크립트가 있어야 하고 비관리 훅은 별도 신뢰 검토를 거쳐야 한다고 설명한다. 이는 해당 경로의 **문서상 후보**이지 일반 Chat이나 모든 설치·기기의 관찰 성공이 아니다. 훅 호출 자체는 다른 세션을 깨우거나, 사용자의 지시가 관련 세션에 수신·적용됐음을 증명하지 않는다. 훅이 켜지지 않거나 실패한 경우에도 해당 지시의 관찰·전달 상태를 따로 다룬다.
+
+[Claude Code 훅 문서](https://code.claude.com/docs/en/hooks#userpromptsubmit)는 같은 이름의 이벤트가 직접 입력 외에도 예약 실행, 백그라운드 에이전트의 보고, 다른 세션의 메시지에서 발생할 수 있다고 명시한다. 따라서 **이벤트 이름이나 텍스트만으로 사용자 발화·승인으로 귀속하지 않는다.** 신뢰할 수 있는 출처가 확인되지 않으면 해당 사용자 의사·권한의 변경을 미확인으로 두되 기존 권한 안에서 독립적으로 할 수 있는 업무는 계속한다. 문서는 Claude Code에 관한 것이므로 다른 Claude 표면의 이벤트 발생 조건을 단정하지 않는다. [Claude 플러그인 안내](https://support.claude.com/en/articles/13837440-use-plugins-in-claude)는 Chat에서 훅과 하위 에이전트가 실행되지 않는다고 기술하며, 별도의 [통합 경험 안내](https://support.claude.com/en/articles/16761823-claude-cowork-and-chat-are-one-claude)는 Cowork 기능이 대화에 통합되는 경험을 설명한다. 계정·버전·표면마다 실제 제공 범위를 따로 확인하고, 두 문장을 모든 계정과 경험에서 동일하게 훅을 지원한다는 뜻으로 해석하지 않는다.
+
+해당 경로의 정책 적합성도 별도다. [Codex 문서](https://learn.chatgpt.com/docs/hooks)는 큰 훅 출력이 임시 파일에 기록될 수 있다고 밝힌다. 길이를 줄이거나 설정값을 조정하는 것만으로 원문·민감정보 비보관이 보장되는 것은 아니다. 입력·출력·오류·운영체제 및 호스트 자체 보관을 구분해 검토하고, 허용되지 않은 원문을 기록하지 않는다. Claude의 [기업용 inference hooks](https://support.claude.com/en/articles/16059458-inference-hooks-overview)는 별도의 관리자 설정과 서버로 향하는 경로다. 개인 데스크톱 로컬 기능이나 현재 제품의 필수 인프라로 가정하지 않으며, 이를 검토한 사실이 외부 원문 전송·보관 권한을 부여하지 않는다.
+
 ## 2026-11-03 세 모델 회의: 결론과 남은 이견
 
 회의는 Codex가 주도하고 Claude Opus 5.5와 Cursor의 Grok 4.7 High가 기존 네 개 계획서를 검토한 뒤 서로의 제안과 질문에 답하는 방식으로 진행했다. 현재 macOS의 기존 Claude·Cursor 대화에서 computer use로 요청을 입력하고 응답을 읽었으며, Codex가 내용을 수동으로 중계했다. 이는 해당 기존 대화의 화면 조작 관찰이지 2.0 프로그램의 채널이나 새 세션 자동 생성의 증거가 아니다. 아래는 발언 전문이 아닌 공개 설계 요약이며, **검증된 구현이나 사용자 추가 결정이 아니다**. Gemini의 의견은 사용자의 요청에 따라 포함하지 않는다.
