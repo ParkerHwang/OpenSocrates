@@ -153,6 +153,13 @@ Esses são os idiomas dos textos de métodos que seu assistente lê.
 
 ## Código aberto, pronto para explorar
 
+Para comparar pessoalmente respostas a tarefas de escritório, o [laboratório de
+avaliação local](docs/evaluation-lab.md) prepara tarefas fictícias para o Work
+de desktop, o Claude Cowork e o Antigravity no Mac e no Windows. Ele registra as
+preferências práticas antes de revelar as condições; a implementação do
+laboratório é separada da qualificação em hosts reais e das evidências de
+efeito.
+
 Leia os métodos completos e o código-fonte, adapte-os ao seu trabalho ou contribua
 com um novo exemplo. OpenSocrates é um projeto independente, disponível sob a
 [licença MIT](LICENSE).

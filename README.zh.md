@@ -146,6 +146,8 @@ npx --yes opensocrates@1.5.3 install --host antigravity --workspace "/absolute/p
 
 ## 开源，欢迎探索
 
+如需由人工比较办公任务的回答，可以使用[本地评估实验室](docs/evaluation-lab.md)。它为 Mac 和 Windows 上的桌面版 Work、Claude Cowork 与 Antigravity 准备虚构任务，先记录实际使用偏好，再揭示各回答对应的条件；该工具的实现，与真实宿主环境中的验证和效果证据彼此独立。
+
 阅读完整方法和源码，将其调整为适合你的工作，或贡献新的案例。
 OpenSocrates 是采用 [MIT 许可证](LICENSE)的独立项目。
 

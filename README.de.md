@@ -157,6 +157,13 @@ Dies sind die Sprachen der Methodentexte, die Ihr Assistent liest.
 
 ## Open Source zum Entdecken
 
+Für einen menschlichen Vergleich von Antworten auf Büroaufgaben bereitet das
+[lokale Evaluationslabor](docs/evaluation-lab.md) fiktive Aufgaben für
+Desktop-Work, Claude Cowork und Antigravity auf Mac und Windows vor. Es erfasst
+praktische Präferenzen, bevor die Bedingungen offengelegt werden; die
+Implementierung des Labors ist von der Qualifizierung in echten Hosts und von
+Wirksamkeitsnachweisen getrennt.
+
 Lesen Sie die vollständigen Methoden und den Quellcode, passen Sie sie an Ihre
 Arbeit an oder steuern Sie ein neues Beispiel bei. OpenSocrates ist ein
 unabhängiges Projekt unter der [MIT-Lizenz](LICENSE).
