@@ -1,5 +1,7 @@
 # OpenSocrates 2.0 master plan
 
+Active scope: build [the core slice](CORE.md) first. The work packages below remain the preserved wider plan. An unfinished package here does not block the artifact or the continuation record.
+
 Status: preparation and proposed execution architecture, 29 October 2026. The owner selected 2.0 as the target and explicitly withdrew the standalone 1.6 track. This document is an implementation handoff, not proof of delivered behavior or release qualification.
 
 ## Product outcome
