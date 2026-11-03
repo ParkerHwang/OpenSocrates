@@ -124,8 +124,14 @@ def _scan(text: str) -> tuple[set, set, str]:
 
     # year-bearing forms first so the year is not lost, then the same forms without a year
     pats = [
-        (rf"\b({_YEAR})-(\d{{1,2}})-(\d{{1,2}})\b", lambda m: add(m[1], int(m[2]), int(m[3]))),
-        (rf"\b({_YEAR})/(\d{{1,2}})/(\d{{1,2}})\b", lambda m: add(m[1], int(m[2]), int(m[3]))),
+        (
+            rf"(?<!\d)({_YEAR})-(\d{{1,2}})-(\d{{1,2}})(?!\d)",
+            lambda m: add(m[1], int(m[2]), int(m[3])),
+        ),
+        (
+            rf"(?<!\d)({_YEAR})/(\d{{1,2}})/(\d{{1,2}})(?!\d)",
+            lambda m: add(m[1], int(m[2]), int(m[3])),
+        ),
         (
             rf"({_YEAR})\s*년\s*(\d{{1,2}})\s*월\s*(\d{{1,2}})\s*일",
             lambda m: add(m[1], int(m[2]), int(m[3])),

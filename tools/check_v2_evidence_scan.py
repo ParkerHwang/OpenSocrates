@@ -35,6 +35,15 @@ class EvidenceScanChecks(unittest.TestCase):
         )
         self.assertFalse(report["input_summary"]["prompt_used_as_source"])
 
+    def test_iso_date_followed_by_korean_particle_is_one_date(self):
+        report = scan.analyze(["날짜는 미정입니다."], "", "행사는 2027-03-01로 확정됐습니다.")
+        self.assertTrue(
+            any(
+                f["kind"] == "novel_date" and "2027-03-01" in f["message"]
+                for f in report["findings"]
+            )
+        )
+
     def test_unsupported_commitment_is_only_a_review_cue(self):
         report = scan.analyze(
             ["The venue is still under consideration."], "", "The venue is booked."
