@@ -40,7 +40,12 @@ release. Their generation does not install or enable anything.
   for account and code-execution requirements.
 
 Neither archive has yet been qualified for installation, discovery, or use on a
-real host. Availability can vary by plan, account, organization, and surface.
+real host. The repository's local marketplace lists the experimental plugin
+separately from the existing OpenSocrates plugin; listing it does not install or
+enable it. A temporary Codex CLI installation with isolated settings succeeded
+and its installed files matched the candidate at commit `c8e1815`; this does not
+establish activation or availability in ChatGPT or another account. Availability
+can vary by plan, account, organization, and surface.
 
 Contributors can run `make v2-candidate-check` for the offline scanner, adapter,
 process-boundary, and synthetic-benchmark checks. This command does not call a
