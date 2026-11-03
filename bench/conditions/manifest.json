@@ -1,0 +1,36 @@
+{
+  "schema": "opensocrates.v2-bench-conditions/1",
+  "conditions": [
+    {
+      "id": "baseline",
+      "future": false,
+      "skill": null,
+      "description": "User prompt and materials only. No skill text is attached."
+    },
+    {
+      "id": "output_brief",
+      "future": false,
+      "skill": {
+        "path": "bench/conditions/output_brief/SKILL.md",
+        "expected_git_blob": "06dfbc5ab41ea5f53952912087453caf8a0044a5",
+        "provenance": "Historical snapshot of the PR #164 skill at codex/v2-output-brief commit d6091b4d7c62086326e494ac724b7d1db7c48d00, blob 06dfbc5ab41ea5f53952912087453caf8a0044a5. Tip 2775bf9beea5e802f94339ae7f8bd7c875c0ae25 (blob f5ed6cf9e0b7e2c70afb027c3d2069f7d3041a58) is not loaded. The branch was not checked out, merged, or modified."
+      },
+      "description": "Reader-focused output skill text from PR #164, stored here as fixture bytes for a later live run."
+    },
+    {
+      "id": "reader_1x",
+      "future": false,
+      "skill": {
+        "path": "plugin-src/shared/reader/guide.en.md",
+        "provenance": "v1 reader guide already on main at plugin-src/shared/reader/guide.en.md. This slot reads the file in the current checkout."
+      },
+      "description": "Existing shared reader guide. Much of the #164 audience, evidence, uncertainty, and commitment guidance is already in this file."
+    },
+    {
+      "id": "opensocrates_v2",
+      "future": true,
+      "skill": null,
+      "description": "Reserved for a future OpenSocrates 2.0 check layer. This harness ships no v2 skill and does not call one."
+    }
+  ]
+}

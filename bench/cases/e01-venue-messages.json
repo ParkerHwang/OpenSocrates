@@ -1,0 +1,60 @@
+{
+  "schema": "opensocrates.v2-bench-case/1",
+  "id": "e01-venue-messages",
+  "title": "Separate venue and volunteer messages without invented agreements",
+  "inspired_by": ["E01"],
+  "tags": ["E01", "audience-separation", "no-invented-agreement"],
+  "public_synthetic": true,
+  "prompt": "아래 내용을 장소 담당자와 접수 자원봉사자에게 각각 보낼 메시지로 작성해 줘. 아직 날짜는 확정하지 않았어. 두 사람에게 실제로 연락하지는 마.",
+  "materials": [
+    "예전 메모: 장소 수용 인원 35명.",
+    "최신 메모: 수용 인원은 24명.",
+    "주최 측은 참가 30명을 바란다.",
+    "장소 예약은 확정되지 않았다.",
+    "자원봉사자는 접수만 맡기로 했고 사진 촬영은 맡지 않았다."
+  ],
+  "checks": [
+    {
+      "id": "current-capacity",
+      "rule": "require_text",
+      "section": "body",
+      "text": "24명"
+    },
+    {
+      "id": "omit-stale-capacity",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["35명", "35 people"]
+    },
+    {
+      "id": "name-both-readers",
+      "rule": "require_all_text",
+      "section": "body",
+      "patterns": ["장소 담당자", "접수 자원봉사자"]
+    },
+    {
+      "id": "no-confirmed-booking",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["예약이 확정", "예약 확정", "confirmed booking", "reservation is confirmed"]
+    },
+    {
+      "id": "no-photography-assignment",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["촬영을 맡", "사진 담당", "photography assignment"]
+    },
+    {
+      "id": "no-invented-date",
+      "rule": "forbid_unlisted_dates",
+      "section": "body",
+      "allowed": []
+    },
+    {
+      "id": "unresolved-date-for-requester",
+      "rule": "require_any_text",
+      "section": "requester_notes",
+      "patterns": ["날짜는 아직", "날짜가 확정되지", "date is not set"]
+    }
+  ]
+}
