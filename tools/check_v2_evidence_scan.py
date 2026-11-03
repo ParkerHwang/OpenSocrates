@@ -106,6 +106,21 @@ class EvidenceScanChecks(unittest.TestCase):
         self.assertFalse(report["verified"])
         self.assertIn("wrong person, item, or event", scan.render(report))
 
+    def test_opt_in_context_shows_source_line_without_claiming_support(self):
+        sources = ["The venue holds 24 people.", "The organizer hopes for 30 people."]
+        draft = "The venue holds 30 people."
+        report = scan.analyze(sources, "", draft)
+        self.assertNotIn("source_contexts", report)
+        contexts = scan.source_contexts(sources, draft)
+        self.assertEqual(contexts["matches"][0]["source"], 2)
+        self.assertEqual(contexts["matches"][0]["text"], sources[1])
+        self.assertIn("not evidence", contexts["meaning"])
+        self.assertFalse(report["verified"])
+
+    def test_context_omits_very_long_line_without_truncating_its_meaning(self):
+        contexts = scan.source_contexts(["A" * 1001 + " 30"], "The value is 30.")
+        self.assertIsNone(contexts["matches"][0]["text"])
+
     def test_cli_requires_comparison_and_does_not_write_source_files(self):
         with tempfile.TemporaryDirectory() as directory:
             folder = Path(directory)
@@ -159,6 +174,24 @@ class EvidenceScanChecks(unittest.TestCase):
                 "novel_number", {f["kind"] for f in json.loads(result.stdout)["findings"]}
             )
             self.assertEqual(list(Path(directory).iterdir()), [])
+
+    def test_cli_source_lines_are_only_included_when_requested(self):
+        source = "The organizer hopes for 30 attendees."
+        payload = {"sources": [source], "output": "The venue holds 30 people."}
+        base = [sys.executable, str(SCRIPT), "--stdin-json", "--json"]
+        ordinary = subprocess.run(
+            base, input=json.dumps(payload), capture_output=True, text=True, check=False
+        )
+        detailed = subprocess.run(
+            [*base, "--show-context"],
+            input=json.dumps(payload),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual((ordinary.returncode, detailed.returncode), (0, 0))
+        self.assertNotIn(source, ordinary.stdout)
+        self.assertIn(source, detailed.stdout)
 
     def test_quoted_draft_in_prompt_is_not_treated_as_evidence(self):
         draft = "The event is confirmed for 25 people on 2027-03-01."

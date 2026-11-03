@@ -58,6 +58,15 @@ output. If the draft changes afterward, run it again or say the result covers
 the earlier draft. Input lengths show what was processed but do not prove that
 it was complete or unchanged. Do not reproduce excerpts merely to prove coverage.
 
+If the user wants to inspect where a draft number or date appears, the optional
+`--show-context` flag includes matching source lines in the tool output. It is
+off by default because those lines can contain private or unrelated material and
+the host may retain tool output. A line containing a value does not prove the
+claim, entity, period, or source is correct. Long lines and excess matches may be
+omitted; say so instead of implying the displayed context is complete. Keep
+source context for the requester unless the user explicitly wants it in the
+recipient's artifact.
+
 The scan compares surface patterns, not meaning or external truth. A matched
 number or date can still refer to the wrong thing, and a correct derived value
 can be flagged. Treat findings as prompts for source-based review, not as

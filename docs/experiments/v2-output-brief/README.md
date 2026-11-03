@@ -88,6 +88,13 @@ may still appear to match by presence. Review source selection and meaning.
 Conditional or future wording can still make an unauthorized promise even if
 the scan does not classify it as a present confirmation.
 
+When requested, `--show-context` displays source lines containing draft numbers
+or dates, along with source and line numbers. It is off by default: the lines
+can contain private information and the host may retain tool output. A matching
+line is not proof that it supports the claim. Lines longer than 1,000 characters
+and matches beyond the first 30 are not displayed; a missing match is not a
+truth verdict. This feature does not identify all claims or check entailment.
+
 The [negation examples](cases/negation.json) were written by Claude while
 designing the matching rule. They are regression cases, not an independent
 accuracy measurement or a representative sample of real writing.

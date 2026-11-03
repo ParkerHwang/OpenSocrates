@@ -555,6 +555,42 @@ def check(
     return analyze(sources, prompt, output, must)["findings"]
 
 
+def source_contexts(sources: list[str], output: str) -> dict:
+    """Find source lines containing a draft number/date; not a support judgment."""
+    dates, numbers = tokens(output)
+    matches = []
+    omitted = 0
+    expected = {("date", fmt_date(d)) for d in dates} | {("number", n) for n in numbers}
+    seen = set()
+    for source_index, source in enumerate(sources, 1):
+        for line_number, line in enumerate(source.splitlines(), 1):
+            line_dates, line_numbers = tokens(line)
+            values = [("date", fmt_date(d)) for d in dates & line_dates]
+            values.extend(("number", n) for n in numbers & line_numbers)
+            for kind, value in sorted(values):
+                seen.add((kind, value))
+                if len(matches) >= 30:
+                    omitted += 1
+                    continue
+                matches.append(
+                    {
+                        "kind": kind,
+                        "value": value,
+                        "source": source_index,
+                        "line": line_number,
+                        "text": line if len(line) <= 1000 else None,
+                    }
+                )
+    return {
+        "meaning": "Value presence in a line is not evidence that the line supports the claim.",
+        "matches": matches,
+        "additional_matches_not_shown": omitted,
+        "values_without_line_match": [
+            {"kind": kind, "value": value} for kind, value in sorted(expected - seen)
+        ],
+    }
+
+
 def render(res: dict) -> str:
     f = res["findings"]
     high = sum(1 for x in f if x["severity"] == "HIGH")
@@ -594,6 +630,26 @@ def render(res: dict) -> str:
         )
     lines.append(f"Blind spots ({len(res['blind_spots'])}), e.g.: " + res["blind_spots"][0])
     lines.append("  (all of them: --json)")
+    if "source_contexts" in res:
+        contexts = res["source_contexts"]
+        lines.append("")
+        lines.append("Source lines containing draft values (presence does not prove support):")
+        for match in contexts["matches"]:
+            source_line = match["text"] if match["text"] is not None else "[line too long to show]"
+            lines.append(
+                f"  {match['kind']} {match['value']}, source {match['source']} "
+                f"line {match['line']}: {source_line}"
+            )
+        if contexts["additional_matches_not_shown"]:
+            lines.append(
+                f"  Additional matches not shown: {contexts['additional_matches_not_shown']}"
+            )
+        if not contexts["matches"]:
+            lines.append("  No matching values found by this limited scan.")
+        for value in contexts["values_without_line_match"]:
+            lines.append(
+                f"  No matching line for {value['kind']} {value['value']} (not a truth verdict)."
+            )
     return "\n".join(lines)
 
 
@@ -626,6 +682,11 @@ def main(argv=None) -> int:  # noqa: C901 - keep input modes and failure boundar
         "--must", action="append", default=[], help="fact that must appear (repeatable)"
     )
     ap.add_argument("--json", action="store_true")
+    ap.add_argument(
+        "--show-context",
+        action="store_true",
+        help="include matching source lines in output; host may retain tool output",
+    )
     ap.add_argument("--strict", action="store_true", help="exit 1 if any HIGH flag")
     a = ap.parse_args(argv)
 
@@ -661,6 +722,8 @@ def main(argv=None) -> int:  # noqa: C901 - keep input modes and failure boundar
         if not any(s.strip() for s in sources):
             return _missing_sources(a.json)
     res = analyze(sources, prompt, output, a.must)
+    if a.show_context:
+        res["source_contexts"] = source_contexts(sources, output)
     print(json.dumps(res, ensure_ascii=False, indent=2) if a.json else render(res))
     return 1 if a.strict and any(f["severity"] == "HIGH" for f in res["findings"]) else 0
 
