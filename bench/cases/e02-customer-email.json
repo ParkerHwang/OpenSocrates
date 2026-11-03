@@ -1,0 +1,46 @@
+{
+  "schema": "opensocrates.v2-bench-case/1",
+  "id": "e02-customer-email",
+  "title": "English customer email with Korean requester notes",
+  "inspired_by": ["E02"],
+  "tags": ["E02", "language-separation", "no-invented-date"],
+  "public_synthetic": true,
+  "prompt": "다음 사실만 사용해서 고객에게 보낼 영어 이메일을 작성해 줘. 내가 확인해야 할 사항은 한국어로 별도로 알려줘. 메일은 보내지 마.",
+  "materials": [
+    "The prototype is ready for review.",
+    "The launch date has not been agreed.",
+    "Ask the customer to suggest a time for a review meeting."
+  ],
+  "checks": [
+    {
+      "id": "email-is-english",
+      "rule": "script",
+      "section": "body",
+      "expect": "latin_dominant"
+    },
+    {
+      "id": "notes-are-korean",
+      "rule": "script",
+      "section": "requester_notes",
+      "expect": "hangul_present"
+    },
+    {
+      "id": "asks-for-review-time",
+      "rule": "require_all_text",
+      "section": "body",
+      "patterns": ["review", "time"]
+    },
+    {
+      "id": "no-asserted-launch-date",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["launch date is", "we will launch on", "출시일은"]
+    },
+    {
+      "id": "no-invented-date",
+      "rule": "forbid_unlisted_dates",
+      "section": "body",
+      "allowed": []
+    }
+  ]
+}
