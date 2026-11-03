@@ -9,8 +9,8 @@ way.
 The entire candidate is [`SKILL.md`](../../../plugin-src/experimental-core/skills/opensocrates-core/SKILL.md).
 It is plain text, with no scripts, tools, hooks, installer, or telemetry. It can
 be read and used as instructions, or provided to a compatible host using that
-host's skill setup. This repository does not yet provide an installable package
-or establish discovery, activation, or use in any host. It does not invoke the
+host's skill setup. This repository does not yet provide an installable package.
+It does not invoke the
 1.x method library; connecting a particular method is future work, not a
 capability claimed here. Existing 1.x files are unchanged.
 
@@ -18,6 +18,20 @@ The earlier [output-brief experiment](https://github.com/ParkerHwang/OpenSocrate
 is preserved separately, including its scanner and benchmark. They are not part
 of this candidate. This is an experiment, not a release or a claim that the
 skill improves outcomes over an unassisted model or a short instruction.
+
+## Try the local skill in Codex
+
+Copy the `opensocrates-core` skill folder into your project's
+`.agents/skills/` folder, then start a new Codex session for that project and
+explicitly request `$opensocrates-core` with your task. If a folder with that
+name already exists, back it up or choose another project before copying. To
+remove this experiment, remove the copied folder.
+
+In one temporary project using Codex CLI 0.166.0-alpha.5.1, an explicit
+`$opensocrates-core` request led to a successful read of the copied skill file
+and a response to a synthetic decision task. This observation does not prove
+automatic discovery, application, or general usefulness, or establish behavior
+in other hosts.
 
 ## Try a decision
 
