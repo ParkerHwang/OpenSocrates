@@ -34,9 +34,17 @@ and `output` is the draft string. This input path does not require creating a
 file. Do not place source text into shell commands or logs; the host may have its
 own retention behavior.
 
+Put factual source material in `sources` separately from the draft. The scanner
+does not treat `prompt` as factual evidence because the request may quote the
+draft. If the user's message contains both, extract the relevant source material
+without adding draft claims; if that separation cannot be made, do not run the
+scan and explain why. An empty source list cannot be scanned. The scanner cannot
+prove that a provided source is accurate or free of draft text.
+
 For existing files, use the actual script path with `--source SOURCE --output
 DRAFT`; multiple `--source` options are allowed, and `--prompt` can name a
-request text file. Run only on material the user made available for this task.
+request text file that is not used as evidence. Run only on material the user
+made available for this task.
 If the host cannot run the scan or standard input is unavailable, use a direct
 source review and say the scan was not run when that distinction matters.
 If standard input can only be supplied by embedding source text in a shell

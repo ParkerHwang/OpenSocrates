@@ -5,7 +5,7 @@ a number, date or confirmation word is (or is not) somewhere in your material. I
 output attaches it to the right thing. It never edits the output and never says "verified" or "safe".
 
 Flags (all surface-level, see KNOWN_BLIND_SPOTS):
-  novel_date / novel_number   a date or number in the output that is not in the prompt/sources; a date whose
+  novel_date / novel_number   a date or number in the output that is not in the sources; a date whose
                               YEAR differs from the year your material gives for that day is also novel_date
   commitment                  confirmation wording (confirmed, booked, approved, 확정 ...) that the
                               material does not contain, or contains only negated ("not confirmed")
@@ -393,7 +393,10 @@ def _present(rx: str, text: str) -> bool:
 def analyze(  # noqa: C901 - keep each distinct advisory check visible
     sources: list[str], prompt: str, output: str, must: list[str] | None = None
 ) -> dict:
-    material = "\n".join([prompt, *sources])
+    if not any(source.strip() for source in sources):
+        raise ValueError("provide at least one nonempty source")
+    # A request can quote the draft. It is not independent evidence for it.
+    material = "\n".join(sources)
     md, mn, mt = _scan(material)
     od, on, ot = _scan(output)
     findings: list[dict] = []
@@ -481,6 +484,7 @@ def analyze(  # noqa: C901 - keep each distinct advisory check visible
             "source_characters": [len(source) for source in sources],
             "prompt_characters": len(prompt),
             "output_characters": len(output),
+            "prompt_used_as_source": False,
         },
         "findings": findings,
         "matched_by_presence_only": cov,
@@ -547,7 +551,7 @@ def main(argv=None) -> int:
     ap.add_argument(
         "--source", action="append", default=[], help="user-provided source file (repeatable)"
     )
-    ap.add_argument("--prompt", help="the user's request text file")
+    ap.add_argument("--prompt", help="request text file; not used as evidence")
     ap.add_argument("--output", help="draft file to inspect")
     ap.add_argument(
         "--stdin-json",
@@ -580,14 +584,16 @@ def main(argv=None) -> int:
             ap.error("sources must be a list of strings")
         if not isinstance(prompt, str) or not isinstance(output, str):
             ap.error("prompt and output must be strings")
-        if not any(s.strip() for s in sources) and not prompt.strip():
-            ap.error("provide at least one nonempty source or prompt")
+        if not any(s.strip() for s in sources):
+            ap.error("provide at least one nonempty source")
     else:
-        if not a.output or (not a.source and not a.prompt):
-            ap.error("provide --output and at least one --source or --prompt")
+        if not a.output or not a.source:
+            ap.error("provide --output and at least one --source")
         sources = [rd(s) for s in a.source]
         prompt = rd(a.prompt) if a.prompt else ""
         output = rd(a.output)
+        if not any(s.strip() for s in sources):
+            ap.error("provide at least one nonempty source")
     res = analyze(sources, prompt, output, a.must)
     print(json.dumps(res, ensure_ascii=False, indent=2) if a.json else render(res))
     return 1 if a.strict and any(f["severity"] == "HIGH" for f in res["findings"]) else 0

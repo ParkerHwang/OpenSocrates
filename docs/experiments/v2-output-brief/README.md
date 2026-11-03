@@ -53,6 +53,12 @@ it to a file. Other hosts can review the sources directly; the scan has not run
 in that case. The scan itself does not save the inputs, although the host may
 retain conversation or tool data according to its own settings.
 
+The scan compares the draft only with separately supplied source material. It
+does not treat the request text as evidence, because a request may quote the
+draft. If a request contains both, the host must separate the sources before
+scanning; if it cannot, it should not claim that the scan was completed. The
+scanner cannot guarantee that a provided source does not itself contain the draft.
+
 ## Try it with a fictional request
 
 Give the same request and source facts to the same model and host in two separate

@@ -19,24 +19,26 @@ SPEC.loader.exec_module(scan)
 class EvidenceScanChecks(unittest.TestCase):
     def test_changed_year_is_flagged_and_equivalent_format_is_not(self):
         source = "The deadline is 2026-03-01."
-        changed = scan.analyze([], source, "Deadline: 2027-03-01.")
-        same = scan.analyze([], source, "Deadline: March 1, 2026.")
+        changed = scan.analyze([source], "", "Deadline: 2027-03-01.")
+        same = scan.analyze([source], "", "Deadline: March 1, 2026.")
         self.assertIn("novel_date", {f["kind"] for f in changed["findings"]})
         self.assertEqual(same["findings"], [])
         self.assertFalse(same["verified"])
 
     def test_new_full_date_keeps_year_in_the_review_cue(self):
-        report = scan.analyze([], "The date is undecided.", "The meeting is 2027-03-01.")
+        report = scan.analyze(["The date is undecided."], "", "The meeting is 2027-03-01.")
         self.assertTrue(
             any(
                 f["kind"] == "novel_date" and "2027-03-01" in f["message"]
                 for f in report["findings"]
             )
         )
-        self.assertEqual(report["input_summary"]["source_characters"], [])
+        self.assertFalse(report["input_summary"]["prompt_used_as_source"])
 
     def test_unsupported_commitment_is_only_a_review_cue(self):
-        report = scan.analyze([], "The venue is still under consideration.", "The venue is booked.")
+        report = scan.analyze(
+            ["The venue is still under consideration."], "", "The venue is booked."
+        )
         self.assertIn("commitment", {f["kind"] for f in report["findings"]})
         text = scan.render(report)
         self.assertIn("Review cues only", text)
@@ -45,17 +47,17 @@ class EvidenceScanChecks(unittest.TestCase):
 
     def test_negated_confirmation_is_not_reported_as_a_commitment(self):
         source = "The venue is not yet confirmed."
-        report = scan.analyze([], source, "The venue is not yet confirmed.")
+        report = scan.analyze([source], "", "The venue is not yet confirmed.")
         self.assertNotIn("commitment", {f["kind"] for f in report["findings"]})
 
     def test_known_correct_arithmetic_can_be_flagged(self):
-        report = scan.analyze([], "There are 24 seats; 3 are reserved.", "21 seats remain.")
+        report = scan.analyze(["There are 24 seats; 3 are reserved."], "", "21 seats remain.")
         self.assertIn("novel_number", {f["kind"] for f in report["findings"]})
         self.assertIn("calculated value", scan.render(report))
 
     def test_presence_is_not_support_for_an_attributed_fact(self):
         report = scan.analyze(
-            [], "Kickoff is 3 March. Deadline is 20 March.", "The deadline is 3 March."
+            ["Kickoff is 3 March. Deadline is 20 March."], "", "The deadline is 3 March."
         )
         self.assertFalse(report["verified"])
         self.assertIn("wrong person, item, or event", scan.render(report))
@@ -113,6 +115,19 @@ class EvidenceScanChecks(unittest.TestCase):
                 "novel_number", {f["kind"] for f in json.loads(result.stdout)["findings"]}
             )
             self.assertEqual(list(Path(directory).iterdir()), [])
+
+    def test_quoted_draft_in_prompt_is_not_treated_as_evidence(self):
+        draft = "The event is confirmed for 25 people on 2027-03-01."
+        report = scan.analyze(
+            ["The capacity is 24; the date and booking are undecided."],
+            f"Please check this draft: {draft}",
+            draft,
+        )
+        kinds = {item["kind"] for item in report["findings"]}
+        self.assertTrue({"novel_date", "novel_number", "commitment"} <= kinds)
+        self.assertFalse(report["input_summary"]["prompt_used_as_source"])
+        with self.assertRaises(ValueError):
+            scan.analyze([], f"Please check: {draft}", draft)
 
 
 if __name__ == "__main__":
