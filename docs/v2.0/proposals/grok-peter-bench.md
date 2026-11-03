@@ -113,9 +113,11 @@ material sentence that denies a verified rate, is not treated as a rate claim.
 A mismatched percentage near a denial cue but outside those exceptions is
 `needs_human_review`. A denial prefix that continues as `없지 않습니다` is
 also `needs_human_review`, not a clean pass. Quoting the material statement that nobody verified 100%
-is not pretended verification. Each scored section is limited to 20000
-characters so repeated exception phrases cannot make the scan grow with the
-square of the input. Longer text is `input_error`. The envelope in
+is not pretended verification. Each scored section is limited to 20000 characters. Longer text is
+`input_error`. After intervals are merged, one start list is built and reused
+for every percent in that section. No timing was measured, so this does not
+establish the scan's asymptotic cost. `forbid_text` still compares each match
+with each of its own exception spans inside that bound. The envelope in
 `bench/regressions/calc-unverified-rate/` was added after this change. It is
 not an independent holdout and is not a performance estimate. The scorer does
 not add a confirmation of its own.
@@ -175,5 +177,6 @@ blob `f5ed6cf9`는 불러오지 않습니다. 프로세스 실행과 봉투 수�
 자료에 있는 수로 비율을 계산하는 것은 허용됩니다. 100% 검증이 없다는 자료
 문장을 인용한 퍼센트는 틀린 비율이 아닙니다. 애매한 부정은 사람 검토이고,
 그냥 틀린 비율과 검증했다고 한 말은 실패입니다. `없지 않습니다`로 부정이
-뒤집히면 사람 검토입니다. 20000자를 넘는 본문은 입력 오류입니다. 사후 예시는
-성능 수치가 아닙니다. 효과 크기는 계산하지 않습니다.
+뒤집히면 사람 검토입니다. 20000자를 넘는 본문은 입력 오류입니다. 그 길이
+상한이 확인된 범위이고, 수행 시간은 재지 않았으며 제곱 비용이 사라졌다고
+하지 않습니다. 사후 예시는 성능 수치가 아닙니다. 효과 크기는 계산하지 않습니다.

@@ -416,7 +416,7 @@ def _arithmetic_claim(
     ]
     exception_spans = _find_spans(haystack, exceptions)
     clean_exceptions, reversed_exceptions = _split_exception_intervals(haystack, exception_spans)
-    cue_intervals = _merge_intervals(
+    cue_intervals = _IntervalIndex(
         _find_spans(haystack, _optional_strings(check, "ambiguous_cues"))
     )
     expected = 100.0 * numerator / denominator
@@ -459,9 +459,9 @@ def _classify_percents(
     numerator: int,
     denominator: int,
     haystack: str,
-    clean_exceptions: list[tuple[int, int]],
-    reversed_exceptions: list[tuple[int, int]],
-    cue_intervals: list[tuple[int, int]],
+    clean_exceptions: "_IntervalIndex",
+    reversed_exceptions: "_IntervalIndex",
+    cue_intervals: "_IntervalIndex",
     failures: list[str],
     unresolved: list[str],
 ) -> None:
@@ -470,9 +470,9 @@ def _classify_percents(
         if abs(claimed - expected) <= tolerance:
             continue
         span = (match.start(), match.end())
-        if _covered_by(clean_exceptions, span[0], span[1]):
+        if clean_exceptions.covers(span[0], span[1]):
             continue
-        if _covered_by(reversed_exceptions, span[0], span[1]):
+        if reversed_exceptions.covers(span[0], span[1]):
             unresolved.append(
                 f"percent {claimed:g} sits in an exception whose polarity is reversed"
             )
@@ -482,7 +482,7 @@ def _classify_percents(
             f"percent {claimed:g} does not match {numerator}/{denominator}; "
             "no external verification is available"
         )
-        if _overlaps_any(cue_intervals, window[0], window[1]):
+        if cue_intervals.overlaps(window[0], window[1]):
             unresolved.append(detail + "; nearby denial cue")
         else:
             failures.append(detail)
@@ -491,19 +491,19 @@ def _classify_percents(
 def _pretended_outside_exceptions(
     haystack: str,
     phrases: list[str],
-    clean_exceptions: list[tuple[int, int]],
+    clean_exceptions: "_IntervalIndex",
     failures: list[str],
 ) -> None:
     for phrase in phrases:
         for start, end in _find_spans(haystack, [phrase]):
-            if _covered_by(clean_exceptions, start, end):
+            if clean_exceptions.covers(start, end):
                 continue
             failures.append(f"pretended verification {phrase!r}")
 
 
 def _split_exception_intervals(
     haystack: str, spans: list[tuple[int, int]]
-) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+) -> tuple["_IntervalIndex", "_IntervalIndex"]:
     clean: list[tuple[int, int]] = []
     reversed_spans: list[tuple[int, int]] = []
     for start, end in spans:
@@ -511,7 +511,7 @@ def _split_exception_intervals(
             reversed_spans.append((start, end))
         else:
             clean.append((start, end))
-    return _merge_intervals(clean), _merge_intervals(reversed_spans)
+    return _IntervalIndex(clean), _IntervalIndex(reversed_spans)
 
 
 def _polarity_reversed(haystack: str, end: int) -> bool:
@@ -533,22 +533,27 @@ def _merge_intervals(spans: list[tuple[int, int]]) -> list[tuple[int, int]]:
     return [(item[0], item[1]) for item in merged]
 
 
-def _covered_by(intervals: list[tuple[int, int]], start: int, end: int) -> bool:
-    if not intervals:
-        return False
-    starts = [item[0] for item in intervals]
-    index = bisect.bisect_right(starts, start) - 1
-    if index < 0:
-        return False
-    return intervals[index][0] <= start and end <= intervals[index][1]
+class _IntervalIndex:
+    """Merged intervals plus the start list built once for every later lookup."""
 
+    def __init__(self, spans: list[tuple[int, int]]) -> None:
+        self.intervals = _merge_intervals(spans)
+        self.starts = [item[0] for item in self.intervals]
 
-def _overlaps_any(intervals: list[tuple[int, int]], start: int, end: int) -> bool:
-    if not intervals:
-        return False
-    starts = [item[0] for item in intervals]
-    index = bisect.bisect_left(starts, end) - 1
-    return index >= 0 and intervals[index][1] > start
+    def covers(self, start: int, end: int) -> bool:
+        if not self.intervals:
+            return False
+        index = bisect.bisect_right(self.starts, start) - 1
+        if index < 0:
+            return False
+        left, right = self.intervals[index]
+        return left <= start and end <= right
+
+    def overlaps(self, start: int, end: int) -> bool:
+        if not self.intervals:
+            return False
+        index = bisect.bisect_left(self.starts, end) - 1
+        return index >= 0 and self.intervals[index][1] > start
 
 
 def _oversize_section(envelope: Mapping[str, str]) -> str | None:
