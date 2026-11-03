@@ -13,6 +13,8 @@ from typing import Any
 from bench.adapters import (
     build_request,
     command_argv,
+    execution_evidence,
+    not_run_evidence,
     run_command,
     unavailable_reason,
 )
@@ -23,7 +25,14 @@ from bench.cases import (
     unexpected_fixture_paths,
 )
 from bench.conditions import audit_status, load_conditions
-from bench.contract import ENVELOPE_SCHEMA, REPORT_SCHEMA
+from bench.contract import (
+    ATTESTATION_SCHEMA,
+    ENVELOPE_SCHEMA,
+    MODEL_CALL_NOT_APPLICABLE,
+    MODEL_CALL_UNVERIFIED,
+    MODEL_CALL_VERIFIED,
+    REPORT_SCHEMA,
+)
 from bench.probes import run_probes
 from bench.report import count_rows, exit_code, render_summary, write_outputs
 from bench.scoring import score_envelope
@@ -33,8 +42,9 @@ _NOTE = (
     "bench-only envelope (body and requester_notes). Skill text is not rewritten "
     "to require English section headings. Fixture rows marked authored_example "
     "were written to exercise the scorer; they are not model outputs. "
-    "model_unavailable means this run did not call a model for that row. "
-    "Row counts are not pass rates and are not effect sizes."
+    "A parsed envelope does not verify a model call. model_called is true only "
+    "for a host attestation recorded by harness code. Row counts are not pass "
+    "rates and are not effect sizes."
 )
 
 
@@ -44,9 +54,20 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--report", type=Path, default=Path("build/bench/report.json"))
     parser.add_argument("--summary", type=Path, default=Path("build/bench/summary.md"))
     parser.add_argument("--timeout", type=float, default=30.0)
+    parser.add_argument(
+        "--output-brief-pin",
+        type=Path,
+        help="Compare another output_brief file without replacing the documented pin",
+    )
     args = parser.parse_args(argv)
     root = Path(__file__).resolve().parents[1]
-    report = build_report(root, mode=args.mode, timeout=args.timeout, env=dict(os.environ))
+    report = build_report(
+        root,
+        mode=args.mode,
+        timeout=args.timeout,
+        env=dict(os.environ),
+        output_brief_pin=args.output_brief_pin,
+    )
     try:
         write_outputs(report, args.report, args.summary)
     except OSError as exc:
@@ -63,8 +84,9 @@ def build_report(
     mode: str,
     timeout: float,
     env: Mapping[str, str],
+    output_brief_pin: Path | None = None,
 ) -> dict[str, Any]:
-    conditions, condition_errors = load_conditions(root)
+    conditions, condition_errors = load_conditions(root, output_brief_pin=output_brief_pin)
     records = load_case_files(root)
     results: list[dict[str, Any]] = []
     expected: list[Path] = []
@@ -106,11 +128,12 @@ def build_report(
             )
         )
     probes = run_probes()
-    live_called = any(row["model_called"] for row in results)
+    evidence = _model_evidence(results)
     return {
         "schema": REPORT_SCHEMA,
         "mode": mode,
-        "live_models_invoked": live_called,
+        "live_models_invoked": evidence["verified_model_calls"] > 0,
+        "model_evidence": evidence,
         "codex_selector_invoked": False,
         "effect_sizes_computed": False,
         "comparison_allowed": False,
@@ -145,7 +168,7 @@ def _condition_row(
             condition=condition["id"],
             status="model_unavailable",
             reason=unavailable_reason(condition, live=False),
-            model_called=False,
+            evidence=not_run_evidence(),
         )
     fixture, errors = load_fixture(
         path,
@@ -162,7 +185,14 @@ def _condition_row(
             reason="input_error: " + "; ".join(errors or ["fixture could not be read"]),
             source=source,
         )
-    return _scored_row(case, condition["id"], fixture["envelope"], fixture, source)
+    return _scored_row(
+        case,
+        condition["id"],
+        fixture["envelope"],
+        fixture,
+        source,
+        evidence=_fixture_evidence(str(fixture["origin"])),
+    )
 
 
 def _live_row(
@@ -178,7 +208,7 @@ def _live_row(
             condition=condition["id"],
             status="model_unavailable",
             reason=unavailable_reason(condition, live=True),
-            model_called=False,
+            evidence=not_run_evidence(),
         )
     outcome = run_command(argv, build_request(case, condition), timeout=timeout, env=env)
     if outcome["status"] != "ready":
@@ -187,8 +217,8 @@ def _live_row(
             condition=condition["id"],
             status=outcome["status"],
             reason=outcome["reason"],
-            model_called=bool(outcome["model_called"]),
             origin="live_command",
+            evidence=outcome,
         )
     return _scored_row(
         case,
@@ -196,10 +226,13 @@ def _live_row(
         outcome["envelope"],
         {
             "origin": "live_command",
-            "model_called": True,
-            "illustrates": "envelope returned by the opted-in local command",
+            "illustrates": (
+                "command returned a bench envelope; that envelope is not host evidence "
+                "of a model call"
+            ),
         },
         None,
+        evidence=outcome,
     )
 
 
@@ -209,10 +242,17 @@ def _scored_row(
     envelope: Mapping[str, str],
     fixture: Mapping[str, Any],
     source: str | None,
+    *,
+    evidence: Mapping[str, Any],
 ) -> dict[str, Any]:
     scored = score_envelope(case, envelope)
     illustrates = str(fixture.get("illustrates") or "")
-    reason = f"{scored['reason']}; origin={fixture['origin']}; model_called={str(fixture['model_called']).lower()}"
+    reason = (
+        f"{scored['reason']}; origin={fixture['origin']}; "
+        f"model_call={evidence['model_call']}; "
+        f"process_started={str(bool(evidence['process_started'])).lower()}; "
+        f"envelope_received={str(bool(evidence['envelope_received'])).lower()}"
+    )
     if illustrates:
         reason = f"{reason}; {illustrates}"
     return _row(
@@ -220,11 +260,23 @@ def _scored_row(
         condition=condition_id,
         status=scored["status"],
         reason=reason,
-        model_called=bool(fixture["model_called"]),
         origin=str(fixture["origin"]),
         illustrates=illustrates or None,
         failed_checks=scored["failed_checks"],
         source=source,
+        evidence=evidence,
+    )
+
+
+def _fixture_evidence(origin: str) -> dict[str, Any]:
+    model_call = MODEL_CALL_NOT_APPLICABLE
+    if origin == "recorded_model_output":
+        model_call = MODEL_CALL_UNVERIFIED
+    return execution_evidence(
+        execution_attempted=False,
+        process_started=False,
+        envelope_received=True,
+        model_call=model_call,
     )
 
 
@@ -235,11 +287,12 @@ def _row(
     status: str,
     reason: str,
     source: str | None = None,
-    model_called: bool = False,
     origin: str | None = None,
     illustrates: str | None = None,
     failed_checks: list[dict[str, str]] | None = None,
+    evidence: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    fields = _normalized_evidence(evidence or not_run_evidence())
     return {
         "kind": "case",
         "case_id": case_id,
@@ -247,10 +300,10 @@ def _row(
         "status": status,
         "reason": reason,
         "origin": origin,
-        "model_called": model_called,
         "illustrates": illustrates,
         "failed_checks": failed_checks or [],
         "source": source,
+        **fields,
     }
 
 
@@ -263,8 +316,61 @@ def _public_condition(item: Mapping[str, Any]) -> dict[str, Any]:
         "skill_sha256": item["skill_sha256"],
         "skill_bytes": item["skill_bytes"],
         "provenance": item["provenance"],
+        "pin": item.get("pin"),
         "forces_fixed_english_headers": item["forces_fixed_english_headers"],
         "forced_headers": item["forced_headers"],
+    }
+
+
+def _normalized_evidence(evidence: Mapping[str, Any]) -> dict[str, Any]:
+    model_call = evidence.get("model_call")
+    attestation = evidence.get("model_attestation")
+    if model_call not in {MODEL_CALL_VERIFIED, MODEL_CALL_UNVERIFIED, MODEL_CALL_NOT_APPLICABLE}:
+        model_call = MODEL_CALL_UNVERIFIED
+    if model_call == MODEL_CALL_VERIFIED and not _trusted_attestation(attestation):
+        model_call = MODEL_CALL_UNVERIFIED
+        attestation = None
+    if model_call != MODEL_CALL_VERIFIED:
+        attestation = None
+    return {
+        "execution_attempted": bool(evidence.get("execution_attempted")),
+        "process_started": bool(evidence.get("process_started")),
+        "envelope_received": bool(evidence.get("envelope_received")),
+        "model_call": model_call,
+        "model_called": model_call == MODEL_CALL_VERIFIED,
+        "model_attestation": attestation,
+    }
+
+
+def _trusted_attestation(value: object) -> bool:
+    if not isinstance(value, Mapping):
+        return False
+    adapter = value.get("adapter")
+    host = value.get("host")
+    return (
+        value.get("schema") == ATTESTATION_SCHEMA
+        and value.get("observed_by") == "harness"
+        and isinstance(adapter, str)
+        and bool(adapter.strip())
+        and isinstance(host, str)
+        and bool(host.strip())
+    )
+
+
+def _model_evidence(results: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "rule": (
+            "model_called and live_models_invoked are true only when harness "
+            "code records a host attestation. A valid envelope does not verify a model call."
+        ),
+        "verified_model_calls": sum(row["model_call"] == MODEL_CALL_VERIFIED for row in results),
+        "unverified_model_calls": sum(
+            row["model_call"] == MODEL_CALL_UNVERIFIED for row in results
+        ),
+        "command_processes_started": sum(bool(row["process_started"]) for row in results),
+        "command_envelopes_received": sum(
+            bool(row["process_started"] and row["envelope_received"]) for row in results
+        ),
     }
 
 

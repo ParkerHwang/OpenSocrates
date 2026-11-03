@@ -39,12 +39,50 @@ part of the skill.
 | Slot | Skill bytes | Default offline result |
 | --- | --- | --- |
 | `baseline` | none | Score a fixture when one exists, otherwise `model_unavailable`. |
-| `output_brief` | Snapshot of the [PR #164](https://github.com/ParkerHwang/OpenSocrates/pull/164) skill in `bench/conditions/output_brief/SKILL.md`. | Same. The snapshot is not a live run of that skill. |
+| `output_brief` | Historical snapshot of the [PR #164](https://github.com/ParkerHwang/OpenSocrates/pull/164) skill in `bench/conditions/output_brief/SKILL.md`. | Same. The snapshot is not a live run of that skill. |
 | `reader_1x` | `plugin-src/shared/reader/guide.en.md` in this checkout. | Same. The guide is fingerprinted, not executed. |
 | `opensocrates_v2` | none; reserved | `model_unavailable` until a skill and an output exist. |
 
 Missing fixtures are an honest skip. Shipping does not wait on a live call
 for every slot.
+
+## output_brief pin
+
+`make bench` loads the committed file and checks its git blob:
+
+- commit `d6091b4d7c62086326e494ac724b7d1db7c48d00`
+- blob `06dfbc5ab41ea5f53952912087453caf8a0044a5`
+- 2227 bytes
+
+The PR #164 tip after Claude review is commit
+`2775bf9beea5e802f94339ae7f8bd7c875c0ae25`, blob
+`f5ed6cf9e0b7e2c70afb027c3d2069f7d3041a58`, 2495 bytes. That tip is recorded
+in `PROVENANCE.json` and is not loaded. The comparison version has to be
+agreed by Parker and Claude before this default changes. A refresh replaces
+`SKILL.md`, `expected_git_blob` in the manifest, and `PROVENANCE.json` in one
+change.
+
+To preview another file without changing the default:
+
+```bash
+python3 -m bench.run --output-brief-pin /path/to/SKILL.md
+```
+
+The report then marks the pin as `override` and still records the documented
+blob. `make bench` does not pass this flag.
+
+## Model-call evidence
+
+A command that prints a valid envelope proves two things: a process started,
+and an envelope was parsed. It does not prove that a model ran. `model_called`
+and `live_models_invoked` stay false unless harness code records a host
+attestation (`opensocrates.v2-bench-model-attestation/1` with
+`observed_by: harness`) after that code invoked the host. Stdout fields such
+as `model_called` or `model_attestation` are ignored.
+
+Failed commands record `execution_attempted` and whether `process_started`.
+The failure status does not count as model use. No shipped adapter invokes a
+host, so this harness does not report a verified model call.
 
 ## Run
 
@@ -72,8 +110,9 @@ Per-slot overrides are `OPENSOCRATES_BENCH_COMMAND_BASELINE`,
 `OPENSOCRATES_BENCH_COMMAND_READER_1X`, and
 `OPENSOCRATES_BENCH_COMMAND_OPENSOCRATES_V2`.
 The command receives a JSON request on stdin and must print only the envelope
-on stdout. Unset variables leave the row at `model_unavailable`. A non-zero
-exit or a non-envelope stdout is `model_error`.
+on stdout. Unset variables leave the row at `model_unavailable` with no
+process started. A non-zero exit or a non-envelope stdout is `model_error`:
+the process was attempted, and the model call stays unverified.
 
 The packaged Codex selector is not this path. It selects a reasoning method
 and returns selection JSON. This harness does not import it.
@@ -103,8 +142,8 @@ model outputs. Do not compare condition columns as a leaderboard.
 | --- | --- |
 | `pass` | All checks passed. |
 | `condition_fail` | The envelope was scored and a check failed. |
-| `model_unavailable` | No output was available to score. |
-| `model_error` | A command ran and did not yield an envelope. |
+| `model_unavailable` | No envelope was available. A missing executable was attempted and did not start. |
+| `model_error` | A command failed before a usable envelope. This is not evidence of model use. |
 | `input_error` | A case, fixture, or condition file is invalid. |
 | `scorer_error` | A rule could not be applied. |
 
@@ -123,9 +162,14 @@ Follow [ADD_A_CASE.md](ADD_A_CASE.md).
 아니고, #161과 #163의 범위 충돌은 여기서 정리하지 않습니다.
 
 채점은 사용자 언어의 본문을 영어 제목으로 강제하지 않습니다. 하네스 전용
-봉투의 `body`와 `requester_notes`만 규칙으로 봅니다. `make bench`는 모델을
-호출하지 않고, 픽스처가 없으면 `model_unavailable`로 남깁니다. 픽스처의
-통과와 실패는 채점기 예시이며 효과 크기가 아닙니다.
+봉투의 `body`와 `requester_notes`만 규칙으로 봅니다. 올바른 봉투가 돌아와도
+모델 호출이 확인된 것은 아닙니다. 호스트를 하네스가 직접 봤다는 증명이
+없으면 `model_called`는 거짓입니다. 픽스처의 통과와 실패는 채점기 예시이며
+효과 크기가 아닙니다.
+
+`output_brief` 기본 핀은 `d6091b4` blob `06dfbc5a`입니다. #164 팁 `2775bf9`
+blob `f5ed6cf9`는 적기만 하고 불러오지 않습니다. 비교 버전은 Parker와 Claude가
+맞춘 뒤에만 바꿉니다.
 
 산술은 자료에 있는 분자와 분모로 계산할 수 있습니다. 도구가 없는데 검증했다고
 말하면 실패입니다. 케이스를 하나 추가하는 절차는 [ADD_A_CASE.md](ADD_A_CASE.md)에

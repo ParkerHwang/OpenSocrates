@@ -156,12 +156,10 @@ def _fixture_origin(source: str, origin: object, called: object) -> list[str]:
     errors: list[str] = []
     if origin not in {"authored_example", "recorded_model_output"}:
         errors.append(f"{source}: origin is not recognized")
-    if not isinstance(called, bool):
-        errors.append(f"{source}: model_called must be a boolean")
-    elif origin == "authored_example" and called:
-        errors.append(f"{source}: an authored example cannot set model_called true")
-    elif origin == "recorded_model_output" and not called:
-        errors.append(f"{source}: a recorded model output must set model_called true")
+    if called is not False:
+        errors.append(
+            f"{source}: model_called must be false; a fixture file cannot verify a model call"
+        )
     return errors
 
 

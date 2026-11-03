@@ -136,7 +136,10 @@ in [bench/ADD_A_CASE.md](bench/ADD_A_CASE.md).
 Scoring reads a bench-only envelope (`body` and `requester_notes`). Do not
 require the headings "Recipient body" or "Requester memo" in a case or skill.
 An authored fixture shows that a rule can pass or fail. It is not a model
-result. Do not publish fixture row counts as an effect size. A percentage
+result. A command envelope does not verify a model call; `model_called` stays
+false without a host attestation recorded by the harness. The `output_brief`
+slot keeps its documented #164 snapshot until the comparison version is
+agreed. Do not publish fixture row counts as an effect size. A percentage
 claim is allowed only when the case supplies the operands; a claim that an
 unavailable tool verified the result fails the arithmetic rule.
 

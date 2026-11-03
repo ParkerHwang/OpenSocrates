@@ -15,7 +15,16 @@ import sys
 from collections.abc import Mapping
 from typing import Any
 
-from bench.contract import ENVELOPE_SCHEMA, REQUEST_SCHEMA, TRANSPORT_INSTRUCTION
+from bench.contract import (
+    ATTESTATION_SCHEMA,
+    ENVELOPE_SCHEMA,
+    MODEL_CALL_NOT_APPLICABLE,
+    MODEL_CALL_UNVERIFIED,
+    MODEL_CALL_VERIFIED,
+    MODEL_CALLS,
+    REQUEST_SCHEMA,
+    TRANSPORT_INSTRUCTION,
+)
 
 _STDOUT_CAP = 100_000
 _FIELD_CAP = 20_000
@@ -55,11 +64,66 @@ def unavailable_reason(condition: Mapping[str, Any], *, live: bool) -> str:
         slot = "no recorded output for this condition"
     if live:
         return (
-            "model_unavailable: "
-            f"{slot}; OPENSOCRATES_BENCH_LIVE=1 and a command were not both set, "
-            "so no model process was started"
+            f"model_unavailable: {slot}; no command process was started; model call not applicable"
         )
-    return f"model_unavailable: {slot}; offline mode does not call a model"
+    return f"model_unavailable: {slot}; offline mode starts no command process"
+
+
+def execution_evidence(
+    *,
+    execution_attempted: bool,
+    process_started: bool,
+    envelope_received: bool,
+    model_call: str,
+) -> dict[str, Any]:
+    """Separate process evidence from a verified model call.
+
+    ``model_call`` is ``verified`` only when harness code observed a host
+    client. Command stdout cannot set it.
+    """
+
+    if model_call not in MODEL_CALLS:
+        raise ValueError(f"unknown model_call: {model_call}")
+    return {
+        "execution_attempted": execution_attempted,
+        "process_started": process_started,
+        "envelope_received": envelope_received,
+        "model_call": model_call,
+        "model_called": model_call == MODEL_CALL_VERIFIED,
+        "model_attestation": None,
+    }
+
+
+def attest_model_call(adapter_id: str, host: str) -> dict[str, Any]:
+    """Attest a model call that this process invoked itself.
+
+    No shipped adapter calls this. A command's JSON cannot substitute for it.
+    """
+
+    if not adapter_id.strip() or not host.strip():
+        raise ValueError("adapter_id and host are required")
+    evidence = execution_evidence(
+        execution_attempted=True,
+        process_started=True,
+        envelope_received=False,
+        model_call=MODEL_CALL_VERIFIED,
+    )
+    evidence["model_attestation"] = {
+        "schema": ATTESTATION_SCHEMA,
+        "adapter": adapter_id,
+        "host": host,
+        "observed_by": "harness",
+    }
+    return evidence
+
+
+def not_run_evidence() -> dict[str, Any]:
+    return execution_evidence(
+        execution_attempted=False,
+        process_started=False,
+        envelope_received=False,
+        model_call=MODEL_CALL_NOT_APPLICABLE,
+    )
 
 
 def run_command(
@@ -69,7 +133,7 @@ def run_command(
     timeout: float,
     env: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
-    """Run one opted-in command. Never invent an envelope."""
+    """Run one opted-in command. Never invent an envelope or a model call."""
 
     payload = json.dumps(request, ensure_ascii=False).encode("utf-8")
     try:
@@ -82,56 +146,92 @@ def run_command(
             env=dict(os.environ if env is None else env),
         )
     except subprocess.TimeoutExpired:
-        return _model_error("command timed out")
+        return _execution_result(
+            status="model_error",
+            detail="command timed out",
+            process_started=True,
+        )
     except FileNotFoundError:
-        return _unavailable("command executable was not found")
+        return _execution_result(
+            status="model_unavailable",
+            detail="command executable was not found",
+            process_started=False,
+        )
     except OSError as exc:
-        return _model_error(f"command could not start: {exc.__class__.__name__}")
+        return _execution_result(
+            status="model_error",
+            detail=f"command could not start: {exc.__class__.__name__}",
+            process_started=False,
+        )
     if completed.returncode != 0:
-        return _model_error(f"command exited with status {completed.returncode}")
+        return _execution_result(
+            status="model_error",
+            detail=f"command exited with status {completed.returncode}",
+            process_started=True,
+        )
     if len(completed.stdout) > _STDOUT_CAP:
-        return _model_error("stdout exceeded the harness cap")
+        return _execution_result(
+            status="model_error",
+            detail="stdout exceeded the harness cap",
+            process_started=True,
+        )
     return _envelope_from_stdout(completed.stdout)
 
 
 def _envelope_from_stdout(stdout: bytes) -> dict[str, Any]:
+    parsed = _parse_envelope(stdout)
+    if parsed is None:
+        return _execution_result(
+            status="model_error",
+            detail="stdout was not a bench envelope",
+            process_started=True,
+        )
+    body, notes = parsed
+    if len(body) > _FIELD_CAP or len(notes) > _FIELD_CAP:
+        return _execution_result(
+            status="model_error",
+            detail="stdout envelope exceeded the field cap",
+            process_started=True,
+        )
+    return {
+        "status": "ready",
+        "reason": "command returned a bench envelope; model call unverified",
+        "envelope": {"body": body, "requester_notes": notes},
+        **execution_evidence(
+            execution_attempted=True,
+            process_started=True,
+            envelope_received=True,
+            model_call=MODEL_CALL_UNVERIFIED,
+        ),
+    }
+
+
+def _parse_envelope(stdout: bytes) -> tuple[str, str] | None:
     try:
         document = json.loads(stdout.decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError):
-        return _model_error("stdout was not a bench envelope")
-    if not isinstance(document, Mapping):
-        return _model_error("stdout envelope was not a JSON object")
-    if document.get("schema") != ENVELOPE_SCHEMA:
-        return _model_error("stdout envelope schema did not match the bench transport")
+        return None
+    if not isinstance(document, Mapping) or document.get("schema") != ENVELOPE_SCHEMA:
+        return None
     body = document.get("body")
     notes = document.get("requester_notes")
     if not isinstance(body, str) or not isinstance(notes, str):
-        return _model_error("stdout envelope body and requester_notes must be strings")
-    if len(body) > _FIELD_CAP or len(notes) > _FIELD_CAP:
-        return _model_error("stdout envelope exceeded the field cap")
-    return {
-        "status": "ready",
-        "reason": "command returned a bench envelope",
-        "model_called": True,
-        "envelope": {"body": body, "requester_notes": notes},
-    }
+        return None
+    return body, notes
 
 
-def _model_error(reason: str) -> dict[str, Any]:
+def _execution_result(*, status: str, detail: str, process_started: bool) -> dict[str, Any]:
+    prefix = "model_error" if status == "model_error" else "model_unavailable"
     return {
-        "status": "model_error",
-        "reason": f"model_error: {reason}",
-        "model_called": True,
+        "status": status,
+        "reason": f"{prefix}: {detail}; model call unverified",
         "envelope": None,
-    }
-
-
-def _unavailable(reason: str) -> dict[str, Any]:
-    return {
-        "status": "model_unavailable",
-        "reason": f"model_unavailable: {reason}",
-        "model_called": False,
-        "envelope": None,
+        **execution_evidence(
+            execution_attempted=True,
+            process_started=process_started,
+            envelope_received=False,
+            model_call=MODEL_CALL_UNVERIFIED,
+        ),
     }
 
 

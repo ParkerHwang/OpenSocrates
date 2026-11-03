@@ -11,7 +11,7 @@ request template, and add the block below under Summary.
 - [ ] State the user task in the user's language. Do not require the headings "Recipient body" or "Requester memo".
 - [ ] Write checks against envelope fields `body` and `requester_notes` only. A rule must be decidable without a model.
 - [ ] If the case allows arithmetic, put the operands in `materials` and set `arithmetic_policy.pretended_verification` to `fail`.
-- [ ] Add an authored fixture only when you want to show the scorer a concrete envelope. Set `origin` to `authored_example` and `model_called` to `false`, and say what the text illustrates.
+- [ ] Add an authored fixture only when you want to show the scorer a concrete envelope. Set `origin` to `authored_example` and `model_called` to `false`. A fixture cannot verify a model call. Say what the text illustrates.
 - [ ] Leave a condition without a fixture when you do not have an output. The runner records `model_unavailable`.
 - [ ] Do not invent a model score, a pass rate, or an effect size.
 - [ ] Run `make bench`. In the pull request, paste the new rows and say whether a live model was called.
@@ -35,7 +35,7 @@ request template, and add the block below under Summary.
 | --- | --- |
 | `pass` | Every rule check passed on an envelope. |
 | `condition_fail` | The envelope parsed, and at least one rule failed. |
-| `model_unavailable` | No fixture and no live command, or the command executable is missing. |
-| `model_error` | A live command started and did not return a usable envelope. |
+| `model_unavailable` | No fixture and no live command, or the command executable is missing. Execution may have been attempted. Model use stays unverified. |
+| `model_error` | A command ran and did not return a usable envelope. That failure does not verify a model call. |
 | `input_error` | The case, fixture, or condition manifest is invalid. |
 | `scorer_error` | A rule could not be applied. |

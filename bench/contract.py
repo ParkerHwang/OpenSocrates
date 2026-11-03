@@ -8,6 +8,17 @@ ENVELOPE_SCHEMA = "opensocrates.v2-bench-envelope/1"
 REPORT_SCHEMA = "opensocrates.v2-bench-report/1"
 CONDITIONS_SCHEMA = "opensocrates.v2-bench-conditions/1"
 REQUEST_SCHEMA = "opensocrates.v2-bench-request/1"
+ATTESTATION_SCHEMA = "opensocrates.v2-bench-model-attestation/1"
+
+# A parsed envelope is not evidence that a model ran.
+MODEL_CALL_VERIFIED = "verified"
+MODEL_CALL_UNVERIFIED = "unverified"
+MODEL_CALL_NOT_APPLICABLE = "not_applicable"
+MODEL_CALLS = (
+    MODEL_CALL_VERIFIED,
+    MODEL_CALL_UNVERIFIED,
+    MODEL_CALL_NOT_APPLICABLE,
+)
 
 REASON_CODES = (
     "input_error",

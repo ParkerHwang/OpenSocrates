@@ -23,6 +23,10 @@ def render_summary(report: dict[str, Any]) -> str:
         "",
         f"Mode: {report['mode']}",
         f"Live models invoked: {_yes(report['live_models_invoked'])}",
+        f"Verified model calls: {report['model_evidence']['verified_model_calls']}",
+        f"Unverified model-call rows: {report['model_evidence']['unverified_model_calls']}",
+        f"Command processes started: {report['model_evidence']['command_processes_started']}",
+        f"Command envelopes received: {report['model_evidence']['command_envelopes_received']}",
         "Codex selector invoked: no",
         "Effect sizes computed: no",
         "Comparison allowed: no",
@@ -30,6 +34,8 @@ def render_summary(report: dict[str, Any]) -> str:
         f"Skill audit: {report['skill_audit']['status']}",
         "",
         report["note"],
+        "",
+        report["model_evidence"]["rule"],
         "",
         "## Condition slots",
         "",
@@ -47,6 +53,7 @@ def render_summary(report: dict[str, Any]) -> str:
                 digest=digest,
             )
         )
+    lines.extend(_pin_lines(report))
     lines.extend(
         [
             "",
@@ -81,6 +88,8 @@ def render_summary(report: dict[str, Any]) -> str:
             "## Classifier probes",
             "",
             "Probes exercise reason codes. They are not cases and are not model results.",
+            "script-envelope is a local process with a forged attestation.",
+            "harness-attestation-shape checks a helper and does not invoke a host.",
             "",
             "| Probe | Expected | Actual | Matched |",
             "| --- | --- | --- | --- |",
@@ -95,6 +104,27 @@ def render_summary(report: dict[str, Any]) -> str:
         lines.extend(f"- {error}" for error in report["skill_audit"]["errors"])
     lines.append("")
     return "\n".join(lines)
+
+
+def _pin_lines(report: dict[str, Any]) -> list[str]:
+    pin = None
+    for item in report["conditions"]:
+        if item["id"] == "output_brief":
+            pin = item.get("pin")
+    if not isinstance(pin, dict):
+        return []
+    tip = pin.get("tip_not_loaded") if isinstance(pin.get("tip_not_loaded"), dict) else {}
+    return [
+        "",
+        "## output_brief pin",
+        "",
+        f"Loaded: {pin.get('loaded')}",
+        f"Documented commit: `{pin.get('commit')}`",
+        f"Documented blob: `{pin.get('git_blob')}`",
+        f"Tip not loaded: `{tip.get('commit')}` blob `{tip.get('git_blob')}`",
+        "",
+        str(tip.get("coordination") or ""),
+    ]
 
 
 def count_rows(rows: list[dict[str, Any]]) -> dict[str, int]:

@@ -50,10 +50,23 @@ The [bench README](../../../bench/README.md) records the comparison.
 `make bench` finishes without a live result for every slot. A missing output
 is `model_unavailable`.
 
-The #164 snapshot recorded here is commit
+The loaded #164 snapshot stays commit
 `d6091b4d7c62086326e494ac724b7d1db7c48d00`, git blob
-`06dfbc5ab41ea5f53952912087453caf8a0044a5`. Later commits on that branch are
-not followed automatically.
+`06dfbc5ab41ea5f53952912087453caf8a0044a5` (2227 bytes). The branch tip after
+Claude review, commit `2775bf9beea5e802f94339ae7f8bd7c875c0ae25`, blob
+`f5ed6cf9e0b7e2c70afb027c3d2069f7d3041a58` (2495 bytes), is recorded in
+`bench/conditions/output_brief/PROVENANCE.json` and is not loaded. Parker and
+Claude need to agree before that comparison version replaces the pin. `make
+bench` checks the documented blob and does not fetch the tip.
+
+## Model-call evidence
+
+`process_started` and `envelope_received` record that a command ran and that
+its stdout parsed as a bench envelope. `model_called` and
+`live_models_invoked` stay false unless this harness records a host
+attestation after its own client call. A local script that prints an envelope,
+or a command that exits non-zero, does not verify model use. No host client
+is wired up here, so verified model calls stay at zero.
 
 ## Arithmetic and pretended verification
 
@@ -96,6 +109,10 @@ Parker의 설계 수정을 반영했습니다. 채점은 스킬에 영어 제목
 `requester_notes`를 봅니다. 조건 슬롯은 `baseline`, `output_brief`(#164 스킬
 원문을 픽스처로 복사), `reader_1x`(저장소의 `guide.en.md`), `opensocrates_v2`
 (미래 슬롯)입니다. 라이브 호출 없이 출고할 수 있습니다.
+
+`output_brief` 기본값은 `d6091b4` / blob `06dfbc5a`입니다. 팁 `2775bf9` /
+blob `f5ed6cf9`는 불러오지 않습니다. 프로세스 실행과 봉투 수신은 모델 호출
+확인과 별개이며, 호스트 증거가 없으면 모델 호출은 미확인입니다.
 
 자료에 있는 수로 비율을 계산하는 것은 허용됩니다. 확인할 수단이 없는데
 검증했다고 말하면 실패입니다. 효과 크기는 계산하지 않습니다.
