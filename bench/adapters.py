@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import shlex
+import signal
 import subprocess
 import sys
 from collections.abc import Mapping
@@ -151,19 +152,14 @@ def run_command(
 
     payload = json.dumps(request, ensure_ascii=False).encode("utf-8")
     try:
-        completed = subprocess.run(
+        process = subprocess.Popen(
             argv,
-            input=payload,
-            capture_output=True,
-            timeout=timeout,
-            check=False,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             env=dict(os.environ if env is None else env),
-        )
-    except subprocess.TimeoutExpired:
-        return _execution_result(
-            status="model_error",
-            detail="command timed out",
-            process_started=True,
+            start_new_session=os.name != "nt",
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0,
         )
     except FileNotFoundError:
         return _execution_result(
@@ -177,19 +173,58 @@ def run_command(
             detail=f"command could not start: {exc.__class__.__name__}",
             process_started=False,
         )
-    if completed.returncode != 0:
+    try:
+        stdout, _ = process.communicate(input=payload, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        _stop_process_group(process)
         return _execution_result(
             status="model_error",
-            detail=f"command exited with status {completed.returncode}",
+            detail="command timed out; process-tree cleanup attempted",
             process_started=True,
         )
-    if len(completed.stdout) > _STDOUT_CAP:
+    if process.returncode != 0:
+        return _execution_result(
+            status="model_error",
+            detail=f"command exited with status {process.returncode}",
+            process_started=True,
+        )
+    if len(stdout) > _STDOUT_CAP:
         return _execution_result(
             status="model_error",
             detail="stdout exceeded the harness cap",
             process_started=True,
         )
-    return _envelope_from_stdout(completed.stdout)
+    return _envelope_from_stdout(stdout)
+
+
+def _stop_process_group(process: subprocess.Popen[bytes]) -> None:
+    """Best-effort cleanup of a timed-out command and its ordinary children."""
+    if os.name == "nt":
+        try:
+            subprocess.run(
+                ["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=5,
+                check=False,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+    else:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except OSError:
+            pass
+    try:
+        process.kill()
+    except OSError:
+        pass
+    try:
+        process.communicate(timeout=5)
+    except subprocess.TimeoutExpired:
+        for pipe in (process.stdin, process.stdout, process.stderr):
+            if pipe is not None:
+                pipe.close()
 
 
 def _envelope_from_stdout(stdout: bytes) -> dict[str, Any]:

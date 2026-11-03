@@ -120,7 +120,10 @@ run. A refusal has to be an explicit non-zero exit or an explicit error
 status. It must not be a silent success or a fabricated envelope. Unset
 command variables leave the row at `model_unavailable` with no process
 started. A non-zero exit or a non-envelope stdout is `model_error`: the
-process was attempted, and the model call stays unverified.
+process was attempted, and the model call stays unverified. Reserved future
+conditions do not start a command. On timeout the harness attempts to stop the
+process group and ordinary descendants; independently detached processes may
+escape cleanup. Windows cleanup is not yet qualified on a native Windows host.
 
 The packaged Codex selector is not this path. It selects a reasoning method
 and returns selection JSON. This harness does not import it.
@@ -193,6 +196,10 @@ and is not a solved checker.
 Follow [ADD_A_CASE.md](ADD_A_CASE.md).
 
 ## 한국어
+
+예약된 미래 조건은 명령을 실행하지 않는다. 시간 초과 시 프로세스 그룹과 일반
+하위 프로세스의 종료를 시도하지만, 독립적으로 분리된 프로세스까지 종료된다는
+보장은 없다. Windows의 정리 동작은 실제 Windows 환경에서 아직 검증하지 않았다.
 
 이 하니스는 Peter의 독립 제안 중 공개 벤치 조각입니다. 팀의 합의된 2.0 범위가
 아니고, #161과 #163의 범위 충돌은 여기서 정리하지 않습니다.

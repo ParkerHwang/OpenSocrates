@@ -18,7 +18,7 @@ REQUEST_SCHEMA = "opensocrates.v2-bench-request/1"
 ENVELOPE_SCHEMA = "opensocrates.v2-bench-envelope/1"
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901 - keep CLI validation and event handling explicit
     try:
         request = json.load(sys.stdin)
     except (UnicodeError, ValueError):

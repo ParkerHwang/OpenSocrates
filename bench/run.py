@@ -204,6 +204,14 @@ def _live_row(
     timeout: float,
     env: Mapping[str, str],
 ) -> dict[str, Any]:
+    if condition.get("future"):
+        return _row(
+            case_id=case["id"],
+            condition=condition["id"],
+            status="model_unavailable",
+            reason=unavailable_reason(condition, live=True),
+            evidence=not_run_evidence(),
+        )
     argv = command_argv(str(condition["id"]), env)
     if argv is None:
         return _row(

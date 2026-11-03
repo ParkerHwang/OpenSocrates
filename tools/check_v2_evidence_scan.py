@@ -2,11 +2,11 @@
 
 import importlib.util
 import json
-from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "plugin-src/experimental-output-brief/skills/output-brief/scripts/evidence_scan.py"

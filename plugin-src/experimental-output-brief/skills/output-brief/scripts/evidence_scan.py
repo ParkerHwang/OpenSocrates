@@ -390,7 +390,9 @@ def _present(rx: str, text: str) -> bool:
     return False
 
 
-def analyze(sources: list[str], prompt: str, output: str, must: list[str] | None = None) -> dict:
+def analyze(  # noqa: C901 - keep each distinct advisory check visible
+    sources: list[str], prompt: str, output: str, must: list[str] | None = None
+) -> dict:
     material = "\n".join([prompt, *sources])
     md, mn, mt = _scan(material)
     od, on, ot = _scan(output)
@@ -549,7 +551,10 @@ def main(argv=None) -> int:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--strict", action="store_true", help="exit 1 if any HIGH flag")
     a = ap.parse_args(argv)
-    rd = lambda p: Path(p).read_text(encoding="utf-8")
+
+    def rd(path: str) -> str:
+        return Path(path).read_text(encoding="utf-8")
+
     if a.stdin_json:
         if a.source or a.prompt or a.output:
             ap.error("--stdin-json cannot be combined with file inputs")
