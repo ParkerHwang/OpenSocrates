@@ -1,8 +1,9 @@
 # OpenSocrates 2.0 preparation
 
-This is the development-start packet for OpenSocrates 2.0. It records the product direction, implementation work, evidence requirements and preserved pre-2.0 work. It does not implement or release the product. Start with [the master plan](MASTER_PLAN.md), then use the focused references below.
+The active slice is [the core](CORE.md): a recipient artifact, continuation that restores the facts the draft uses, and one Cursor path proved after that slice exists. [한국어 핵심](CORE.ko.md) states the same scope. This directory also keeps the development-start packet. The packet records the wider product direction, implementation research, evidence requirements, and preserved pre-2.0 work. It does not implement or release the product.
 
 - [한국어 시작 안내](README.ko.md)
+- [Core slice](CORE.md)
 - [Master plan and work packages](MASTER_PLAN.md)
 - [Implementation backlog](IMPLEMENTATION_BACKLOG.md)
 - [v1.5.3 package and source inventory](RELEASE_BASELINE_1.5.3.md) (B01, partial: actual host delivery not yet measured)

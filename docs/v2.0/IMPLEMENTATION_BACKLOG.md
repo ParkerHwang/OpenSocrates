@@ -1,5 +1,7 @@
 # OpenSocrates 2.0 implementation backlog
 
+The active build is the four steps in [the core slice](CORE.md). Items B01–B22 remain the preserved wider backlog. B01's unmeasured host-token inventory does not block the offline artifact and continuation steps.
+
 This backlog is a proposed sequence of implementable work, not a record that any feature is complete. Read [the master plan](MASTER_PLAN.md), [product cases](PRODUCT_AND_EVALUATION.md), [host research](HOSTS_AND_BOTS.md), and [architecture](ARCHITECTURE_AND_MIGRATION.md). Each item should become a focused issue or PR when its prerequisite contracts and current-main source are reconciled; do not start implementation from historical branches blindly.
 
 Use the work items below as the current planning backlog. The former parent issue #136 and workstream issues #138–#145 were deleted; they are historical identifiers, not active trackers. Create focused issues or PRs as scope and dependencies are validated.
