@@ -19,6 +19,12 @@ is preserved separately, including its scanner and benchmark. They are not part
 of this candidate. This is an experiment, not a release or a claim that the
 skill improves outcomes over an unassisted model or a short instruction.
 
+The distinction between binding requirements and preferences is adapted from
+the 1.x [trade-off analysis](../../../content/methods/trade-off-analysis/procedure.en.md).
+The idea of checking whether information could change an action comes from
+[value of information](../../../content/methods/value-of-information/procedure.en.md).
+The short guidance is not either full procedure and does not call them.
+
 ## Try the local skill in Codex
 
 Copy the `opensocrates-core` skill folder into your project's
@@ -39,8 +45,11 @@ in other hosts.
 > buying, building, and a temporary manual process. We do not yet know whether
 > the tool supports offline use or whether the team can maintain a custom tool.
 
-A useful response can compare the options without assuming offline support,
-staff capacity, or the feasibility of manual work. It can identify a small
+A useful response can keep the mandatory offline requirement separate from
+preferences such as convenience, and compare the options without assuming
+offline support, staff capacity, or the feasibility of manual work. A tool
+that cannot work offline fails the requirement; one whose offline support is
+unknown remains conditional, not rejected or approved. The response can identify a small
 next step that does not depend on those unknowns and explain what would change
 its recommendation. This is an illustrative prompt, not a recorded test result.
 
