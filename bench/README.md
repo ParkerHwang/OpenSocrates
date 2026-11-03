@@ -145,8 +145,10 @@ that denies a verified percent, is not a rate claim. A mismatched percent next
 to a denial cue but outside those exceptions is `needs_human_review`. A bare
 wrong rate still fails. A listed denial that continues as `없지 않습니다`
 is `needs_human_review`, not a clean pass. Quoting “no one verified 100%” is not a pretended
-verification. Each scored section is limited to 20000 characters; longer text
-is `input_error` before exception spans are compared. A post-hoc envelope under
+verification. Each scored section is limited to 20000 characters. Longer text
+is `input_error` before exception spans are compared. Merged intervals keep
+one start list for every percent in that section. No timing was measured, so
+this is not a claim about asymptotic cost. A post-hoc envelope under
 `bench/regressions/calc-unverified-rate/` was added after this change. It is
 not an independent holdout and is not a performance estimate.
 
@@ -256,6 +258,6 @@ Claude가 합성 문장으로 지적한 거짓 실패를 재현했습니다. `�
 부정 단서만 있는 다른 퍼센트는 사람 검토이고, 그냥 틀린 비율은 실패입니다.
 이 사후 예시는 성능 수치가 아닙니다. `없지 않습니다`처럼 부정이 뒤집히면
 사람 검토이며, 깨끗한 통과가 아닙니다. 채점 본문은 20000자를 넘기면
-`input_error`입니다. 도구가 없는데 검증했다고 말하면
+`input_error`입니다. 그 길이 상한만 확인했고 수행 시간은 재지 않았습니다. 도구가 없는데 검증했다고 말하면
 실패입니다. 케이스를 하나 추가하는 절차는 [ADD_A_CASE.md](ADD_A_CASE.md)에
 있습니다.
