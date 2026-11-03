@@ -15,7 +15,21 @@
 - OpenAI 패키지는 문서에 나온 [플러그인 구조](https://developers.openai.com/plugins/build/plugins)를 따른다. 로컬 설치나 디렉터리 배포는 대상 환경에 따라 다르다.
 - Claude는 **Customize → Skills**에서 스킬 폴더가 들어 있는 ZIP을 업로드하는 방법을 안내한다. 계정과 코드 실행 조건은 [Claude 스킬 사용 안내](https://support.claude.com/en/articles/12512180-use-skills-in-claude)를 참고한다.
 
-두 패키지는 아직 실제 호스트에서 사용을 검증하지 않았다. 저장소의 로컬 플러그인 목록에는 기존 OpenSocrates와 별도로 실험용 후보가 보이도록 등록했다. 목록 등록만으로 설치되거나 활성화되지는 않는다. 별도 임시 설정의 Codex CLI에서는 설치가 성공했고 설치된 파일이 `c8e1815`의 후보와 일치했다. 이 관찰은 ChatGPT나 다른 계정에서의 활성화·사용을 뜻하지 않는다. 제공 여부는 요금제·계정·조직과 사용 화면에 따라 다를 수 있다.
+두 패키지는 아직 실제 호스트에서 사용을 검증하지 않았다. 실험 폴더 `plugin-src/experimental-output-brief/`에 별도 로컬 플러그인 목록을 두었다. 목록을 등록하는 것만으로 설치되거나 활성화되지는 않으며 기존 1.x 목록은 바뀌지 않는다. 별도 임시 설정의 Codex CLI에서는 설치가 성공했고 설치된 파일이 `c8e1815`의 후보와 일치했다. 이 관찰은 ChatGPT나 다른 계정에서의 활성화·사용을 뜻하지 않는다. 제공 여부는 요금제·계정·조직과 사용 화면에 따라 다를 수 있다.
+
+저장소를 내려받은 환경의 Codex CLI에서는 별도 실험용 목록을 등록하고 후보만 설치할 수 있다.
+
+```sh
+codex plugin marketplace add ./plugin-src/experimental-output-brief
+codex plugin add opensocrates-output-brief-experiment@opensocrates-output-brief-experiment-local
+```
+
+이 명령은 실행하는 사용자의 로컬 Codex 설정을 변경한다. 더 이상 필요하지 않으면 실험용 플러그인과 해당 목록만 제거하고 기존 OpenSocrates 설치는 유지한다. 격리된 설치 시험은 로그인된 세션에서 실제로 사용된다는 증거가 아니다.
+
+```sh
+codex plugin remove opensocrates-output-brief-experiment@opensocrates-output-brief-experiment-local
+codex plugin marketplace remove opensocrates-output-brief-experiment-local
+```
 
 기여자는 `make v2-candidate-check`로 점검기·연결 코드·프로세스 경계와 합성 벤치의 오프라인 검사를 실행할 수 있다. 이 명령은 모델을 호출하거나 호스트 설치를 검증하지 않는다.
 

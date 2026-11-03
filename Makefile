@@ -170,7 +170,7 @@ evaluation-lab-check:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" tools/check_evaluation_lab_package.py
 
 v2-candidate-check:
-	@PYTHONPATH="$(ROOT):$(PYTHONPATH)" "$(PYTHON)" -m unittest tools.check_v2_evidence_scan tools.check_v2_codex_adapter tools.check_v2_bench_boundaries
+	@PYTHONPATH="$(ROOT):$(PYTHONPATH)" "$(PYTHON)" -m unittest tools.check_v2_evidence_scan tools.check_v2_codex_adapter tools.check_v2_bench_boundaries tools.check_v2_marketplace
 	@PYTHONPATH="$(ROOT):$(PYTHONPATH)" "$(PYTHON)" -m bench.run --mode offline --report build/bench/report.json --summary build/bench/summary.md
 
 smoke: evaluation-lab-check v2-candidate-check

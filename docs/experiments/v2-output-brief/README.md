@@ -40,12 +40,30 @@ release. Their generation does not install or enable anything.
   for account and code-execution requirements.
 
 Neither archive has yet been qualified for installation, discovery, or use on a
-real host. The repository's local marketplace lists the experimental plugin
-separately from the existing OpenSocrates plugin; listing it does not install or
-enable it. A temporary Codex CLI installation with isolated settings succeeded
+real host. The experiment contains a separate local marketplace rooted at
+`plugin-src/experimental-output-brief/`; registering it does not install or
+enable the plugin. The existing 1.x marketplace is unchanged. A temporary Codex CLI installation with isolated settings succeeded
 and its installed files matched the candidate at commit `c8e1815`; this does not
 establish activation or availability in ChatGPT or another account. Availability
 can vary by plan, account, organization, and surface.
+
+From a local checkout, a Codex CLI user can register the separate experimental
+marketplace and install this candidate:
+
+```sh
+codex plugin marketplace add ./plugin-src/experimental-output-brief
+codex plugin add opensocrates-output-brief-experiment@opensocrates-output-brief-experiment-local
+```
+
+These commands change the invoking user's local Codex settings. Remove only the
+experimental plugin and marketplace when no longer needed; keep the existing
+OpenSocrates installation. The isolated test does not establish how the
+installed candidate behaves in an authenticated session.
+
+```sh
+codex plugin remove opensocrates-output-brief-experiment@opensocrates-output-brief-experiment-local
+codex plugin marketplace remove opensocrates-output-brief-experiment-local
+```
 
 Contributors can run `make v2-candidate-check` for the offline scanner, adapter,
 process-boundary, and synthetic-benchmark checks. This command does not call a
