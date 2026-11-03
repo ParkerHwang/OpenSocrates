@@ -39,6 +39,7 @@ def run_probes() -> list[dict[str, Any]]:
         _date_ambiguous_probe(),
         _date_omitted_probe(),
         _invented_calendar_date_probe(),
+        _bad_expected_status_probe(),
     ]
 
 
@@ -277,6 +278,46 @@ def _reversed_stale_probe() -> dict[str, Any]:
         "needs_human_review",
         scored["status"],
         "a listed stale phrase followed by a denial is unresolved, not a pass",
+    )
+
+
+def _bad_expected_status_probe() -> dict[str, Any]:
+    import tempfile
+
+    from bench.cases import _read_regression
+    from bench.contract import ENVELOPE_SCHEMA, REGRESSION_SCHEMA
+    from bench.run import _score_regressions
+
+    envelope = {"schema": ENVELOPE_SCHEMA, "body": "x", "requester_notes": ""}
+    base = {
+        "schema": REGRESSION_SCHEMA,
+        "case_id": "e01-venue-messages",
+        "label": "bad-status",
+        "framing": "Post-hoc example added for validation. Not an independent holdout.",
+        "envelope": envelope,
+    }
+    rows: list[dict[str, Any]] = []
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        for name, status in (("array", ["pass"]), ("object", {"status": "pass"})):
+            path = root / f"{name}.json"
+            path.write_text(
+                json.dumps({**base, "expected_status": status}),
+                encoding="utf-8",
+            )
+            loaded = _read_regression(path, root)
+            rows.extend(_score_regressions([], [loaded]))
+    ok = (
+        len(rows) == 2
+        and all(row["status"] == "input_error" and row["matched"] is False for row in rows)
+        and all("expected_status" in row["reason"] for row in rows)
+    )
+    return _finish(
+        "expected-status-type",
+        "input_error",
+        "input_error" if ok else "crash-or-miss",
+        "a list or object expected_status is input_error, not an uncaught TypeError",
+        ok=ok,
     )
 
 
