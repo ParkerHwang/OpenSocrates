@@ -129,7 +129,8 @@ request instead of claiming it passed.
 ## Public synthetic bench
 
 The offline harness in [bench/README.md](bench/README.md) scores public synthetic
-cases with deterministic rules. `make bench` does not call a model. The first
+cases with deterministic rules. `public_synthetic: true` is the case author's
+claim, not a certification, and it is copied into the adapter request. `make bench` does not call a model. The first
 external contribution this harness asks for is one new case; use the checklist
 in [bench/ADD_A_CASE.md](bench/ADD_A_CASE.md).
 

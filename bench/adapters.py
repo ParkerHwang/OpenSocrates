@@ -43,10 +43,24 @@ def command_argv(condition_id: str, env: Mapping[str, str]) -> list[str] | None:
     return argv or None
 
 
+def public_synthetic_claim(case: Mapping[str, Any]) -> bool | None:
+    """Return the author's boolean claim, or None when it is absent or not boolean.
+
+    ``True`` is the author's claim. It does not certify that the materials are
+    public or synthetic.
+    """
+
+    value = case.get("public_synthetic")
+    if isinstance(value, bool):
+        return value
+    return None
+
+
 def build_request(case: Mapping[str, Any], condition: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "schema": REQUEST_SCHEMA,
         "condition": condition["id"],
+        "public_synthetic": public_synthetic_claim(case),
         "skill_text": condition.get("skill_text"),
         "prompt": case["prompt"],
         "materials": case["materials"],

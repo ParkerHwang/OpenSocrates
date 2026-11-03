@@ -59,6 +59,16 @@ Claude review, commit `2775bf9beea5e802f94339ae7f8bd7c875c0ae25`, blob
 Claude need to agree before that comparison version replaces the pin. `make
 bench` checks the documented blob and does not fetch the tip.
 
+## Author claim on adapter requests
+
+`build_request` puts the case's `public_synthetic` value on the JSON stdin
+object. `true` is the author's claim. It does not prove the materials are
+public or synthetic. The case loader in this harness still requires the claim
+to be `true` before a case is scored. If the field is missing or `false`, an
+experimental adapter may refuse the run. That refusal must be an explicit
+non-zero exit or an explicit error status, not a silent success or a
+fabricated envelope. This branch does not implement that adapter.
+
 ## Model-call evidence
 
 `process_started` and `envelope_received` record that a command ran and that
@@ -132,6 +142,10 @@ Parker의 설계 수정을 반영했습니다. 채점은 스킬에 영어 제목
 `output_brief` 기본값은 `d6091b4` / blob `06dfbc5a`입니다. 팁 `2775bf9` /
 blob `f5ed6cf9`는 불러오지 않습니다. 프로세스 실행과 봉투 수신은 모델 호출
 확인과 별개이며, 호스트 증거가 없으면 모델 호출은 미확인입니다.
+
+`public_synthetic: true`는 작성자의 주장이지, 공개·가상 자료라는 인증이
+아닙니다. 요청 JSON에 포함되며, 없거나 `false`이면 실험용 어댑터는 명시적
+오류로 거부할 수 있습니다.
 
 `baseline`은 스킬 없음이고, 한 줄 일반 지시 조건은 없습니다. `reader_1x`는
 영어 독자 가이드 파일만이며 1.5.3 전체 설치가 아닙니다. `예약이 확정되지

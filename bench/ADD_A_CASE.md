@@ -6,7 +6,7 @@ request template, and add the block below under Summary.
 ## Checklist
 
 - [ ] Search open cases so the scenario is not a duplicate.
-- [ ] Add `bench/cases/<id>.json` with `public_synthetic: true`.
+- [ ] Add `bench/cases/<id>.json` with `public_synthetic: true`. That value is the author's claim, not a certification that the text is public or synthetic. The harness copies it into the adapter request. An experimental adapter may refuse a request when the field is missing or `false`; that refusal must be an explicit error, not a silent success.
 - [ ] Use fictional facts only. No private prompts, transcripts, credentials, or real customer text.
 - [ ] State the user task in the user's language. Do not require the headings "Recipient body" or "Requester memo".
 - [ ] Write checks against envelope fields `body` and `requester_notes` only. A rule must be decidable without a model. For `forbid_text`, list `clear_exceptions` for spans that are clearly not the forbidden claim, and `ambiguous_cues` for nearby wording that must stay `needs_human_review`. Do not treat a product scanner flag as the bench result. A paraphrase that avoids the literal pattern is a blind spot, not a pass you have proved.

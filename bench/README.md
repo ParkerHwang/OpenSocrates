@@ -112,9 +112,15 @@ Per-slot overrides are `OPENSOCRATES_BENCH_COMMAND_BASELINE`,
 `OPENSOCRATES_BENCH_COMMAND_READER_1X`, and
 `OPENSOCRATES_BENCH_COMMAND_OPENSOCRATES_V2`.
 The command receives a JSON request on stdin and must print only the envelope
-on stdout. Unset variables leave the row at `model_unavailable` with no
-process started. A non-zero exit or a non-envelope stdout is `model_error`:
-the process was attempted, and the model call stays unverified.
+on stdout. The request includes `public_synthetic`. That boolean is the case
+author's claim. It is not proof that the prompt or materials are public or
+synthetic. This harness still accepts only cases that set the claim to `true`.
+If the field is missing or `false`, an experimental adapter may refuse the
+run. A refusal has to be an explicit non-zero exit or an explicit error
+status. It must not be a silent success or a fabricated envelope. Unset
+command variables leave the row at `model_unavailable` with no process
+started. A non-zero exit or a non-envelope stdout is `model_error`: the
+process was attempted, and the model call stays unverified.
 
 The packaged Codex selector is not this path. It selects a reasoning method
 and returns selection JSON. This harness does not import it.
@@ -200,6 +206,11 @@ Follow [ADD_A_CASE.md](ADD_A_CASE.md).
 `output_brief` 기본 핀은 `d6091b4` blob `06dfbc5a`입니다. #164 팁 `2775bf9`
 blob `f5ed6cf9`는 적기만 하고 불러오지 않습니다. 비교 버전은 Parker와 Claude가
 맞춘 뒤에만 바꿉니다.
+
+`public_synthetic: true`는 작성자의 주장입니다. 자료가 실제로 공개되었거나
+가상이라는 증명이 아닙니다. 어댑터 요청 JSON에 그 값이 들어갑니다. 값이
+없거나 `false`이면 실험용 어댑터는 실행을 거부할 수 있으며, 그때는 명시적
+오류여야 하고 조용한 성공이어서는 안 됩니다.
 
 `baseline`은 스킬이 없는 조건입니다. 한 줄 일반 지시 조건은 없습니다.
 `reader_1x`는 `guide.en.md` 파일만 지문으로 읽으며, 1.5.3 전체 설치나 실행이

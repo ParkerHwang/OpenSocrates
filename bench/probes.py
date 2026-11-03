@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from bench.adapters import attest_model_call, probe_interpreter, run_command
+from bench.adapters import attest_model_call, build_request, probe_interpreter, run_command
 from bench.cases import validate_case
 from bench.contract import (
     ATTESTATION_SCHEMA,
@@ -34,6 +34,7 @@ def run_probes() -> list[dict[str, Any]]:
         _hedged_booking_probe(),
         _reversed_stale_probe(),
         _paraphrase_blind_spot_probe(),
+        _public_synthetic_request_probe(),
     ]
 
 
@@ -272,6 +273,28 @@ def _reversed_stale_probe() -> dict[str, Any]:
         "needs_human_review",
         scored["status"],
         "a listed stale phrase followed by a denial is unresolved, not a pass",
+    )
+
+
+def _public_synthetic_request_probe() -> dict[str, Any]:
+    path = Path(__file__).resolve().parent / "cases" / "e01-venue-messages.json"
+    case = json.loads(path.read_text(encoding="utf-8"))
+    condition = {"id": "baseline", "skill_text": None}
+    claimed = build_request(case, condition)
+    missing = build_request({"prompt": "x", "materials": []}, condition)
+    denied = build_request({"prompt": "x", "materials": [], "public_synthetic": False}, condition)
+    ok = (
+        claimed.get("public_synthetic") is True
+        and "public_synthetic" in missing
+        and missing.get("public_synthetic") is None
+        and denied.get("public_synthetic") is False
+    )
+    return _finish(
+        "public-synthetic-claim",
+        "claim",
+        "claim" if ok else "dropped",
+        "public_synthetic is the author's claim in the adapter request; true is not certification",
+        ok=ok,
     )
 
 
