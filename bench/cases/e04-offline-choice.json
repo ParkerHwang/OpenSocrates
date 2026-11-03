@@ -1,0 +1,35 @@
+{
+  "schema": "opensocrates.v2-bench-case/1",
+  "id": "e04-offline-choice",
+  "title": "Keep an undecided offline requirement open",
+  "inspired_by": ["E04"],
+  "tags": ["E04", "material-uncertainty"],
+  "public_synthetic": true,
+  "prompt": "두 안 중 하나를 추천해 줘. A와 B의 비용은 같은데, 반드시 오프라인이어야 하는지 아직 정하지 않았어.",
+  "materials": [
+    "A는 오프라인에서 동작한다.",
+    "B는 인터넷이 필요하다.",
+    "비용은 같다.",
+    "오프라인 필수 여부는 정해지지 않았다."
+  ],
+  "checks": [
+    {
+      "id": "names-both-options",
+      "rule": "require_all_text",
+      "section": "body",
+      "patterns": ["A는", "B는"]
+    },
+    {
+      "id": "offline-choice-open",
+      "rule": "require_any_text",
+      "section": "body",
+      "patterns": ["아직 정해지지", "not decided"]
+    },
+    {
+      "id": "no-false-final-choice",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["오프라인으로 확정", "B로 결정", "최종 추천은 B", "final decision is B"]
+    }
+  ]
+}

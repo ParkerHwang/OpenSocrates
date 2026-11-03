@@ -2,7 +2,7 @@ PYTHON ?= $(shell if command -v uv >/dev/null 2>&1; then uv python find 3.12; el
 PYTHONPATH := src
 ROOT := $(CURDIR)
 
-.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check codex-hook-timing package release-check version evaluation-lab-check
+.PHONY: bootstrap format format-check lint typecheck generate generated-check content-check adjudication-check docs-check governance-check package-check security-scan smoke installer-check codex-hook-timing package release-check version evaluation-lab-check bench
 
 bootstrap:
 	@PYTHONPATH="$(PYTHONPATH)" "$(PYTHON)" -c 'import pathlib,sys,tomllib; assert sys.version_info[:2] == (3, 12), sys.version; root=pathlib.Path("."); project=tomllib.loads((root/"pyproject.toml").read_text()); lock=tomllib.loads((root/"uv.lock").read_text()); expected=("openai-codex==0.144.4", "openai-codex-cli-bin==0.144.4", "pydantic>=2.12,<3"); assert tuple(project["project"].get("dependencies", [])) == expected; packages={item.get("name"): item for item in lock.get("package", []) if isinstance(item, dict) and isinstance(item.get("name"), str)}; assert packages.get("openai-codex", {}).get("version") == "0.144.4"; assert packages.get("openai-codex-cli-bin", {}).get("version") == "0.144.4"; pydantic=packages.get("pydantic", {}).get("version", ""); assert pydantic.startswith("2.") and tuple(map(int, pydantic.split(".")[:2])) >= (2, 12); assert packages.get("pydantic-core", {}).get("version"); opensocrates=packages.get("opensocrates", {}); direct={item.get("name") for item in opensocrates.get("dependencies", []) if isinstance(item, dict)}; assert {"openai-codex", "openai-codex-cli-bin", "pydantic"} <= direct; print("Python 3.12 and locked Codex SDK/runtime metadata ready")'
@@ -202,3 +202,6 @@ release-check: adjudication-check
 
 version:
 	@PYTHONPATH=$(PYTHONPATH) $(PYTHON) -m opensocrates version --json
+
+bench:
+	@python3 -m bench.run --mode offline --report build/bench/report.json --summary build/bench/summary.md

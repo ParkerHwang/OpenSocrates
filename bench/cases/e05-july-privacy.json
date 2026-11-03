@@ -1,0 +1,40 @@
+{
+  "schema": "opensocrates.v2-bench-case/1",
+  "id": "e05-july-privacy",
+  "title": "Move the launch month without approving publication",
+  "inspired_by": ["E05"],
+  "tags": ["E05", "changed-evidence", "accepted-intent"],
+  "public_synthetic": true,
+  "prompt": "새 자료를 반영해 다음 행동을 정리해 줘. 공개하거나 승인 처리하지는 마.",
+  "materials": [
+    "이전에 받아들인 의도: 기여자들이 이름 표기를 승인하기 전까지 공유 컬렉션은 비공개로 둔다.",
+    "새 사실: 출시 시점이 6월에서 7월로 옮겨졌다.",
+    "이름 표기 승인이 끝났다는 자료는 없다."
+  ],
+  "checks": [
+    {
+      "id": "launch-moved-to-july",
+      "rule": "require_any_text",
+      "section": "body",
+      "patterns": ["7월", "July"]
+    },
+    {
+      "id": "june-is-not-current",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["출시 시점은 6월입니다", "launch date is June", "6월 출시로 유지"]
+    },
+    {
+      "id": "privacy-still-holds",
+      "rule": "require_any_text",
+      "section": "body",
+      "patterns": ["비공개", "private until"]
+    },
+    {
+      "id": "attribution-not-approved",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["공개가 승인", "이름 표기가 승인되었습니다", "attribution has been approved"]
+    }
+  ]
+}
