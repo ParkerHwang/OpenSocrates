@@ -11,6 +11,10 @@ CONDITIONS_SCHEMA = "opensocrates.v2-bench-conditions/1"
 REQUEST_SCHEMA = "opensocrates.v2-bench-request/1"
 ATTESTATION_SCHEMA = "opensocrates.v2-bench-model-attestation/1"
 
+# Live command fields and offline scoring share this bound. It keeps
+# percent-by-exception work off unbounded contributor text.
+MAX_SCORED_SECTION_CHARS = 20_000
+
 # A parsed envelope is not evidence that a model ran.
 MODEL_CALL_VERIFIED = "verified"
 MODEL_CALL_UNVERIFIED = "unverified"

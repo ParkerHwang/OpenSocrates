@@ -6,9 +6,12 @@ English section headings inside the artifact.
 
 from __future__ import annotations
 
+import bisect
 import re
 from collections.abc import Mapping
 from typing import Any
+
+from bench.contract import MAX_SCORED_SECTION_CHARS
 
 _DATE_PATTERNS = (
     re.compile(r"\d{4}-\d{2}-\d{2}"),
@@ -48,6 +51,9 @@ def score_envelope(case: Mapping[str, Any], envelope: Mapping[str, str]) -> dict
     folded into pass or fail.
     """
 
+    oversize = _oversize_section(envelope)
+    if oversize:
+        return _score_result("input_error", oversize, [], [])
     try:
         failed, unresolved = _collect_checks(case, envelope)
     except ScorerError as exc:
@@ -409,20 +415,24 @@ def _arithmetic_claim(
         *_denial_materials(check.get("materials")),
     ]
     exception_spans = _find_spans(haystack, exceptions)
-    cue_spans = _find_spans(haystack, _optional_strings(check, "ambiguous_cues"))
+    clean_exceptions, reversed_exceptions = _split_exception_intervals(haystack, exception_spans)
+    cue_intervals = _merge_intervals(
+        _find_spans(haystack, _optional_strings(check, "ambiguous_cues"))
+    )
     expected = 100.0 * numerator / denominator
     _classify_percents(
-        haystack,
         expected,
         float(tolerance),
         numerator,
         denominator,
-        exception_spans,
-        cue_spans,
+        haystack,
+        clean_exceptions,
+        reversed_exceptions,
+        cue_intervals,
         failures,
         unresolved,
     )
-    _pretended_outside_exceptions(haystack, phrases, exception_spans, failures)
+    _pretended_outside_exceptions(haystack, phrases, clean_exceptions, failures)
     if failures:
         return {"state": "fail", "details": failures}
     if unresolved:
@@ -444,13 +454,14 @@ def _denial_materials(materials: object) -> list[str]:
 
 
 def _classify_percents(
-    haystack: str,
     expected: float,
     tolerance: float,
     numerator: int,
     denominator: int,
-    exception_spans: list[tuple[int, int]],
-    cue_spans: list[tuple[int, int]],
+    haystack: str,
+    clean_exceptions: list[tuple[int, int]],
+    reversed_exceptions: list[tuple[int, int]],
+    cue_intervals: list[tuple[int, int]],
     failures: list[str],
     unresolved: list[str],
 ) -> None:
@@ -459,14 +470,19 @@ def _classify_percents(
         if abs(claimed - expected) <= tolerance:
             continue
         span = (match.start(), match.end())
-        if any(_contains(outer, span) for outer in exception_spans):
+        if _covered_by(clean_exceptions, span[0], span[1]):
+            continue
+        if _covered_by(reversed_exceptions, span[0], span[1]):
+            unresolved.append(
+                f"percent {claimed:g} sits in an exception whose polarity is reversed"
+            )
             continue
         window = (max(0, span[0] - _CUE_BEFORE), min(len(haystack), span[1] + _CUE_AFTER))
         detail = (
             f"percent {claimed:g} does not match {numerator}/{denominator}; "
             "no external verification is available"
         )
-        if any(_overlaps(cue, window) for cue in cue_spans):
+        if _overlaps_any(cue_intervals, window[0], window[1]):
             unresolved.append(detail + "; nearby denial cue")
         else:
             failures.append(detail)
@@ -475,15 +491,76 @@ def _classify_percents(
 def _pretended_outside_exceptions(
     haystack: str,
     phrases: list[str],
-    exception_spans: list[tuple[int, int]],
+    clean_exceptions: list[tuple[int, int]],
     failures: list[str],
 ) -> None:
     for phrase in phrases:
         for start, end in _find_spans(haystack, [phrase]):
-            if any(_contains(outer, (start, end)) for outer in exception_spans):
+            if _covered_by(clean_exceptions, start, end):
                 continue
             failures.append(f"pretended verification {phrase!r}")
 
+
+def _split_exception_intervals(
+    haystack: str, spans: list[tuple[int, int]]
+) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+    clean: list[tuple[int, int]] = []
+    reversed_spans: list[tuple[int, int]] = []
+    for start, end in spans:
+        if _polarity_reversed(haystack, end):
+            reversed_spans.append((start, end))
+        else:
+            clean.append((start, end))
+    return _merge_intervals(clean), _merge_intervals(reversed_spans)
+
+
+def _polarity_reversed(haystack: str, end: int) -> bool:
+    tail = haystack[end : end + _POLARITY_WINDOW]
+    return any(cue in tail for cue in _POLARITY_REVERSALS)
+
+
+def _merge_intervals(spans: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    if not spans:
+        return []
+    ordered = sorted(spans)
+    merged: list[list[int]] = [[ordered[0][0], ordered[0][1]]]
+    for start, end in ordered[1:]:
+        if start <= merged[-1][1]:
+            if end > merged[-1][1]:
+                merged[-1][1] = end
+        else:
+            merged.append([start, end])
+    return [(item[0], item[1]) for item in merged]
+
+
+def _covered_by(intervals: list[tuple[int, int]], start: int, end: int) -> bool:
+    if not intervals:
+        return False
+    starts = [item[0] for item in intervals]
+    index = bisect.bisect_right(starts, start) - 1
+    if index < 0:
+        return False
+    return intervals[index][0] <= start and end <= intervals[index][1]
+
+
+def _overlaps_any(intervals: list[tuple[int, int]], start: int, end: int) -> bool:
+    if not intervals:
+        return False
+    starts = [item[0] for item in intervals]
+    index = bisect.bisect_left(starts, end) - 1
+    return index >= 0 and intervals[index][1] > start
+
+
+def _oversize_section(envelope: Mapping[str, str]) -> str | None:
+    for name in ("body", "requester_notes"):
+        value = envelope.get(name)
+        if isinstance(value, str) and len(value) > MAX_SCORED_SECTION_CHARS:
+            return f"{name} exceeds {MAX_SCORED_SECTION_CHARS} characters"
+    return None
+
+
+_POLARITY_WINDOW = 12
+_POLARITY_REVERSALS = ("지 않", "지는 않", "지가 않")
 
 _PERCENT_DENIAL_CUES = (
     "없다",

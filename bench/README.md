@@ -140,8 +140,10 @@ tags, and checks a rule scorer can apply without a model. Supported rules:
 denominator. A percent inside a listed exception, or inside a material sentence
 that denies a verified percent, is not a rate claim. A mismatched percent next
 to a denial cue but outside those exceptions is `needs_human_review`. A bare
-wrong rate still fails. Quoting “no one verified 100%” is not a pretended
-verification. A post-hoc envelope under
+wrong rate still fails. A listed denial that continues as `없지 않습니다`
+is `needs_human_review`, not a clean pass. Quoting “no one verified 100%” is not a pretended
+verification. Each scored section is limited to 20000 characters; longer text
+is `input_error` before exception spans are compared. A post-hoc envelope under
 `bench/regressions/calc-unverified-rate/` was added after this change. It is
 not an independent holdout and is not a performance estimate.
 
@@ -245,6 +247,8 @@ Claude가 합성 문장으로 지적한 거짓 실패를 재현했습니다. `�
 산술은 자료에 있는 분자와 분모로 계산할 수 있습니다. 자료가 100% 검증을
 부인하는 문장을 본문이 인용하면 그 퍼센트는 비율 주장이 아닙니다. 예외 없이
 부정 단서만 있는 다른 퍼센트는 사람 검토이고, 그냥 틀린 비율은 실패입니다.
-이 사후 예시는 성능 수치가 아닙니다. 도구가 없는데 검증했다고 말하면
+이 사후 예시는 성능 수치가 아닙니다. `없지 않습니다`처럼 부정이 뒤집히면
+사람 검토이며, 깨끗한 통과가 아닙니다. 채점 본문은 20000자를 넘기면
+`input_error`입니다. 도구가 없는데 검증했다고 말하면
 실패입니다. 케이스를 하나 추가하는 절차는 [ADD_A_CASE.md](ADD_A_CASE.md)에
 있습니다.

@@ -18,6 +18,7 @@ from typing import Any
 from bench.contract import (
     ATTESTATION_SCHEMA,
     ENVELOPE_SCHEMA,
+    MAX_SCORED_SECTION_CHARS,
     MODEL_CALL_NOT_APPLICABLE,
     MODEL_CALL_UNVERIFIED,
     MODEL_CALL_VERIFIED,
@@ -27,7 +28,7 @@ from bench.contract import (
 )
 
 _STDOUT_CAP = 100_000
-_FIELD_CAP = 20_000
+_FIELD_CAP = MAX_SCORED_SECTION_CHARS
 
 
 def command_argv(condition_id: str, env: Mapping[str, str]) -> list[str] | None:
