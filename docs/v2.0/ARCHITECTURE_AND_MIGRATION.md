@@ -1,5 +1,9 @@
 # OpenSocrates 2.0 architecture and migration plan
 
+> **Earlier plan:** The owner has authorized reconsideration of the 2.0 direction
+> and prior product conditions. Preserve this design as context; it is not binding
+> on the [current experiment](../experiments/v2-output-brief/README.md).
+
 Status: implementation design, not a claim of shipped behavior. Start from the
 released 1.5.3 product and its documented contracts. The user has withdrawn the
 separate 1.6 release work; its PRs, branches, and evidence are historical inputs

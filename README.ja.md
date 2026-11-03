@@ -4,6 +4,8 @@
 
 # OpenSocrates
 
+> **2.0 実験:** 読者向けの文書作成と、草案を提供資料と照合する作業を支援する別の候補を開発しています。正式リリースではなく、事実の正確性を保証するものでもありません。[実験を見る（英語）](docs/experiments/v2-output-brief/README.md)。
+
 **AI との会話に、48 種類の思考法を。**
 
 OpenSocrates は、**Claude、Codex、Antigravity** で繰り返し使える思考の手順を

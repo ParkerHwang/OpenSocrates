@@ -4,6 +4,10 @@
 
 # OpenSocrates
 
+> **2.0 experiment:** Try a separate candidate that helps prepare reader-facing
+> work and compare a draft with supplied material. It is not a release or a
+> guarantee of factual accuracy. [Explore the experiment](docs/experiments/v2-output-brief/README.md).
+
 **Put 48 reasoning methods to work in your AI conversations.**
 
 OpenSocrates brings reusable reasoning procedures to **Claude, Codex and

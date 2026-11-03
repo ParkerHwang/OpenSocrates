@@ -1,5 +1,9 @@
 # OpenSocrates 2.0 product requirements and evaluation plan
 
+> **Earlier plan:** The owner has authorized reconsideration of the 2.0 direction
+> and prior product conditions. Preserve these proposals as context; they are not
+> binding on the [current experiment](../experiments/v2-output-brief/README.md).
+
 Status: preparation specification, not evidence of implementation or product improvement. The intended user is a person who asks an AI assistant to do work in ordinary language and needs an understandable, usable result. The product must help the assistant understand the job, make appropriate judgments, communicate to the intended reader, and continue a long task without losing important context. Avoid adding ceremony to straightforward work.
 
 This document turns the owner’s 2.0 direction into observable requirements and evaluation cases. The released comparison is [v1.5.3](https://github.com/ParkerHwang/OpenSocrates/releases/tag/v1.5.3); compare the actual pinned release, not an old checkout or a local approximation. The owner has withdrawn the separate 1.6 release direction; the Go candidate remains historical evidence and possible design material, not an approved 2.0 implementation. Applicable repository privacy, content, security and generated-source rules remain binding. Do not import the withdrawn earlier v1.5 candidate contrary to `AGENTS.md`.

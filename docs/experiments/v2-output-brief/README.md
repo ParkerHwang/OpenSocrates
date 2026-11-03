@@ -1,0 +1,139 @@
+# Output Brief: an OpenSocrates 2.0 candidate
+
+This is an experimental, self-contained skill candidate for drafting messages,
+reports, and decision documents for a reader. It asks an assistant to preserve
+material facts, uncertainty and the user's choices while producing a usable
+artifact. An optional Python text scan highlights some surface-level differences
+between supplied source files and a draft. Neither the skill nor the scan sends
+messages or saves source files; the host's own handling is separate.
+
+The scan cannot verify meaning or external facts. It can miss errors and flag
+correct derived values. A finding is a prompt for human or source-based review;
+no findings do not prove that a draft is correct. The scanner is adapted from
+Claude's synthetic `rulelab` prototype and has not yet been independently
+verified in this repository.
+
+The experimental packages include an executable Python script. Its source is
+[`evidence_scan.py`](../../../plugin-src/experimental-output-brief/skills/output-brief/scripts/evidence_scan.py).
+The assistant should distinguish a scan that actually ran from a manual review,
+identify omitted or transformed inputs, and not reuse a scan result for a draft
+that has since changed.
+
+The candidate is not an integrated 2.0 product or evidence of improved answers.
+The shared skill source is under
+[`plugin-src/experimental-output-brief/skills/output-brief`](../../../plugin-src/experimental-output-brief/skills/output-brief/SKILL.md).
+Simply making a skill available does not establish discovery, activation,
+reading, or use.
+
+## Experimental packages
+
+From the repository root, run `python3 docs/experiments/v2-output-brief/package.py`.
+It produces two local archives from the same skill under
+`build/experiments/v2-output-brief/`: an OpenAI-format plugin archive and a
+Claude skill archive. These are experimental, unpublished packages, not a 2.0
+release. Their generation does not install or enable anything.
+
+- The OpenAI package follows the documented [plugin layout](https://developers.openai.com/plugins/build/plugins).
+  Local installation or directory distribution depends on the target surface.
+- Claude documents uploading a ZIP containing the skill folder through
+  **Customize → Skills**; see [Use skills in Claude](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+  for account and code-execution requirements.
+
+Neither archive has yet been qualified for installation, discovery, or use on a
+real host. The experiment contains a separate local marketplace rooted at
+`plugin-src/experimental-output-brief/`; registering it does not install or
+enable the plugin. The existing 1.x marketplace is unchanged. A temporary Codex CLI installation with isolated settings succeeded
+and its installed files matched the candidate at commit `c8e1815`; this does not
+establish activation or availability in ChatGPT or another account. Availability
+can vary by plan, account, organization, and surface.
+
+From a local checkout, a Codex CLI user can register the separate experimental
+marketplace and install this candidate:
+
+```sh
+codex plugin marketplace add ./plugin-src/experimental-output-brief
+codex plugin add opensocrates-output-brief-experiment@opensocrates-output-brief-experiment-local
+```
+
+These commands change the invoking user's local Codex settings. Remove only the
+experimental plugin and marketplace when no longer needed; keep the existing
+OpenSocrates installation. The isolated test does not establish how the
+installed candidate behaves in an authenticated session.
+
+```sh
+codex plugin remove opensocrates-output-brief-experiment@opensocrates-output-brief-experiment-local
+codex plugin marketplace remove opensocrates-output-brief-experiment-local
+```
+
+Contributors can run `make v2-candidate-check` for the offline scanner, adapter,
+process-boundary, and synthetic-benchmark checks. This command does not call a
+model or validate host installation.
+
+Once a compatible host has loaded the skill, a user can ask it to compare a
+draft with material supplied in the conversation. On a host that can run Python
+and provide standard input, the scan accepts the material without first saving
+it to a file. Other hosts can review the sources directly; the scan has not run
+in that case. The scan itself does not save the inputs, although the host may
+retain conversation or tool data according to its own settings.
+
+The scan compares the draft only with separately supplied source material. It
+does not treat the request text as evidence, because a request may quote the
+draft. If a request contains both, the host must separate the sources before
+scanning; if it cannot, it should not claim that the scan was completed. The
+scanner cannot guarantee that a provided source does not itself contain the draft.
+It flags an exact full-draft overlap as a possible circular comparison, but
+cannot detect every paraphrase or partial overlap. It also cannot decide which
+source is current, authoritative, rejected, or merely proposed; an old value
+may still appear to match by presence. Review source selection and meaning.
+Conditional or future wording can still make an unauthorized promise even if
+the scan does not classify it as a present confirmation.
+
+When requested, `--show-context` displays source lines containing draft numbers
+or dates, along with source and line numbers. It is off by default: the lines
+can contain private information and the host may retain tool output. A matching
+line is not proof that it supports the claim. Lines longer than 1,000 characters
+and matches beyond the first 30 are not displayed; a missing match is not a
+truth verdict. This feature does not identify all claims or check entailment.
+Date matches with a missing year are labeled as such. Terminal and directional
+control characters in a displayed line are escaped rather than executed, so the
+displayed text is not necessarily a byte-for-byte representation of the source.
+
+The [negation examples](cases/negation.json) were written by Claude while
+designing the matching rule. They are regression cases, not an independent
+accuracy measurement or a representative sample of real writing.
+
+## Try it with a fictional request
+
+Give the same request and source facts to the same model and host in two separate
+sessions, once without this skill and once with it enabled. Keep the conditions
+as comparable as the host permits, and record the exact skill bytes, model,
+host, and whether the skill was actually made available. A single comparison is
+an example, not a general result. Avoid uploading real private work to a public
+evaluation or repository.
+
+> Draft a short English email to visitors about a workshop. There is room for
+> 24 people. The venue is still being considered, and no one has agreed to
+> photography. Ask visitors to express interest. Explain any remaining question
+> to me in Korean.
+
+An adequate email can invite expressions of interest without claiming the venue
+is booked or photography approved. A note to the requester may be in Korean;
+the email should be in English. Compare accuracy, clarity, usefulness, questions
+and time, rather than only checking for particular words. The prompt by itself
+does not measure actual skill discovery or use.
+
+This candidate is intended for joint review with the separate personal-rule and
+public-benchmark proposals. No host integration, benchmark results, adoption,
+or superiority over an unassisted model is claimed.
+
+The experimental [`tools/v2_codex_bench_adapter.py`](../../../tools/v2_codex_bench_adapter.py)
+can connect the public synthetic bench to an already authenticated local Codex
+CLI. It creates an ephemeral session in a temporary directory and asks the model
+not to use tools; tool events it observes are rejected after the fact. This does
+not guarantee all reads or network access were prevented. Use public synthetic
+cases only. It passes guidance text inline and does not install a plugin, deliver
+its scripts, or establish native skill discovery, reading, or application. A
+command's output is not a verified model-call attestation in the bench. Model
+identity, availability, and account or host limits require separate observation.
+The adapter requires the case's `public_synthetic: true` marker. This is an
+author's assertion, not proof that the data is public or synthetic.

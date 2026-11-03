@@ -4,6 +4,8 @@
 
 # OpenSocrates
 
+> **2.0 实验：** 我们正在开发一个独立候选版本，帮助准备面向读者的文档，并将草稿与所提供的资料进行对照。它不是正式发布版本，也不保证事实准确。[了解实验（英语）](docs/experiments/v2-output-brief/README.md)。
+
 **在 AI 对话中运用 48 种推理方法。**
 
 OpenSocrates 为 **Claude、Codex 和 Antigravity** 提供可重复使用的推理流程。

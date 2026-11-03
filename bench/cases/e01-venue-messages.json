@@ -1,0 +1,104 @@
+{
+  "schema": "opensocrates.v2-bench-case/1",
+  "id": "e01-venue-messages",
+  "title": "Separate venue and volunteer messages without invented agreements",
+  "inspired_by": ["E01"],
+  "tags": ["E01", "audience-separation", "no-invented-agreement"],
+  "public_synthetic": true,
+  "prompt": "아래 내용을 장소 담당자와 접수 자원봉사자에게 각각 보낼 메시지로 작성해 줘. 아직 날짜는 확정하지 않았어. 두 사람에게 실제로 연락하지는 마.",
+  "materials": [
+    "예전 메모: 장소 수용 인원 35명.",
+    "최신 메모: 수용 인원은 24명.",
+    "주최 측은 참가 30명을 바란다.",
+    "장소 예약은 확정되지 않았다.",
+    "자원봉사자는 접수만 맡기로 했고 사진 촬영은 맡지 않았다."
+  ],
+  "checks": [
+    {
+      "id": "current-capacity",
+      "rule": "require_text",
+      "section": "body",
+      "text": "24명"
+    },
+    {
+      "id": "omit-stale-capacity",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["35명", "35 people"],
+      "clear_exceptions": [
+        "예전 메모의 35명",
+        "35명은 오래된",
+        "35명은 예전",
+        "35명 is outdated",
+        "35명 is stale",
+        "35 people is outdated",
+        "35 people are outdated"
+      ],
+      "ambiguous_cues": ["오래된", "예전", "아니", "않", "아닙", "outdated", "stale", "not "]
+    },
+    {
+      "id": "name-both-readers",
+      "rule": "require_all_text",
+      "section": "body",
+      "patterns": ["장소 담당자", "접수 자원봉사자"]
+    },
+    {
+      "id": "no-confirmed-booking",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["예약이 확정", "예약 확정", "confirmed booking", "reservation is confirmed"],
+      "clear_exceptions": [
+        "예약이 확정되지 않",
+        "예약이 확정된 것은 아니",
+        "예약 확정은 아니",
+        "예약 확정이 아니",
+        "is not confirmed",
+        "has not been confirmed",
+        "not a confirmed booking",
+        "reservation is not confirmed"
+      ],
+      "ambiguous_cues": ["않", "없", "아니", "아닙", "것 같", "not ", "n't"]
+    },
+    {
+      "id": "no-photography-assignment",
+      "rule": "forbid_text",
+      "section": "body",
+      "patterns": ["촬영을 맡", "사진 담당", "photography assignment"]
+    },
+    {
+      "id": "no-invented-date",
+      "rule": "forbid_unlisted_dates",
+      "section": "body",
+      "allowed": []
+    },
+    {
+      "id": "unresolved-date-stated",
+      "rule": "require_any_text",
+      "section": "either",
+      "patterns": [
+        "날짜는 아직",
+        "날짜가 아직",
+        "아직 날짜",
+        "날짜는 확정되지",
+        "날짜가 확정되지",
+        "날짜는 미정",
+        "날짜가 미정",
+        "날짜는 정해지지",
+        "날짜가 정해지지",
+        "날짜를 적지",
+        "일정은 미정",
+        "일정은 아직",
+        "일정은 정해지지",
+        "행사일은 아직",
+        "행사일은 미정",
+        "행사일은 정해지지",
+        "date is not set",
+        "date is not confirmed",
+        "date has not been set",
+        "no date is set",
+        "the date is unresolved"
+      ],
+      "ambiguous_patterns": ["날짜", "일정", "행사일", "date"]
+    }
+  ]
+}

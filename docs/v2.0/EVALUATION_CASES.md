@@ -1,5 +1,9 @@
 # Initial synthetic evaluation cases
 
+> **Earlier plan:** The owner has authorized reconsideration of the 2.0 direction
+> and prior product conditions. These cases remain useful as synthetic material,
+> but are not binding scope for the [current experiment](../experiments/v2-output-brief/README.md).
+
 These cases are authored preparation inputs, not executed outcomes. Before collecting results, freeze task wording, expected criteria, host/version/model/effort, runner permissions and data, comparison arms, sample size, order, timeout/censoring and human review procedure. Do not use these fixtures to infer a product-wide improvement from a single run. Materials are synthetic; no external messages or bookings are authorized.
 
 ## E01: Reader context and separate user note

@@ -4,6 +4,8 @@
 
 # OpenSocrates
 
+> **Expérience 2.0 :** Nous développons une version candidate distincte pour préparer des documents destinés à un lecteur et comparer un brouillon aux documents fournis. Ce n'est pas une version publiée et elle ne garantit pas l'exactitude des faits. [Découvrir l'expérience (anglais)](docs/experiments/v2-output-brief/README.md).
+
 **Mettez 48 méthodes de raisonnement au service de vos conversations avec l’IA.**
 
 OpenSocrates propose des procédures de raisonnement réutilisables dans **Claude,

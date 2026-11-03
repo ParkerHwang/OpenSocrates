@@ -4,6 +4,8 @@
 
 # OpenSocrates
 
+> **2.0 실험:** 독자를 위한 문서 작성과 제공한 자료·초안의 대조를 돕는 별도 후보를 만들고 있습니다. 정식 릴리스나 사실 정확성의 보장은 아닙니다. [실험 살펴보기](docs/experiments/v2-output-brief/README.ko.md).
+
 **AI와의 대화에 48가지 사고 방법을 더하세요.**
 
 OpenSocrates는 **Claude, Codex, Antigravity**에서 활용할 수 있는 사고 절차를

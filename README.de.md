@@ -4,6 +4,8 @@
 
 # OpenSocrates
 
+> **2.0-Experiment:** Wir entwickeln einen separaten Kandidaten, der beim Erstellen von Dokumenten für Leser und beim Abgleich eines Entwurfs mit bereitgestellten Unterlagen hilft. Er ist keine Veröffentlichung und garantiert keine sachliche Richtigkeit. [Experiment ansehen (Englisch)](docs/experiments/v2-output-brief/README.md).
+
 **Nutzen Sie 48 Denkmethoden in Ihren KI-Gesprächen.**
 
 OpenSocrates bietet wiederverwendbare Denkverfahren für **Claude, Codex und
