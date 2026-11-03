@@ -97,6 +97,13 @@ Paraphrases that do not contain the literal pattern, including `잡아
 두었습니다`, `삼십오 명`, and `채택되었습니다`, are still missed. A literal
 pass on those sentences is a blind spot, not a solved semantic check.
 
+The unresolved-date check accepts a clear phrase in the recipient body or in
+the requester notes. It does not fail only because the notes lack a canned
+phrase. Ambiguous date wording is `needs_human_review`. An invented calendar
+date still fails. The three envelopes in `bench/regressions/e01-venue-messages/`
+were added after that change. They are not independent holdouts and are not a
+performance estimate.
+
 ## Arithmetic and pretended verification
 
 A model may compute a percentage from operands that are in the case. The
@@ -150,6 +157,9 @@ blob `f5ed6cf9`는 불러오지 않습니다. 프로세스 실행과 봉투 수�
 `baseline`은 스킬 없음이고, 한 줄 일반 지시 조건은 없습니다. `reader_1x`는
 영어 독자 가이드 파일만이며 1.5.3 전체 설치가 아닙니다. `예약이 확정되지
 않았습니다`와 오래된 `35명` 경고는 거짓 실패였고, 이제 예외로 통과합니다.
+본문이 날짜가 정해지지 않았다고 말하면 요청자 메모가 비어도 그 이유만으로
+실패하지 않습니다. 애매하면 사람 검토이고, 지어낸 달력 날짜는 실패입니다.
+사후 회귀 예시는 성능 수치가 아닙니다.
 주변 단서가 애매하면 사람 검토입니다. 다른 말로 바꾼 주장은 글자 규칙이
 놓치며, 그 통과는 의미 판정이 아닙니다. 제품 스캐너는 벤치의 유일한 판정자가
 아닙니다.

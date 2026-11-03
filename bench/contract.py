@@ -4,6 +4,7 @@ from __future__ import annotations
 
 CASE_SCHEMA = "opensocrates.v2-bench-case/1"
 FIXTURE_SCHEMA = "opensocrates.v2-bench-fixture/1"
+REGRESSION_SCHEMA = "opensocrates.v2-bench-regression/1"
 ENVELOPE_SCHEMA = "opensocrates.v2-bench-envelope/1"
 REPORT_SCHEMA = "opensocrates.v2-bench-report/1"
 CONDITIONS_SCHEMA = "opensocrates.v2-bench-conditions/1"

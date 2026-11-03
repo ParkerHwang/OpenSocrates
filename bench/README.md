@@ -186,6 +186,15 @@ stays `needs_human_review`. A bare assertion, `예약이 확정되었습니다` 
 `수용 인원은 35명입니다`, still fails. A denial that begins more than 16
 characters after the match is outside this automatic window.
 
+`unresolved-date-stated` accepts a clear unresolved-date phrase in the recipient
+body or in `requester_notes`. Empty notes do not fail that check when the body
+already says the date is unset. Wording that mentions a date or schedule
+without saying whether it is set is `needs_human_review`. An unlisted calendar
+date still fails `forbid_unlisted_dates`. Three post-hoc envelopes under
+`bench/regressions/e01-venue-messages/` lock that behavior. They were added
+after the rule change. They are not independent holdouts and are not a
+performance estimate.
+
 Paraphrases that never contain the literal pattern are still missed:
 `잡아 두었습니다`, `삼십오 명`, and `채택되었습니다`. That is a blind spot.
 The literal rule returning pass on those sentences is not a semantic clearance
@@ -222,6 +231,12 @@ blob `f5ed6cf9`는 적기만 하고 불러오지 않습니다. 비교 버전은 
 `baseline`은 스킬이 없는 조건입니다. 한 줄 일반 지시 조건은 없습니다.
 `reader_1x`는 `guide.en.md` 파일만 지문으로 읽으며, 1.5.3 전체 설치나 실행이
 아닙니다.
+
+날짜가 본문에 아직 정해지지 않았다고 분명히 있으면 요청자 메모가 비어 있어도
+그 항목만으로 실패하지 않습니다. 날짜를 말하기만 하고 정해졌는지 드러나지
+않으면 사람 검토입니다. 달력 날짜를 지어낸 경우는 계속 실패입니다.
+`bench/regressions/`의 세 예는 규칙 수정 뒤에 더한 사후 예시이며, 독립
+홀드아웃이나 성능 수치가 아닙니다.
 
 Claude가 합성 문장으로 지적한 거짓 실패를 재현했습니다. `예약이 확정되지
 않았습니다`와 `예전 메모의 35명은 오래된 값`은 이제 실패가 아닙니다. 예외
