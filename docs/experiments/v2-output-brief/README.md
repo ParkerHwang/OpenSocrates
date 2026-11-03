@@ -36,6 +36,13 @@ release. Their generation does not install or enable anything.
 Neither archive has yet been qualified for installation, discovery, or use on a
 real host. Availability can vary by plan, account, organization, and surface.
 
+Once a compatible host has loaded the skill, a user can ask it to compare a
+draft with material supplied in the conversation. On a host that can run Python
+and provide standard input, the scan accepts the material without first saving
+it to a file. Other hosts can review the sources directly; the scan has not run
+in that case. The scan itself does not save the inputs, although the host may
+retain conversation or tool data according to its own settings.
+
 ## Try it with a fictional request
 
 Give the same request and source facts to the same model and host in two separate

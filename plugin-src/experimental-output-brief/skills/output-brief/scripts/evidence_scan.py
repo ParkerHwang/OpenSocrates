@@ -310,15 +310,41 @@ def main(argv=None) -> int:
                                  epilog="Exit code 1 (with --strict) means a HIGH flag. Exit code 0 NEVER means the output is correct.")
     ap.add_argument("--source", action="append", default=[], help="user-provided source file (repeatable)")
     ap.add_argument("--prompt", help="the user's request text file")
-    ap.add_argument("--output", required=True)
+    ap.add_argument("--output", help="draft file to inspect")
+    ap.add_argument(
+        "--stdin-json", action="store_true",
+        help="read sources, prompt, and output as a JSON object from standard input",
+    )
     ap.add_argument("--must", action="append", default=[], help="fact that must appear (repeatable)")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--strict", action="store_true", help="exit 1 if any HIGH flag")
     a = ap.parse_args(argv)
-    if not a.source and not a.prompt:
-        ap.error("provide at least one --source or --prompt for comparison")
     rd = lambda p: Path(p).read_text(encoding="utf-8")
-    res = analyze([rd(s) for s in a.source], rd(a.prompt) if a.prompt else "", rd(a.output), a.must)
+    if a.stdin_json:
+        if a.source or a.prompt or a.output:
+            ap.error("--stdin-json cannot be combined with file inputs")
+        try:
+            payload = json.load(sys.stdin)
+        except (ValueError, UnicodeError):
+            ap.error("standard input must contain a JSON object")
+        if not isinstance(payload, dict):
+            ap.error("standard input must contain a JSON object")
+        sources = payload.get("sources", [])
+        prompt = payload.get("prompt", "")
+        output = payload.get("output")
+        if not isinstance(sources, list) or not all(isinstance(s, str) for s in sources):
+            ap.error("sources must be a list of strings")
+        if not isinstance(prompt, str) or not isinstance(output, str):
+            ap.error("prompt and output must be strings")
+        if not any(s.strip() for s in sources) and not prompt.strip():
+            ap.error("provide at least one nonempty source or prompt")
+    else:
+        if not a.output or (not a.source and not a.prompt):
+            ap.error("provide --output and at least one --source or --prompt")
+        sources = [rd(s) for s in a.source]
+        prompt = rd(a.prompt) if a.prompt else ""
+        output = rd(a.output)
+    res = analyze(sources, prompt, output, a.must)
     print(json.dumps(res, ensure_ascii=False, indent=2) if a.json else render(res))
     return 1 if a.strict and any(f["severity"] == "HIGH" for f in res["findings"]) else 0
 

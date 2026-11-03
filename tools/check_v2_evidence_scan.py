@@ -68,6 +68,17 @@ class EvidenceScanChecks(unittest.TestCase):
             self.assertFalse(json.loads(result.stdout)["verified"])
             self.assertEqual(before, {p.name: p.read_bytes() for p in folder.iterdir()})
 
+    def test_chat_text_can_be_scanned_via_stdin_without_files(self):
+        payload = {"sources": ["There are 24 seats."], "prompt": "", "output": "There are 25 seats."}
+        with tempfile.TemporaryDirectory() as directory:
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--stdin-json", "--json"],
+                input=json.dumps(payload), capture_output=True, text=True, check=False, cwd=directory,
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("novel_number", {f["kind"] for f in json.loads(result.stdout)["findings"]})
+            self.assertEqual(list(Path(directory).iterdir()), [])
+
 
 if __name__ == "__main__":
     unittest.main()

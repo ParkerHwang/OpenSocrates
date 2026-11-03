@@ -22,14 +22,20 @@ Use the lightest check suited to the task. Do not add an audit, warnings, questi
 
 ## Optional text scan
 
-When comparing an existing draft with supplied source files, and the host can run
-Python, the bundled `scripts/evidence_scan.py` can flag some literal mismatches:
-`python3 scripts/evidence_scan.py --source SOURCE --output DRAFT`. Paths in the
-command are relative to the current working directory; use the actual path to
-the bundled script and the files. Multiple `--source` options are allowed, and
-`--prompt` can provide the request as a text file. Run only on material the user
-has made available for this task. Use a direct source review when the script is
-unavailable or would not help.
+When comparing an existing draft with supplied material, and the host can run
+Python, the bundled `scripts/evidence_scan.py` can flag some literal mismatches.
+For text already in the conversation, invoke the actual path to the bundled
+script with `--stdin-json` and send a JSON object through the host's standard
+input: `sources` is a list of source strings, `prompt` is the request string,
+and `output` is the draft string. This input path does not require creating a
+file. Do not place source text into shell commands or logs; the host may have its
+own retention behavior.
+
+For existing files, use the actual script path with `--source SOURCE --output
+DRAFT`; multiple `--source` options are allowed, and `--prompt` can name a
+request text file. Run only on material the user made available for this task.
+If the host cannot run the scan or standard input is unavailable, use a direct
+source review and say the scan was not run when that distinction matters.
 
 The scan compares surface patterns, not meaning or external truth. A matched
 number or date can still refer to the wrong thing, and a correct derived value
