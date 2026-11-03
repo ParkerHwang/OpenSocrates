@@ -46,14 +46,16 @@ usefulness, or establish behavior in other hosts.
 ## Make a portable skill ZIP
 
 From the root of a Git checkout in a macOS or Linux shell, create a ZIP
-containing only the committed `opensocrates-core/SKILL.md` and `LICENSE`.
-Uncommitted edits are not included. The command replaces an existing ZIP at
-the same output path:
+containing only `opensocrates-core/SKILL.md` and `LICENSE` from the currently
+checked-out commit. Uncommitted edits are not included. The command replaces
+an existing ZIP at the same output path:
 
 ```sh
 mkdir -p build/experiments/v2-essential-core
 git archive --format=zip --prefix=opensocrates-core/ --output=build/experiments/v2-essential-core/opensocrates-core-experimental.zip HEAD:plugin-src/experimental-core/skills/opensocrates-core SKILL.md LICENSE
 ```
+
+If the command fails, do not use the output ZIP; it may be incomplete.
 
 For a Codex project, extract that folder into `.agents/skills/`, preserving any
 existing folder as described above. Claude's [custom skill instructions](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)

@@ -42,14 +42,16 @@ Codex CLI 0.166.0-alpha.5.1의 임시 프로젝트에서 `$opensocrates-core`를
 ## 스킬 ZIP 만들기
 
 macOS 또는 Linux 셸에서 Git으로 내려받은 저장소 루트에서 다음을 실행하면
-커밋된 `opensocrates-core/SKILL.md`와 `LICENSE`만 담긴 ZIP이 생깁니다.
-커밋하지 않은 수정은 포함되지 않습니다. 같은 출력 경로에 ZIP이 있으면
-덮어씁니다.
+현재 체크아웃한 커밋의 `opensocrates-core/SKILL.md`와 `LICENSE`만 담긴 ZIP이
+생깁니다. 커밋하지 않은 수정은 포함되지 않습니다. 같은 출력 경로에 ZIP이
+있으면 덮어씁니다.
 
 ```sh
 mkdir -p build/experiments/v2-essential-core
 git archive --format=zip --prefix=opensocrates-core/ --output=build/experiments/v2-essential-core/opensocrates-core-experimental.zip HEAD:plugin-src/experimental-core/skills/opensocrates-core SKILL.md LICENSE
 ```
+
+명령이 실패했다면 출력 ZIP이 불완전할 수 있으므로 사용하지 않습니다.
 
 Codex 프로젝트에서는 위의 기존 폴더 주의사항을 지키며 스킬 폴더를
 `.agents/skills/`에 압축 해제할 수 있습니다. Claude의
