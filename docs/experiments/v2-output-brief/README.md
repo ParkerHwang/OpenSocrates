@@ -6,10 +6,27 @@ material facts, uncertainty and the user's choices while producing a usable
 artifact. It does not send messages or persist user material.
 
 The candidate is not an integrated 2.0 product or evidence of improved answers.
-It can be inspected and copied into a compatible host's skill mechanism, subject
-to that host's own instructions and permissions. Simply copying a file does not
-establish discovery, activation, reading, or use. Use the host's supported skill
-installation path; none is implemented here.
+The shared skill source is under
+[`plugin-src/experimental-output-brief/skills/output-brief`](../../../plugin-src/experimental-output-brief/skills/output-brief/SKILL.md).
+Simply making a skill available does not establish discovery, activation,
+reading, or use.
+
+## Experimental packages
+
+From the repository root, run `python3 docs/experiments/v2-output-brief/package.py`.
+It produces two local archives from the same skill under
+`build/experiments/v2-output-brief/`: an OpenAI-format plugin archive and a
+Claude skill archive. These are experimental, unpublished packages, not a 2.0
+release. Their generation does not install or enable anything.
+
+- The OpenAI package follows the documented [plugin layout](https://developers.openai.com/plugins/build/plugins).
+  Local installation or directory distribution depends on the target surface.
+- Claude documents uploading a ZIP containing the skill folder through
+  **Customize → Skills**; see [Use skills in Claude](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+  for account and code-execution requirements.
+
+Neither archive has yet been qualified for installation, discovery, or use on a
+real host. Availability can vary by plan, account, organization, and surface.
 
 ## Try it with a fictional request
 

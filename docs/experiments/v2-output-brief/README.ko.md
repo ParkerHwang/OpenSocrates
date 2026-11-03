@@ -2,7 +2,16 @@
 
 특정 독자를 위한 메시지·보고서·의사결정 문서 작성을 돕는 독립적인 실험용 스킬 후보다. 사용자에게 쓸 수 있는 결과물을 제공하면서 중요한 사실과 불확실성, 사용자가 정한 선택을 보존하도록 안내한다. 메시지를 전송하거나 사용자 자료를 보관하지 않는다.
 
-완성된 2.0 제품이나 답변 품질 개선의 증거는 아니다. 호환되는 호스트의 스킬 방식에 맞게 내용을 검토하고 복사해 사용할 수 있다. 파일을 복사한 사실만으로 호스트가 발견·활성화했고 모델이 읽거나 사용했다고 단정하지 않는다. 설치는 각 호스트의 지원 경로를 따르며 이 후보에는 설치 기능이 없다.
+완성된 2.0 제품이나 답변 품질 개선의 증거는 아니다. 공통 스킬 원본은 [`plugin-src/experimental-output-brief/skills/output-brief`](../../../plugin-src/experimental-output-brief/skills/output-brief/SKILL.md)에 있다. 스킬 파일을 제공했다는 사실만으로 호스트가 발견·활성화했고 모델이 읽거나 사용했다고 단정하지 않는다.
+
+## 실험용 패키지
+
+저장소 루트에서 `python3 docs/experiments/v2-output-brief/package.py`를 실행하면 같은 스킬 원본으로 OpenAI 형식 플러그인과 Claude 스킬 ZIP을 `build/experiments/v2-output-brief/`에 만든다. 공개되지 않은 실험용 패키지이며 2.0 릴리스가 아니다. 파일 생성만으로 설치하거나 활성화하지 않는다.
+
+- OpenAI 패키지는 문서에 나온 [플러그인 구조](https://developers.openai.com/plugins/build/plugins)를 따른다. 로컬 설치나 디렉터리 배포는 대상 환경에 따라 다르다.
+- Claude는 **Customize → Skills**에서 스킬 폴더가 들어 있는 ZIP을 업로드하는 방법을 안내한다. 계정과 코드 실행 조건은 [Claude 스킬 사용 안내](https://support.claude.com/en/articles/12512180-use-skills-in-claude)를 참고한다.
+
+두 패키지는 아직 실제 호스트에서 설치·발견·사용을 검증하지 않았다. 제공 여부는 요금제·계정·조직과 사용 화면에 따라 다를 수 있다.
 
 ## 가상 요청으로 사용해 보기
 
