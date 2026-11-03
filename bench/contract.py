@@ -25,6 +25,7 @@ REASON_CODES = (
     "model_unavailable",
     "model_error",
     "condition_fail",
+    "needs_human_review",
     "scorer_error",
     "pass",
 )

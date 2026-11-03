@@ -44,7 +44,10 @@ _NOTE = (
     "were written to exercise the scorer; they are not model outputs. "
     "A parsed envelope does not verify a model call. model_called is true only "
     "for a host attestation recorded by harness code. Row counts are not pass "
-    "rates and are not effect sizes."
+    "rates and are not effect sizes. A forbid match that is only a nearby "
+    "hedge or denial cue is needs_human_review, not pass or fail. Literal "
+    "rules miss paraphrases; that miss is a blind spot, not a semantic pass. "
+    "A product evidence scanner is not this judge."
 )
 
 
@@ -263,6 +266,7 @@ def _scored_row(
         origin=str(fixture["origin"]),
         illustrates=illustrates or None,
         failed_checks=scored["failed_checks"],
+        unresolved_checks=scored["unresolved_checks"],
         source=source,
         evidence=evidence,
     )
@@ -290,6 +294,7 @@ def _row(
     origin: str | None = None,
     illustrates: str | None = None,
     failed_checks: list[dict[str, str]] | None = None,
+    unresolved_checks: list[dict[str, str]] | None = None,
     evidence: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     fields = _normalized_evidence(evidence or not_run_evidence())
@@ -302,6 +307,7 @@ def _row(
         "origin": origin,
         "illustrates": illustrates,
         "failed_checks": failed_checks or [],
+        "unresolved_checks": unresolved_checks or [],
         "source": source,
         **fields,
     }

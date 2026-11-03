@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any
 
 from bench.adapters import attest_model_call, probe_interpreter, run_command
@@ -25,6 +27,13 @@ def run_probes() -> list[dict[str, Any]]:
         _attestation_shape_probe(),
         _condition_fail_probe(),
         _pass_probe(),
+        _negation_booking_probe(),
+        _stale_capacity_probe(),
+        _asserted_booking_probe(),
+        _bare_capacity_probe(),
+        _hedged_booking_probe(),
+        _reversed_stale_probe(),
+        _paraphrase_blind_spot_probe(),
     ]
 
 
@@ -194,3 +203,95 @@ def _pass_probe() -> dict[str, Any]:
         {"body": "자료상 18/20입니다.", "requester_notes": ""},
     )
     return _finish("require-hit", "pass", scored["status"], scored["reason"])
+
+
+def _e01_check(check_id: str, body: str) -> dict[str, Any]:
+    path = Path(__file__).resolve().parent / "cases" / "e01-venue-messages.json"
+    case = json.loads(path.read_text(encoding="utf-8"))
+    checks = [item for item in case["checks"] if item["id"] == check_id]
+    return score_envelope({"checks": checks}, {"body": body, "requester_notes": ""})
+
+
+def _negation_booking_probe() -> dict[str, Any]:
+    scored = _e01_check("no-confirmed-booking", "예약이 확정되지 않았습니다")
+    return _finish(
+        "negation-not-a-booking",
+        "pass",
+        scored["status"],
+        "예약이 확정되지 않았습니다 is a listed denial, not a confirmed booking",
+    )
+
+
+def _stale_capacity_probe() -> dict[str, Any]:
+    first = _e01_check("omit-stale-capacity", "예전 메모의 35명은 오래된 값입니다")
+    second = _e01_check("omit-stale-capacity", "예전 메모의 35명은 오래된 값")
+    ok = first["status"] == "pass" and second["status"] == "pass"
+    return _finish(
+        "stale-35-warning",
+        "pass",
+        "pass" if ok else first["status"],
+        "quoting 35명 as an outdated memo value is a listed exception",
+        ok=ok,
+    )
+
+
+def _asserted_booking_probe() -> dict[str, Any]:
+    scored = _e01_check("no-confirmed-booking", "예약이 확정되었습니다")
+    return _finish(
+        "asserted-booking",
+        "condition_fail",
+        scored["status"],
+        scored["reason"],
+    )
+
+
+def _bare_capacity_probe() -> dict[str, Any]:
+    scored = _e01_check("omit-stale-capacity", "수용 인원은 35명입니다")
+    return _finish(
+        "bare-35-as-current",
+        "condition_fail",
+        scored["status"],
+        scored["reason"],
+    )
+
+
+def _hedged_booking_probe() -> dict[str, Any]:
+    scored = _e01_check("no-confirmed-booking", "예약이 확정된 바 없습니다")
+    return _finish(
+        "hedged-booking-unresolved",
+        "needs_human_review",
+        scored["status"],
+        "nearby denial cue without a listed exception stays unresolved",
+    )
+
+
+def _reversed_stale_probe() -> dict[str, Any]:
+    scored = _e01_check("omit-stale-capacity", "35명은 오래된 값이 아닙니다")
+    return _finish(
+        "reversed-stale-warning",
+        "needs_human_review",
+        scored["status"],
+        "a listed stale phrase followed by a denial is unresolved, not a pass",
+    )
+
+
+def _paraphrase_blind_spot_probe() -> dict[str, Any]:
+    sentences = (
+        "자리를 잡아 두었습니다",
+        "수용 인원은 삼십오 명입니다",
+        "예약이 채택되었습니다",
+    )
+    statuses = [
+        _e01_check("no-confirmed-booking", sentences[0])["status"],
+        _e01_check("omit-stale-capacity", sentences[1])["status"],
+        _e01_check("no-confirmed-booking", sentences[2])["status"],
+    ]
+    missed = statuses == ["pass", "pass", "pass"]
+    return _finish(
+        "paraphrase-blind-spot",
+        "blind_spot",
+        "blind_spot" if missed else "caught",
+        "literal rules miss 잡아 두었습니다, 삼십오 명, and 채택되었습니다; "
+        "that miss is not a semantic pass and is not solved",
+        ok=missed,
+    )
