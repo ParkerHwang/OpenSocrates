@@ -24,7 +24,11 @@ def main() -> int:
     except (UnicodeError, ValueError):
         print("invalid benchmark request", file=sys.stderr)
         return 2
-    if not isinstance(request, dict) or request.get("schema") != REQUEST_SCHEMA:
+    if (
+        not isinstance(request, dict)
+        or request.get("schema") != REQUEST_SCHEMA
+        or request.get("public_synthetic") is not True
+    ):
         print("invalid benchmark request schema", file=sys.stderr)
         return 2
     prompt, materials, skill = (
@@ -111,13 +115,15 @@ def main() -> int:
             if not isinstance(event, dict):
                 raise ValueError("invalid event")
             item = event.get("item")
-            if isinstance(item, dict) and item.get("type") in {
-                "command_execution",
-                "file_change",
-                "mcp_tool_call",
-                "web_search",
-            }:
-                print("Codex CLI used a tool; refusing this result", file=sys.stderr)
+            if item is not None and (
+                not isinstance(item, dict) or item.get("type") not in {"agent_message", "reasoning"}
+            ):
+                print(
+                    "Codex CLI returned an unsupported item; refusing this result", file=sys.stderr
+                )
+                return 1
+            if event.get("type") in {"error", "turn.failed"}:
+                print("Codex CLI reported a failed turn", file=sys.stderr)
                 return 1
             if event.get("type") == "item.completed" and isinstance(item, dict):
                 if item.get("type") == "agent_message":

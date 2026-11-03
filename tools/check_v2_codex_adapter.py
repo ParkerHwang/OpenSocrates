@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ADAPTER = ROOT / "tools/v2_codex_bench_adapter.py"
 REQUEST = {
     "schema": "opensocrates.v2-bench-request/1",
+    "public_synthetic": True,
     "condition": "baseline",
     "prompt": "Draft a fictional message.",
     "materials": ["The venue is undecided."],
@@ -59,6 +60,19 @@ class CodexAdapterChecks(unittest.TestCase):
 
     def test_observed_tool_execution_rejects_result(self):
         result = self.run_with_fake_cli(use_tool=True)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, "")
+
+    def test_request_without_synthetic_marker_is_rejected(self):
+        request = dict(REQUEST)
+        request.pop("public_synthetic")
+        result = subprocess.run(
+            [sys.executable, str(ADAPTER)],
+            input=json.dumps(request),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(result.stdout, "")
 

@@ -82,3 +82,5 @@ cases only. It passes guidance text inline and does not install a plugin, delive
 its scripts, or establish native skill discovery, reading, or application. A
 command's output is not a verified model-call attestation in the bench. Model
 identity, availability, and account or host limits require separate observation.
+The adapter requires the case's `public_synthetic: true` marker. This is an
+author's assertion, not proof that the data is public or synthetic.
