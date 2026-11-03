@@ -214,8 +214,8 @@ def _read_regression(path: Path, root: Path) -> dict[str, Any]:
         errors.append(f"{source}: label is invalid")
     if not isinstance(framing, str) or not _post_hoc_framing(framing):
         errors.append(f"{source}: framing must call this a post-hoc example and not a holdout")
-    if expected not in {"pass", "condition_fail", "needs_human_review"}:
-        errors.append(f"{source}: expected_status is not a scored outcome")
+    if not _is_scored_status(expected):
+        errors.append(f"{source}: expected_status must be a string scored outcome")
     envelope, envelope_errors = _validate_envelope(document.get("envelope"), source)
     errors.extend(envelope_errors)
     if errors or envelope is None:
@@ -229,6 +229,10 @@ def _read_regression(path: Path, root: Path) -> dict[str, Any]:
         "expected_status": expected,
         "envelope": envelope,
     }
+
+
+def _is_scored_status(value: object) -> bool:
+    return isinstance(value, str) and value in {"pass", "condition_fail", "needs_human_review"}
 
 
 def _post_hoc_framing(value: str) -> bool:
