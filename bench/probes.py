@@ -44,6 +44,8 @@ def run_probes() -> list[dict[str, Any]]:
         _material_rate_denial_probe(),
         _bare_wrong_rate_probe(),
         _hedged_rate_probe(),
+        _flipped_rate_denial_probe(),
+        _oversize_section_probe(),
     ]
 
 
@@ -473,4 +475,31 @@ def _hedged_rate_probe() -> dict[str, Any]:
         "needs_human_review",
         scored["status"],
         "a mismatched percent next to a denial cue, outside a listed exception, stays unresolved",
+    )
+
+
+def _flipped_rate_denial_probe() -> dict[str, Any]:
+    scored = _calc_body(
+        "예시 이전은 20개 중 18개입니다. 18/20은 90%입니다. "
+        "100% 완료를 확인한 사람이나 시스템은 없지 않습니다."
+    )
+    return _finish(
+        "flipped-rate-denial",
+        "needs_human_review",
+        scored["status"],
+        "a denial prefix followed by 지 않습니다 is not a clean exception",
+    )
+
+
+def _oversize_section_probe() -> dict[str, Any]:
+    from bench.contract import MAX_SCORED_SECTION_CHARS
+
+    piece = "100% 완료를 확인한 사람이나 시스템은 없습니다. "
+    repeats = (MAX_SCORED_SECTION_CHARS // len(piece)) + 2
+    scored = _calc_body("18/20은 90%입니다. " + (piece * repeats))
+    return _finish(
+        "oversize-section",
+        "input_error",
+        scored["status"],
+        f"a section over {MAX_SCORED_SECTION_CHARS} characters is rejected before span scans",
     )

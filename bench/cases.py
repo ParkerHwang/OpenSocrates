@@ -232,7 +232,12 @@ def _read_regression(path: Path, root: Path) -> dict[str, Any]:
 
 
 def _is_scored_status(value: object) -> bool:
-    return isinstance(value, str) and value in {"pass", "condition_fail", "needs_human_review"}
+    return isinstance(value, str) and value in {
+        "pass",
+        "condition_fail",
+        "needs_human_review",
+        "input_error",
+    }
 
 
 def _post_hoc_framing(value: str) -> bool:
