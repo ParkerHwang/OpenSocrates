@@ -25,6 +25,16 @@ class EvidenceScanChecks(unittest.TestCase):
         self.assertEqual(same["findings"], [])
         self.assertFalse(same["verified"])
 
+    def test_new_full_date_keeps_year_in_the_review_cue(self):
+        report = scan.analyze([], "The date is undecided.", "The meeting is 2027-03-01.")
+        self.assertTrue(
+            any(
+                f["kind"] == "novel_date" and "2027-03-01" in f["message"]
+                for f in report["findings"]
+            )
+        )
+        self.assertEqual(report["input_summary"]["source_characters"], [])
+
     def test_unsupported_commitment_is_only_a_review_cue(self):
         report = scan.analyze([], "The venue is still under consideration.", "The venue is booked.")
         self.assertIn("commitment", {f["kind"] for f in report["findings"]})

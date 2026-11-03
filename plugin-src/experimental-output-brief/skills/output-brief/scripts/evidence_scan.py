@@ -424,7 +424,7 @@ def analyze(  # noqa: C901 - keep each distinct advisory check visible
                 {
                     "severity": "HIGH",
                     "kind": "novel_date",
-                    "message": f"date {d[1]}/{d[2]} (month/day) is not in your material; if derived, recompute it",
+                    "message": f"date {fmt_date(d)} is not in your material; if derived, recompute it",
                 }
             )
     for n in sorted(on - mn, key=lambda x: (len(x), x)):
@@ -477,6 +477,11 @@ def analyze(  # noqa: C901 - keep each distinct advisory check visible
         )
     return {
         "verified": False,
+        "input_summary": {
+            "source_characters": [len(source) for source in sources],
+            "prompt_characters": len(prompt),
+            "output_characters": len(output),
+        },
         "findings": findings,
         "matched_by_presence_only": cov,
         "meaning": "matched_by_presence_only values occur somewhere in your material. Nobody checked that they "
@@ -498,6 +503,10 @@ def render(res: dict) -> str:
         "Review cues only: a flag can be correct, including a calculated value. "
         "No flags do not mean the draft is safe or accurate.",
         "The scan may miss a real value attached to the wrong person, item, or event.",
+        "Input lengths show what the scan received, not whether it was complete or unchanged: "
+        f"sources={res['input_summary']['source_characters']}, "
+        f"request={res['input_summary']['prompt_characters']}, "
+        f"draft={res['input_summary']['output_characters']} characters.",
         "",
     ]
     lines.extend(

@@ -24,6 +24,9 @@ Use the lightest check suited to the task. Do not add an audit, warnings, questi
 
 When comparing an existing draft with supplied material, and the host can run
 Python, the bundled `scripts/evidence_scan.py` can flag some literal mismatches.
+If the user explicitly requests this scan and the host can run it with the
+necessary input permissions, run it. For ordinary drafting, choose whether it
+helps rather than forcing it on every task.
 For text already in the conversation, invoke the actual path to the bundled
 script with `--stdin-json` and send a JSON object through the host's standard
 input: `sources` is a list of source strings, `prompt` is the request string,
@@ -36,12 +39,16 @@ DRAFT`; multiple `--source` options are allowed, and `--prompt` can name a
 request text file. Run only on material the user made available for this task.
 If the host cannot run the scan or standard input is unavailable, use a direct
 source review and say the scan was not run when that distinction matters.
+If standard input can only be supplied by embedding source text in a shell
+command, do not do that; use direct review instead. Tool input may still be
+retained by the host even when no input file is created.
 
 When reporting a scan, distinguish it from a manual review: say whether it ran,
 which supplied sources and draft version it covered, and whether anything was
 omitted or transformed before scanning. Do not claim it ran without its actual
 output. If the draft changes afterward, run it again or say the result covers
-the earlier draft. Do not reproduce source excerpts merely to prove coverage.
+the earlier draft. Input lengths show what was processed but do not prove that
+it was complete or unchanged. Do not reproduce excerpts merely to prove coverage.
 
 The scan compares surface patterns, not meaning or external truth. A matched
 number or date can still refer to the wrong thing, and a correct derived value
