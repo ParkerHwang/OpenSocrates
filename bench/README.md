@@ -137,8 +137,13 @@ tags, and checks a rule scorer can apply without a model. Supported rules:
 - `arithmetic_claim`
 
 `arithmetic_claim` allows a percentage equal to the supplied numerator and
-denominator. Any other percentage fails. Phrases that claim an external
-verification also fail. The scorer does not invent a confirmation.
+denominator. A percent inside a listed exception, or inside a material sentence
+that denies a verified percent, is not a rate claim. A mismatched percent next
+to a denial cue but outside those exceptions is `needs_human_review`. A bare
+wrong rate still fails. Quoting “no one verified 100%” is not a pretended
+verification. A post-hoc envelope under
+`bench/regressions/calc-unverified-rate/` was added after this change. It is
+not an independent holdout and is not a performance estimate.
 
 Authored fixtures under `bench/fixtures/<case-id>/<condition>.json` exist to
 show pass and `condition_fail`. Their `illustrates` text says they are not
@@ -237,6 +242,9 @@ Claude가 합성 문장으로 지적한 거짓 실패를 재현했습니다. `�
 `삼십오 명`, `채택되었습니다`처럼 글자 패턴을 피한 말은 여전히 놓칩니다.
 그 통과는 의미 판정이 아닙니다. 제품 스캐너 표시는 벤치 합격이 아닙니다.
 
-산술은 자료에 있는 분자와 분모로 계산할 수 있습니다. 도구가 없는데 검증했다고
-말하면 실패입니다. 케이스를 하나 추가하는 절차는 [ADD_A_CASE.md](ADD_A_CASE.md)에
+산술은 자료에 있는 분자와 분모로 계산할 수 있습니다. 자료가 100% 검증을
+부인하는 문장을 본문이 인용하면 그 퍼센트는 비율 주장이 아닙니다. 예외 없이
+부정 단서만 있는 다른 퍼센트는 사람 검토이고, 그냥 틀린 비율은 실패입니다.
+이 사후 예시는 성능 수치가 아닙니다. 도구가 없는데 검증했다고 말하면
+실패입니다. 케이스를 하나 추가하는 절차는 [ADD_A_CASE.md](ADD_A_CASE.md)에
 있습니다.

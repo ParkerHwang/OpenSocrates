@@ -349,6 +349,8 @@ def _arithmetic_shape(check: Mapping[str, Any], label: str) -> list[str]:
         errors.append(f"{label} tolerance must be a number")
     if check.get("policy") not in {None, "model_may_calculate"}:
         errors.append(f"{label} policy must be model_may_calculate when set")
+    errors.extend(_optional_string_list(check, "clear_exceptions", label))
+    errors.extend(_optional_string_list(check, "ambiguous_cues", label))
     return errors
 
 
