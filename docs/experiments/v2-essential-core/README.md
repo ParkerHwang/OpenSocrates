@@ -6,10 +6,12 @@ unknown. When a choice matters, it should make the trade-off and a condition
 that could change the decision clear. For simple work it should stay out of the
 way.
 
-The entire candidate is [`SKILL.md`](../../../plugin-src/experimental-core/skills/opensocrates-core/SKILL.md).
+The candidate's guidance is [`SKILL.md`](../../../plugin-src/experimental-core/skills/opensocrates-core/SKILL.md),
+accompanied by the project MIT license.
 It is plain text, with no scripts, tools, hooks, installer, or telemetry. It can
 be read and used as instructions, or provided to a compatible host using that
-host's skill setup. This repository does not yet provide an installable package.
+host's skill setup. There is no published 2.0 release; the local ZIP below is
+an experimental way to share this file.
 The skill adapts two ideas described below, but does not invoke the 1.x method
 library or run those full methods. Existing 1.x files are unchanged.
 
@@ -30,7 +32,9 @@ Copy the `opensocrates-core` skill folder into your project's
 `.agents/skills/` folder, then start a new Codex session for that project and
 explicitly request `$opensocrates-core` with your task. If a folder with that
 name already exists, back it up or choose another project before copying. To
-remove this experiment, remove the copied folder.
+remove this experiment, remove the copied folder. If 1.x is also active in
+the host, both sets of guidance may be available; a separate project alone
+does not necessarily isolate a user-wide installation.
 
 In one temporary project using Codex CLI 0.166.0-alpha.5.1, an explicit
 `$opensocrates-core` request led to a successful read of the copied skill file
@@ -38,6 +42,25 @@ and a response to a synthetic decision task. This was observed with the earlier
 skill at `b813474` (unchanged at `176c146`), before the decision guidance was
 updated. It does not prove automatic discovery, application, or general
 usefulness, or establish behavior in other hosts.
+
+## Make a portable skill ZIP
+
+From the repository root in a macOS or Linux shell, create a ZIP containing
+`opensocrates-core/SKILL.md` and its `LICENSE`. The command replaces an
+existing ZIP at the same output path:
+
+```sh
+mkdir -p build/experiments/v2-essential-core
+python3 -m zipfile -c build/experiments/v2-essential-core/opensocrates-core-experimental.zip plugin-src/experimental-core/skills/opensocrates-core
+```
+
+For a Codex project, extract that folder into `.agents/skills/`, preserving any
+existing folder as described above. Claude's [custom skill instructions](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)
+describe uploading a ZIP with the skill folder at its root via **Customize →
+Skills**. The archive structure has been inspected locally, but uploading,
+activation, and use of this candidate in Claude have not been tested. Creating
+the ZIP does not install or publish it. Its name differs from the 1.x skill;
+do not use the 1.x skill's Replace action to install this experiment.
 
 ## Try a decision
 

@@ -5,11 +5,11 @@
 어떤 사실이 판단을 바꿀 수 있는지 설명하고, 단순한 일에는 절차를 강요하지
 않습니다.
 
-후보 전체는 [`SKILL.md`](../../../plugin-src/experimental-core/skills/opensocrates-core/SKILL.md)
-한 파일입니다. 스크립트, 도구, 훅, 설치 프로그램이나 사용 기록 수집 기능이
+후보 지침은 [`SKILL.md`](../../../plugin-src/experimental-core/skills/opensocrates-core/SKILL.md)
+한 파일이며 프로젝트 MIT 라이선스가 함께 제공됩니다. 스크립트, 도구, 훅, 설치 프로그램이나 사용 기록 수집 기능이
 없는 일반 텍스트입니다. 내용을 직접 읽어 지침으로 쓰거나, 스킬을 지원하는
-호스트에 해당 호스트의 방법으로 제공할 수 있습니다. 이 저장소는 아직 설치용
-패키지를 제공하지 않습니다. 아래 두 아이디어는 가져왔지만 1.x 사고 방법
+호스트에 해당 호스트의 방법으로 제공할 수 있습니다. 정식 2.0 릴리스는 아직
+없으며, 아래 로컬 ZIP은 이 파일을 공유하기 위한 실험입니다. 아래 두 아이디어는 가져왔지만 1.x 사고 방법
 라이브러리나 전체 절차를 호출하지 않습니다. 기존 1.x 파일은 바꾸지 않았습니다.
 
 이전 [output-brief 실험](https://github.com/ParkerHwang/OpenSocrates/pull/164)은
@@ -29,13 +29,35 @@
 복사하고, 그 프로젝트에서 새 Codex 세션을 열어 작업과 함께
 `$opensocrates-core`를 명시적으로 요청합니다. 같은 이름의 폴더가 이미 있다면
 복사 전에 백업하거나 다른 프로젝트를 선택하세요. 실험을 제거하려면 복사한
-폴더를 지우면 됩니다.
+폴더를 지우면 됩니다. 같은 호스트에 1.x도 활성화돼 있다면 두 지침을 함께
+사용할 수 있습니다. 별도 프로젝트만으로 사용자 전체에 설치된 1.x와 반드시
+분리되는 것은 아닙니다.
 
 Codex CLI 0.166.0-alpha.5.1의 임시 프로젝트에서 `$opensocrates-core`를 명시해
 요청했을 때, 복사한 스킬 파일을 성공적으로 읽고 가상의 선택 과제에 답변하는
 것을 한 번 확인했습니다. 이는 선택 지침을 바꾸기 전의 `b813474` 스킬
 (`176c146`에서도 동일)에 대한 관찰입니다. 자동 발견, 실제 적용, 일반적인
 유용성이나 다른 호스트에서의 동작을 입증하지 않습니다.
+
+## 스킬 ZIP 만들기
+
+macOS 또는 Linux 셸의 저장소 루트에서 다음을 실행하면
+`opensocrates-core/SKILL.md`와 `LICENSE`가 담긴 ZIP이 생깁니다. 같은 출력
+경로에 ZIP이 있으면 덮어씁니다.
+
+```sh
+mkdir -p build/experiments/v2-essential-core
+python3 -m zipfile -c build/experiments/v2-essential-core/opensocrates-core-experimental.zip plugin-src/experimental-core/skills/opensocrates-core
+```
+
+Codex 프로젝트에서는 위의 기존 폴더 주의사항을 지키며 스킬 폴더를
+`.agents/skills/`에 압축 해제할 수 있습니다. Claude의
+[사용자 지정 스킬 안내](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)는
+스킬 폴더가 최상위에 있는 ZIP을 **Customize → Skills**에서 업로드하는 방법을
+설명합니다. ZIP 구조는 로컬에서 확인했지만, 이 후보의 Claude 업로드·활성화·
+사용은 시험하지 않았습니다. ZIP을 만드는 것만으로 설치하거나 배포하지 않습니다.
+이름은 1.x 스킬과 다르며, 이 실험을 설치할 때 1.x 스킬의 교체 기능을 쓰지
+않습니다.
 
 ## 선택에 사용해 보기
 
