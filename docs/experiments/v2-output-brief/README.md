@@ -13,6 +13,12 @@ no findings do not prove that a draft is correct. The scanner is adapted from
 Claude's synthetic `rulelab` prototype and has not yet been independently
 verified in this repository.
 
+The experimental packages include an executable Python script. Its source is
+[`evidence_scan.py`](../../../plugin-src/experimental-output-brief/skills/output-brief/scripts/evidence_scan.py).
+The assistant should distinguish a scan that actually ran from a manual review,
+identify omitted or transformed inputs, and not reuse a scan result for a draft
+that has since changed.
+
 The candidate is not an integrated 2.0 product or evidence of improved answers.
 The shared skill source is under
 [`plugin-src/experimental-output-brief/skills/output-brief`](../../../plugin-src/experimental-output-brief/skills/output-brief/SKILL.md).
@@ -66,3 +72,13 @@ does not measure actual skill discovery or use.
 This candidate is intended for joint review with the separate personal-rule and
 public-benchmark proposals. No host integration, benchmark results, adoption,
 or superiority over an unassisted model is claimed.
+
+The experimental [`tools/v2_codex_bench_adapter.py`](../../../tools/v2_codex_bench_adapter.py)
+can connect the public synthetic bench to an already authenticated local Codex
+CLI. It creates an ephemeral session in a temporary directory and asks the model
+not to use tools; tool events it observes are rejected after the fact. This does
+not guarantee all reads or network access were prevented. Use public synthetic
+cases only. It passes guidance text inline and does not install a plugin, deliver
+its scripts, or establish native skill discovery, reading, or application. A
+command's output is not a verified model-call attestation in the bench. Model
+identity, availability, and account or host limits require separate observation.

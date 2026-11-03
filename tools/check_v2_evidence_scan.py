@@ -9,9 +9,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = (
-    ROOT / "plugin-src/experimental-output-brief/skills/output-brief/scripts/evidence_scan.py"
-)
+SCRIPT = ROOT / "plugin-src/experimental-output-brief/skills/output-brief/scripts/evidence_scan.py"
 SPEC = importlib.util.spec_from_file_location("experimental_evidence_scan", SCRIPT)
 assert SPEC and SPEC.loader
 scan = importlib.util.module_from_spec(SPEC)
@@ -62,26 +60,48 @@ class EvidenceScanChecks(unittest.TestCase):
             before = {p.name: p.read_bytes() for p in folder.iterdir()}
             missing = subprocess.run(
                 [sys.executable, str(SCRIPT), "--output", str(draft)],
-                capture_output=True, text=True, check=False,
+                capture_output=True,
+                text=True,
+                check=False,
             )
             self.assertNotEqual(missing.returncode, 0)
             result = subprocess.run(
-                [sys.executable, str(SCRIPT), "--source", str(source), "--output", str(draft), "--json"],
-                capture_output=True, text=True, check=False,
+                [
+                    sys.executable,
+                    str(SCRIPT),
+                    "--source",
+                    str(source),
+                    "--output",
+                    str(draft),
+                    "--json",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
             )
             self.assertEqual(result.returncode, 0)
             self.assertFalse(json.loads(result.stdout)["verified"])
             self.assertEqual(before, {p.name: p.read_bytes() for p in folder.iterdir()})
 
     def test_chat_text_can_be_scanned_via_stdin_without_files(self):
-        payload = {"sources": ["There are 24 seats."], "prompt": "", "output": "There are 25 seats."}
+        payload = {
+            "sources": ["There are 24 seats."],
+            "prompt": "",
+            "output": "There are 25 seats.",
+        }
         with tempfile.TemporaryDirectory() as directory:
             result = subprocess.run(
                 [sys.executable, str(SCRIPT), "--stdin-json", "--json"],
-                input=json.dumps(payload), capture_output=True, text=True, check=False, cwd=directory,
+                input=json.dumps(payload),
+                capture_output=True,
+                text=True,
+                check=False,
+                cwd=directory,
             )
             self.assertEqual(result.returncode, 0)
-            self.assertIn("novel_number", {f["kind"] for f in json.loads(result.stdout)["findings"]})
+            self.assertIn(
+                "novel_number", {f["kind"] for f in json.loads(result.stdout)["findings"]}
+            )
             self.assertEqual(list(Path(directory).iterdir()), [])
 
 

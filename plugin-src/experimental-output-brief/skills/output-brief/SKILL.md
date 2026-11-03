@@ -37,6 +37,12 @@ request text file. Run only on material the user made available for this task.
 If the host cannot run the scan or standard input is unavailable, use a direct
 source review and say the scan was not run when that distinction matters.
 
+When reporting a scan, distinguish it from a manual review: say whether it ran,
+which supplied sources and draft version it covered, and whether anything was
+omitted or transformed before scanning. Do not claim it ran without its actual
+output. If the draft changes afterward, run it again or say the result covers
+the earlier draft. Do not reproduce source excerpts merely to prove coverage.
+
 The scan compares surface patterns, not meaning or external truth. A matched
 number or date can still refer to the wrong thing, and a correct derived value
 can be flagged. Treat findings as prompts for source-based review, not as
