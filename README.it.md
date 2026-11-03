@@ -4,6 +4,8 @@
 
 # OpenSocrates
 
+> **Esperimento 2.0:** Stiamo sviluppando una versione candidata separata che aiuta a preparare documenti per un destinatario e a confrontare una bozza con i materiali forniti. Non è una versione rilasciata e non garantisce l'accuratezza dei fatti. [Scopri l'esperimento (inglese)](docs/experiments/v2-output-brief/README.md).
+
 **Metti 48 metodi di ragionamento al servizio delle tue conversazioni con l’AI.**
 
 OpenSocrates offre procedure di ragionamento riutilizzabili in **Claude, Codex e
