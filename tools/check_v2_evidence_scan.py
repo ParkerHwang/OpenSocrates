@@ -35,6 +35,11 @@ class EvidenceScanChecks(unittest.TestCase):
         self.assertIn("RESULT: NOT VERIFIED", text)
         self.assertNotIn("[HIGH]", text)
 
+    def test_negated_confirmation_is_not_reported_as_a_commitment(self):
+        source = "The venue is not yet confirmed."
+        report = scan.analyze([], source, "The venue is not yet confirmed.")
+        self.assertNotIn("commitment", {f["kind"] for f in report["findings"]})
+
     def test_known_correct_arithmetic_can_be_flagged(self):
         report = scan.analyze([], "There are 24 seats; 3 are reserved.", "21 seats remain.")
         self.assertIn("novel_number", {f["kind"] for f in report["findings"]})

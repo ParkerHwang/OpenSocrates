@@ -250,7 +250,7 @@ def analyze(sources: list[str], prompt: str, output: str, must: list[str] | None
     cov["numbers"] = sorted(on & mn, key=lambda x: (len(x), x))
     findings += unit_binding_findings(mt, ot, on & mn)
     for rx, label in COMMIT:
-        if re.search(rx, output, re.I):
+        if _present(rx, output):
             if _present(rx, material):
                 cov["wording"].append(label)
             else:
