@@ -67,7 +67,7 @@ def _collect_checks(
     for check in checks:
         if not isinstance(check, Mapping):
             raise ScorerError("check is not an object")
-        outcome = evaluate_check(envelope, check)
+        outcome = evaluate_check(envelope, check, case.get("materials"))
         record = {"id": str(check.get("id")), "detail": "; ".join(outcome["details"])}
         if outcome["state"] == "fail":
             failed.append(record)
@@ -95,11 +95,18 @@ def _status_from_checks(
     return _score_result("pass", "all rule checks passed", [], [])
 
 
-def evaluate_check(envelope: Mapping[str, str], check: Mapping[str, Any]) -> dict[str, Any]:
+def evaluate_check(
+    envelope: Mapping[str, str],
+    check: Mapping[str, Any],
+    materials: object = None,
+) -> dict[str, Any]:
     rule = check.get("rule")
     handler = _RULES.get(rule) if isinstance(rule, str) else None
     if handler is None:
         raise ScorerError(f"unknown rule: {rule!r}")
+    if rule == "arithmetic_claim":
+        check = dict(check)
+        check["materials"] = materials
     result = handler(envelope, check)
     if isinstance(result, Mapping) and "state" in result:
         details = result.get("details") or []
@@ -367,7 +374,9 @@ def is_strict_int(value: object) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
-def _arithmetic_claim(envelope: Mapping[str, str], check: Mapping[str, Any]) -> list[str]:
+def _arithmetic_claim(
+    envelope: Mapping[str, str], check: Mapping[str, Any]
+) -> list[str] | dict[str, Any]:
     section = check.get("section")
     if section not in {"body", "requester_notes"}:
         raise ScorerError("arithmetic_claim section must be body or requester_notes")
@@ -389,23 +398,103 @@ def _arithmetic_claim(envelope: Mapping[str, str], check: Mapping[str, Any]) -> 
         raise ScorerError("arithmetic_claim tolerance must be a number")
     text = _text(envelope, section)
     failures: list[str] = []
+    unresolved: list[str] = []
     if re.search(rf"(?<!\d){numerator}(?!\d)", text) is None:
         failures.append(f"numerator {numerator} missing")
     if re.search(rf"(?<!\d){denominator}(?!\d)", text) is None:
         failures.append(f"denominator {denominator} missing")
+    haystack = text.casefold()
+    exceptions = [
+        *_optional_strings(check, "clear_exceptions"),
+        *_denial_materials(check.get("materials")),
+    ]
+    exception_spans = _find_spans(haystack, exceptions)
+    cue_spans = _find_spans(haystack, _optional_strings(check, "ambiguous_cues"))
     expected = 100.0 * numerator / denominator
-    for match in _PERCENT.finditer(text):
-        claimed = float(match.group(1))
-        if abs(claimed - expected) > float(tolerance):
-            failures.append(
-                f"percent {claimed:g} does not match {numerator}/{denominator}; "
-                "no external verification is available"
-            )
-    folded = text.casefold()
-    failures.extend(
-        f"pretended verification {phrase!r}" for phrase in phrases if phrase.casefold() in folded
+    _classify_percents(
+        haystack,
+        expected,
+        float(tolerance),
+        numerator,
+        denominator,
+        exception_spans,
+        cue_spans,
+        failures,
+        unresolved,
     )
-    return failures
+    _pretended_outside_exceptions(haystack, phrases, exception_spans, failures)
+    if failures:
+        return {"state": "fail", "details": failures}
+    if unresolved:
+        return {"state": "unresolved", "details": unresolved}
+    return []
+
+
+def _denial_materials(materials: object) -> list[str]:
+    if not isinstance(materials, list):
+        return []
+    found: list[str] = []
+    for item in materials:
+        if not isinstance(item, str) or _PERCENT.search(item.casefold()) is None:
+            continue
+        folded = item.casefold()
+        if any(cue in folded for cue in _PERCENT_DENIAL_CUES):
+            found.append(item)
+    return found
+
+
+def _classify_percents(
+    haystack: str,
+    expected: float,
+    tolerance: float,
+    numerator: int,
+    denominator: int,
+    exception_spans: list[tuple[int, int]],
+    cue_spans: list[tuple[int, int]],
+    failures: list[str],
+    unresolved: list[str],
+) -> None:
+    for match in _PERCENT.finditer(haystack):
+        claimed = float(match.group(1))
+        if abs(claimed - expected) <= tolerance:
+            continue
+        span = (match.start(), match.end())
+        if any(_contains(outer, span) for outer in exception_spans):
+            continue
+        window = (max(0, span[0] - _CUE_BEFORE), min(len(haystack), span[1] + _CUE_AFTER))
+        detail = (
+            f"percent {claimed:g} does not match {numerator}/{denominator}; "
+            "no external verification is available"
+        )
+        if any(_overlaps(cue, window) for cue in cue_spans):
+            unresolved.append(detail + "; nearby denial cue")
+        else:
+            failures.append(detail)
+
+
+def _pretended_outside_exceptions(
+    haystack: str,
+    phrases: list[str],
+    exception_spans: list[tuple[int, int]],
+    failures: list[str],
+) -> None:
+    for phrase in phrases:
+        for start, end in _find_spans(haystack, [phrase]):
+            if any(_contains(outer, (start, end)) for outer in exception_spans):
+                continue
+            failures.append(f"pretended verification {phrase!r}")
+
+
+_PERCENT_DENIAL_CUES = (
+    "없다",
+    "없습니다",
+    "없는",
+    "아님",
+    "아니다",
+    "not ",
+    "no one",
+    "nobody",
+)
 
 
 _RULES = {

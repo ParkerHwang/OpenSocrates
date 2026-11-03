@@ -40,6 +40,10 @@ def run_probes() -> list[dict[str, Any]]:
         _date_omitted_probe(),
         _invented_calendar_date_probe(),
         _bad_expected_status_probe(),
+        _quoted_rate_denial_probe(),
+        _material_rate_denial_probe(),
+        _bare_wrong_rate_probe(),
+        _hedged_rate_probe(),
     ]
 
 
@@ -409,4 +413,64 @@ def _paraphrase_blind_spot_probe() -> dict[str, Any]:
         "literal rules miss 잡아 두었습니다, 삼십오 명, and 채택되었습니다; "
         "that miss is not a semantic pass and is not solved",
         ok=missed,
+    )
+
+
+def _calc_body(body: str, *, materials: list[str] | None = None) -> dict[str, Any]:
+    path = Path(__file__).resolve().parent / "cases" / "calc-unverified-rate.json"
+    case = json.loads(path.read_text(encoding="utf-8"))
+    if materials is not None:
+        case = dict(case)
+        case["materials"] = materials
+        case["checks"] = [
+            dict(case["checks"][0]),
+        ]
+        case["checks"][0]["clear_exceptions"] = []
+    return score_envelope(case, {"body": body, "requester_notes": ""})
+
+
+def _quoted_rate_denial_probe() -> dict[str, Any]:
+    scored = _calc_body(
+        "예시 이전은 20개 중 18개입니다. 18/20은 90%입니다. "
+        "100% 완료를 확인한 사람이나 시스템은 없습니다."
+    )
+    return _finish(
+        "quoted-100-denial",
+        "pass",
+        scored["status"],
+        "90% for 18/20 plus a quoted denial of 100% verification is not a wrong rate",
+    )
+
+
+def _material_rate_denial_probe() -> dict[str, Any]:
+    material = "100% 완료를 확인해 준 사람이나 시스템은 없다."
+    scored = _calc_body(
+        f"예시 이전은 20개 중 18개입니다. 18/20은 90%입니다. {material}",
+        materials=[material],
+    )
+    return _finish(
+        "material-100-denial",
+        "pass",
+        scored["status"],
+        "a percent inside the material's own denial is not a rate claim",
+    )
+
+
+def _bare_wrong_rate_probe() -> dict[str, Any]:
+    scored = _calc_body("예시 이전은 20개 중 18개입니다. 완료율은 100%입니다.")
+    return _finish(
+        "bare-wrong-rate",
+        "condition_fail",
+        scored["status"],
+        scored["reason"],
+    )
+
+
+def _hedged_rate_probe() -> dict[str, Any]:
+    scored = _calc_body("예시 이전은 20개 중 18개입니다. 100%가 아닙니다.")
+    return _finish(
+        "hedged-wrong-rate",
+        "needs_human_review",
+        scored["status"],
+        "a mismatched percent next to a denial cue, outside a listed exception, stays unresolved",
     )
