@@ -280,10 +280,19 @@ def check(sources: list[str], prompt: str, output: str, must: list[str] | None =
 def render(res: dict) -> str:
     f = res["findings"]
     high = sum(1 for x in f if x["severity"] == "HIGH")
-    lines = [f"[{x['severity']}] {x['kind']}: {x['message']}" for x in f]
+    lines = [
+        "Review cues only: a flag can be correct, including a calculated value. "
+        "No flags do not mean the draft is safe or accurate.",
+        "The scan may miss a real value attached to the wrong person, item, or event.",
+        "",
+    ]
+    lines.extend(
+        f"[{'REVIEW' if x['severity'] == 'HIGH' else 'INFO'}] {x['kind']}: {x['message']}"
+        for x in f
+    )
     cov = res["matched_by_presence_only"]
     lines.append("")
-    lines.append(f"RESULT: NOT VERIFIED. {len(f)} flag(s), {high} HIGH. "
+    lines.append(f"RESULT: NOT VERIFIED. {len(f)} flag(s), {high} to review. "
                  "Zero flags is not a pass; this tool only compares surface strings with your material.")
     if any(cov.values()):
         lines.append("Matched by PRESENCE ONLY (found somewhere in your material; NOT checked that they mean the same thing there):")
@@ -306,6 +315,8 @@ def main(argv=None) -> int:
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--strict", action="store_true", help="exit 1 if any HIGH flag")
     a = ap.parse_args(argv)
+    if not a.source and not a.prompt:
+        ap.error("provide at least one --source or --prompt for comparison")
     rd = lambda p: Path(p).read_text(encoding="utf-8")
     res = analyze([rd(s) for s in a.source], rd(a.prompt) if a.prompt else "", rd(a.output), a.must)
     print(json.dumps(res, ensure_ascii=False, indent=2) if a.json else render(res))
