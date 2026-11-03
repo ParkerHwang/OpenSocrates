@@ -10,14 +10,13 @@ The entire candidate is [`SKILL.md`](../../../plugin-src/experimental-core/skill
 It is plain text, with no scripts, tools, hooks, installer, or telemetry. It can
 be read and used as instructions, or provided to a compatible host using that
 host's skill setup. This repository does not yet provide an installable package.
-It does not invoke the
-1.x method library; connecting a particular method is future work, not a
-capability claimed here. Existing 1.x files are unchanged.
+The skill adapts two ideas described below, but does not invoke the 1.x method
+library or run those full methods. Existing 1.x files are unchanged.
 
 The earlier [output-brief experiment](https://github.com/ParkerHwang/OpenSocrates/pull/164)
 is preserved separately, including its scanner and benchmark. They are not part
-of this candidate. This is an experiment, not a release or a claim that the
-skill improves outcomes over an unassisted model or a short instruction.
+of this candidate. This is an experiment, not a release; there is not yet
+evidence of improved outcomes over an unassisted model or a short instruction.
 
 The distinction between binding requirements and preferences is adapted from
 the 1.x [trade-off analysis](../../../content/methods/trade-off-analysis/procedure.en.md).
@@ -35,9 +34,10 @@ remove this experiment, remove the copied folder.
 
 In one temporary project using Codex CLI 0.166.0-alpha.5.1, an explicit
 `$opensocrates-core` request led to a successful read of the copied skill file
-and a response to a synthetic decision task. This observation does not prove
-automatic discovery, application, or general usefulness, or establish behavior
-in other hosts.
+and a response to a synthetic decision task. This was observed with the earlier
+skill at `b813474` (unchanged at `176c146`), before the decision guidance was
+updated. It does not prove automatic discovery, application, or general
+usefulness, or establish behavior in other hosts.
 
 ## Try a decision
 
@@ -49,9 +49,10 @@ A useful response can keep the mandatory offline requirement separate from
 preferences such as convenience, and compare the options without assuming
 offline support, staff capacity, or the feasibility of manual work. A tool
 that cannot work offline fails the requirement; one whose offline support is
-unknown remains conditional, not rejected or approved. The response can identify a small
-next step that does not depend on those unknowns and explain what would change
-its recommendation. This is an illustrative prompt, not a recorded test result.
+unknown remains conditional, not rejected or approved. The response can
+identify an accessible way to check offline support, explain how the answer
+could affect the choice, and continue any work that does not depend on it.
+This is an illustrative prompt, not a recorded test result.
 
 If comparing answers, use the same task and relevant context in separate
 conversations, including a short ordinary instruction as well as no added
