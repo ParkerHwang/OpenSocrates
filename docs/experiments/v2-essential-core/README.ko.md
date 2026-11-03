@@ -41,23 +41,25 @@ Codex CLI 0.166.0-alpha.5.1의 임시 프로젝트에서 `$opensocrates-core`를
 
 ## 스킬 ZIP 만들기
 
-macOS 또는 Linux 셸의 저장소 루트에서 다음을 실행하면
-`opensocrates-core/SKILL.md`와 `LICENSE`가 담긴 ZIP이 생깁니다. 같은 출력
-경로에 ZIP이 있으면 덮어씁니다.
+macOS 또는 Linux 셸에서 Git으로 내려받은 저장소 루트에서 다음을 실행하면
+커밋된 `opensocrates-core/SKILL.md`와 `LICENSE`만 담긴 ZIP이 생깁니다.
+커밋하지 않은 수정은 포함되지 않습니다. 같은 출력 경로에 ZIP이 있으면
+덮어씁니다.
 
 ```sh
 mkdir -p build/experiments/v2-essential-core
-python3 -m zipfile -c build/experiments/v2-essential-core/opensocrates-core-experimental.zip plugin-src/experimental-core/skills/opensocrates-core
+git archive --format=zip --prefix=opensocrates-core/ --output=build/experiments/v2-essential-core/opensocrates-core-experimental.zip HEAD:plugin-src/experimental-core/skills/opensocrates-core SKILL.md LICENSE
 ```
 
 Codex 프로젝트에서는 위의 기존 폴더 주의사항을 지키며 스킬 폴더를
 `.agents/skills/`에 압축 해제할 수 있습니다. Claude의
 [사용자 지정 스킬 안내](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)는
 스킬 폴더가 최상위에 있는 ZIP을 **Customize → Skills**에서 업로드하는 방법을
-설명합니다. ZIP 구조는 로컬에서 확인했지만, 이 후보의 Claude 업로드·활성화·
-사용은 시험하지 않았습니다. ZIP을 만드는 것만으로 설치하거나 배포하지 않습니다.
-이름은 1.x 스킬과 다르며, 이 실험을 설치할 때 1.x 스킬의 교체 기능을 쓰지
-않습니다.
+설명합니다. Claude 안내에 따르면 스킬을 쓰려면 코드 실행이 활성화돼 있어야
+하며 조직 설정에 따른 제한도 있을 수 있습니다. ZIP 구조는 로컬에서 확인했지만,
+이 후보의 Claude 업로드·활성화·사용은 시험하지 않았습니다. ZIP을 만드는
+것만으로 설치하거나 배포하지 않습니다. 이름은 1.x 스킬과 다르며, 이 실험을
+설치할 때 1.x 스킬의 교체 기능을 쓰지 않습니다.
 
 ## 선택에 사용해 보기
 

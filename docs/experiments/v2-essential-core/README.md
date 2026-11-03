@@ -45,22 +45,25 @@ usefulness, or establish behavior in other hosts.
 
 ## Make a portable skill ZIP
 
-From the repository root in a macOS or Linux shell, create a ZIP containing
-`opensocrates-core/SKILL.md` and its `LICENSE`. The command replaces an
-existing ZIP at the same output path:
+From the root of a Git checkout in a macOS or Linux shell, create a ZIP
+containing only the committed `opensocrates-core/SKILL.md` and `LICENSE`.
+Uncommitted edits are not included. The command replaces an existing ZIP at
+the same output path:
 
 ```sh
 mkdir -p build/experiments/v2-essential-core
-python3 -m zipfile -c build/experiments/v2-essential-core/opensocrates-core-experimental.zip plugin-src/experimental-core/skills/opensocrates-core
+git archive --format=zip --prefix=opensocrates-core/ --output=build/experiments/v2-essential-core/opensocrates-core-experimental.zip HEAD:plugin-src/experimental-core/skills/opensocrates-core SKILL.md LICENSE
 ```
 
 For a Codex project, extract that folder into `.agents/skills/`, preserving any
 existing folder as described above. Claude's [custom skill instructions](https://support.claude.com/en/articles/12512198-how-to-create-custom-skills)
 describe uploading a ZIP with the skill folder at its root via **Customize →
-Skills**. The archive structure has been inspected locally, but uploading,
-activation, and use of this candidate in Claude have not been tested. Creating
-the ZIP does not install or publish it. Its name differs from the 1.x skill;
-do not use the 1.x skill's Replace action to install this experiment.
+Skills**. Claude's instructions say skills require code execution to be
+enabled; organization settings may also restrict them. The archive structure
+has been inspected locally, but uploading, activation, and use of this candidate
+in Claude have not been tested. Creating the ZIP does not install or publish
+it. Its name differs from the 1.x skill; do not use the 1.x skill's Replace
+action to install this experiment.
 
 ## Try a decision
 
