@@ -155,20 +155,50 @@ def _require_text(envelope: Mapping[str, str], check: Mapping[str, Any]) -> list
     return _require_all(envelope, check, [needle])
 
 
-def _require_any_text(envelope: Mapping[str, str], check: Mapping[str, Any]) -> list[str]:
+def _require_any_text(
+    envelope: Mapping[str, str], check: Mapping[str, Any]
+) -> list[str] | dict[str, Any]:
     patterns = _patterns(check)
+    ambiguous = _optional_strings(check, "ambiguous_patterns")
     fields = _fields(check)
     if check.get("section") == "both":
-        failures: list[str] = []
-        for name in fields:
-            haystack = _text(envelope, name).casefold()
-            if not any(pattern.casefold() in haystack for pattern in patterns):
-                failures.append(f"none of the accepted phrases was present in {name}")
-        return failures
+        return _require_any_both(envelope, fields, patterns, ambiguous)
     blobs = [_text(envelope, name).casefold() for name in fields]
-    if any(pattern.casefold() in blob for blob in blobs for pattern in patterns):
+    if _any_phrase(blobs, patterns):
         return []
+    if ambiguous and _any_phrase(blobs, ambiguous):
+        return {
+            "state": "unresolved",
+            "details": ["wording mentions the topic without a clear required phrase"],
+        }
     return ["none of the accepted phrases was present"]
+
+
+def _require_any_both(
+    envelope: Mapping[str, str],
+    fields: tuple[str, ...],
+    patterns: list[str],
+    ambiguous: list[str],
+) -> list[str] | dict[str, Any]:
+    failures: list[str] = []
+    unresolved: list[str] = []
+    for name in fields:
+        haystack = _text(envelope, name).casefold()
+        if _any_phrase([haystack], patterns):
+            continue
+        if ambiguous and _any_phrase([haystack], ambiguous):
+            unresolved.append(f"{name} is ambiguous")
+        else:
+            failures.append(f"none of the accepted phrases was present in {name}")
+    if failures:
+        return failures
+    if unresolved:
+        return {"state": "unresolved", "details": unresolved}
+    return []
+
+
+def _any_phrase(blobs: list[str], patterns: list[str]) -> bool:
+    return any(pattern.casefold() in blob for blob in blobs for pattern in patterns)
 
 
 def _require_all_text(envelope: Mapping[str, str], check: Mapping[str, Any]) -> list[str]:

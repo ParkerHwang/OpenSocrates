@@ -82,6 +82,7 @@ def render_summary(report: dict[str, Any]) -> str:
         ]
     )
     lines.extend(_count_lines(report["counts"]["results"]))
+    lines.extend(_regression_lines(report))
     lines.extend(
         [
             "",
@@ -127,6 +128,26 @@ def _pin_lines(report: dict[str, Any]) -> list[str]:
     ]
 
 
+def _regression_lines(report: dict[str, Any]) -> list[str]:
+    rows = report.get("regressions") or []
+    if not rows:
+        return []
+    lines = [
+        "",
+        "## Post-hoc regressions",
+        "",
+        report.get("regression_framing") or "",
+        "",
+        "| Label | Expected | Actual | Matched |",
+        "| --- | --- | --- | --- |",
+    ]
+    lines.extend(
+        f"| {row.get('label') or '—'} | {row.get('expected_status') or '—'} | {row['status']} | {_yes(bool(row['matched']))} |"
+        for row in rows
+    )
+    return lines
+
+
 def count_rows(rows: list[dict[str, Any]]) -> dict[str, int]:
     counts = Counter(row["status"] for row in rows)
     return {code: int(counts.get(code, 0)) for code in REASON_CODES}
@@ -138,6 +159,8 @@ def exit_code(report: dict[str, Any]) -> int:
     if any(row["status"] in {"input_error", "scorer_error"} for row in report["results"]):
         return 1
     if any(not probe["matched"] for probe in report["classifier_probes"]):
+        return 1
+    if any(not row["matched"] for row in report.get("regressions", [])):
         return 1
     return 0
 

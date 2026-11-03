@@ -8,7 +8,13 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from bench.contract import CASE_SCHEMA, ENVELOPE_SCHEMA, FIXED_ENGLISH_HEADERS, FIXTURE_SCHEMA
+from bench.contract import (
+    CASE_SCHEMA,
+    ENVELOPE_SCHEMA,
+    FIXED_ENGLISH_HEADERS,
+    FIXTURE_SCHEMA,
+    REGRESSION_SCHEMA,
+)
 from bench.scoring import is_strict_int
 
 _CASE_KEYS = {
@@ -167,12 +173,67 @@ def expected_fixture_path(root: Path, case_id: str, condition: str) -> Path:
     return root / "bench" / "fixtures" / case_id / f"{condition}.json"
 
 
+def load_regression_files(root: Path) -> list[dict[str, Any]]:
+    """Load post-hoc regression envelopes. They are not condition-slot fixtures."""
+
+    directory = root / "bench" / "regressions"
+    if not directory.is_dir():
+        return []
+    rows: list[dict[str, Any]] = []
+    for path in sorted(item for item in directory.rglob("*.json") if item.is_file()):
+        rows.append(_read_regression(path, root))
+    return rows
+
+
 def unexpected_fixture_paths(root: Path, expected: set[Path]) -> list[Path]:
     directory = root / "bench" / "fixtures"
     if not directory.is_dir():
         return []
     found = {path.resolve() for path in directory.rglob("*.json") if path.is_file()}
     return sorted(found - {path.resolve() for path in expected})
+
+
+def _read_regression(path: Path, root: Path) -> dict[str, Any]:
+    source = path.relative_to(root).as_posix()
+    document, errors = _read_json(path)
+    if errors:
+        return {"source": source, "errors": [f"{source}: {item}" for item in errors]}
+    if not isinstance(document, Mapping):
+        return {"source": source, "errors": [f"{source}: regression is not an object"]}
+    allowed = {"schema", "case_id", "label", "framing", "expected_status", "envelope"}
+    errors = _unknown_keys(document, allowed, source)
+    if document.get("schema") != REGRESSION_SCHEMA:
+        errors.append(f"{source}: schema must be {REGRESSION_SCHEMA}")
+    case_id = document.get("case_id")
+    label = document.get("label")
+    framing = document.get("framing")
+    expected = document.get("expected_status")
+    if not isinstance(case_id, str) or _ID.fullmatch(case_id) is None:
+        errors.append(f"{source}: case_id is invalid")
+    if not isinstance(label, str) or _ID.fullmatch(label) is None:
+        errors.append(f"{source}: label is invalid")
+    if not isinstance(framing, str) or not _post_hoc_framing(framing):
+        errors.append(f"{source}: framing must call this a post-hoc example and not a holdout")
+    if expected not in {"pass", "condition_fail", "needs_human_review"}:
+        errors.append(f"{source}: expected_status is not a scored outcome")
+    envelope, envelope_errors = _validate_envelope(document.get("envelope"), source)
+    errors.extend(envelope_errors)
+    if errors or envelope is None:
+        return {"source": source, "errors": errors}
+    return {
+        "source": source,
+        "errors": [],
+        "case_id": case_id,
+        "label": label,
+        "framing": framing.strip(),
+        "expected_status": expected,
+        "envelope": envelope,
+    }
+
+
+def _post_hoc_framing(value: str) -> bool:
+    folded = value.casefold()
+    return "post-hoc" in folded and "not an independent holdout" in folded
 
 
 def _validate_envelope(value: object, source: str) -> tuple[dict[str, str] | None, list[str]]:
@@ -224,10 +285,10 @@ def _validate_rule_shape(check: Mapping[str, Any], label: str) -> list[str]:
     section = check.get("section")
     errors: list[str] = []
     if rule == "require_text":
-        errors.extend(_section(section, label, allow_combined=True))
-        if not isinstance(check.get("text"), str) or not check.get("text"):
-            errors.append(f"{label} text must be a non-empty string")
-    elif rule in {"require_any_text", "require_all_text"}:
+        errors.extend(_require_text_shape(check, section, label))
+    elif rule == "require_any_text":
+        errors.extend(_require_any_shape(check, section, label))
+    elif rule == "require_all_text":
         errors.extend(_section(section, label, allow_combined=True))
         errors.extend(_pattern_list(check.get("patterns"), label))
     elif rule == "forbid_text":
@@ -247,6 +308,20 @@ def _validate_rule_shape(check: Mapping[str, Any], label: str) -> list[str]:
     elif rule == "arithmetic_claim":
         errors.extend(_section(section, label, allow_combined=False))
         errors.extend(_arithmetic_shape(check, label))
+    return errors
+
+
+def _require_text_shape(check: Mapping[str, Any], section: object, label: str) -> list[str]:
+    errors = _section(section, label, allow_combined=True)
+    if not isinstance(check.get("text"), str) or not check.get("text"):
+        errors.append(f"{label} text must be a non-empty string")
+    return errors
+
+
+def _require_any_shape(check: Mapping[str, Any], section: object, label: str) -> list[str]:
+    errors = _section(section, label, allow_combined=True)
+    errors.extend(_pattern_list(check.get("patterns"), label))
+    errors.extend(_optional_string_list(check, "ambiguous_patterns", label))
     return errors
 
 

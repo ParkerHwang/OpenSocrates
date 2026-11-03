@@ -22,6 +22,7 @@ from bench.cases import (
     expected_fixture_path,
     load_case_files,
     load_fixture,
+    load_regression_files,
     unexpected_fixture_paths,
 )
 from bench.conditions import audit_status, load_conditions
@@ -131,6 +132,7 @@ def build_report(
             )
         )
     probes = run_probes()
+    regressions = _score_regressions(records, load_regression_files(root))
     evidence = _model_evidence(results)
     return {
         "schema": REPORT_SCHEMA,
@@ -149,9 +151,68 @@ def build_report(
             "errors": condition_errors,
         },
         "results": results,
+        "regressions": regressions,
+        "regression_framing": (
+            "Regression envelopes are post-hoc examples added after a rule change. "
+            "They are not independent holdouts and are not a performance estimate."
+        ),
         "counts": {"results": count_rows(results), "probes": count_rows(probes)},
         "classifier_probes": probes,
     }
+
+
+def _score_regressions(
+    records: list[dict[str, Any]],
+    loaded: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    cases = {
+        record["case"]["id"]: record["case"] for record in records if record.get("case") is not None
+    }
+    rows: list[dict[str, Any]] = []
+    for item in loaded:
+        if item["errors"]:
+            rows.append(
+                {
+                    "source": item["source"],
+                    "label": None,
+                    "case_id": None,
+                    "expected_status": None,
+                    "status": "input_error",
+                    "matched": False,
+                    "framing": None,
+                    "reason": "; ".join(item["errors"]),
+                }
+            )
+            continue
+        case = cases.get(item["case_id"])
+        if case is None:
+            rows.append(
+                {
+                    "source": item["source"],
+                    "label": item["label"],
+                    "case_id": item["case_id"],
+                    "expected_status": item["expected_status"],
+                    "status": "input_error",
+                    "matched": False,
+                    "framing": item["framing"],
+                    "reason": "case id is not loaded",
+                }
+            )
+            continue
+        scored = score_envelope(case, item["envelope"])
+        rows.append(
+            {
+                "source": item["source"],
+                "label": item["label"],
+                "case_id": item["case_id"],
+                "expected_status": item["expected_status"],
+                "status": scored["status"],
+                "matched": scored["status"] == item["expected_status"],
+                "framing": item["framing"],
+                "reason": scored["reason"],
+            }
+        )
+    return rows
 
 
 def _condition_row(

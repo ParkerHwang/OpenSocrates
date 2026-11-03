@@ -13,7 +13,7 @@ request template, and add the block below under Summary.
 - [ ] If the case allows arithmetic, put the operands in `materials` and set `arithmetic_policy.pretended_verification` to `fail`.
 - [ ] Add an authored fixture only when you want to show the scorer a concrete envelope. Set `origin` to `authored_example` and `model_called` to `false`. A fixture cannot verify a model call. Say what the text illustrates.
 - [ ] Leave a condition without a fixture when you do not have an output. The runner records `model_unavailable`.
-- [ ] Do not invent a model score, a pass rate, or an effect size.
+- [ ] Do not invent a model score, a pass rate, or an effect size. A file under `bench/regressions/` is a post-hoc example, not an independent holdout or a performance estimate.
 - [ ] Run `make bench`. In the pull request, paste the new rows and say whether a live model was called.
 
 ## Pull request snippet

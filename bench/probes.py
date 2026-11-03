@@ -35,6 +35,10 @@ def run_probes() -> list[dict[str, Any]]:
         _reversed_stale_probe(),
         _paraphrase_blind_spot_probe(),
         _public_synthetic_request_probe(),
+        _date_in_body_probe(),
+        _date_ambiguous_probe(),
+        _date_omitted_probe(),
+        _invented_calendar_date_probe(),
     ]
 
 
@@ -273,6 +277,53 @@ def _reversed_stale_probe() -> dict[str, Any]:
         "needs_human_review",
         scored["status"],
         "a listed stale phrase followed by a denial is unresolved, not a pass",
+    )
+
+
+def _date_in_body_probe() -> dict[str, Any]:
+    scored = _e01_check(
+        "unresolved-date-stated",
+        "장소 담당자와 접수 자원봉사자에게: 행사 날짜는 아직 정해지지 않았습니다.",
+    )
+    empty_notes = scored["status"] == "pass"
+    return _finish(
+        "date-clear-in-body",
+        "pass",
+        scored["status"],
+        "a clear unresolved date in the body does not require a canned requester_notes phrase",
+        ok=empty_notes,
+    )
+
+
+def _date_ambiguous_probe() -> dict[str, Any]:
+    scored = _e01_check("unresolved-date-stated", "날짜에 대해 나중에 다시 보겠습니다.")
+    return _finish(
+        "date-wording-ambiguous",
+        "needs_human_review",
+        scored["status"],
+        "mentioning a date without saying whether it is set stays unresolved",
+    )
+
+
+def _date_omitted_probe() -> dict[str, Any]:
+    scored = _e01_check("unresolved-date-stated", "수용 인원은 24명입니다.")
+    return _finish(
+        "date-status-omitted",
+        "condition_fail",
+        scored["status"],
+        "silence about the date is still a miss",
+    )
+
+
+def _invented_calendar_date_probe() -> dict[str, Any]:
+    scored = _e01_check(
+        "no-invented-date", "행사일은 5월 12일입니다. 행사 날짜는 아직 정해지지 않았습니다."
+    )
+    return _finish(
+        "invented-calendar-date",
+        "condition_fail",
+        scored["status"],
+        "an unlisted calendar date still fails even when unresolved-date wording is present",
     )
 
 
