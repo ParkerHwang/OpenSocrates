@@ -121,6 +121,34 @@ class EvidenceScanChecks(unittest.TestCase):
         contexts = scan.source_contexts(["A" * 1001 + " 30"], "The value is 30.")
         self.assertIsNone(contexts["matches"][0]["text"])
 
+    def test_context_date_with_missing_year_is_labeled(self):
+        contexts = scan.source_contexts(["Deadline: March 1, 2027."], "Deadline: March 1.")
+        self.assertEqual(contexts["matches"][0]["match_type"], "year_missing")
+        self.assertEqual(contexts["matches"][0]["text"], "Deadline: March 1, 2027.")
+        other = scan.source_contexts(["Deadline: March 1, 2026."], "Deadline: March 1, 2027.")
+        self.assertEqual(other["matches"], [])
+
+    def test_context_escapes_terminal_and_bidirectional_controls(self):
+        source = "Capacity 30\x1b]52;c;Zm9v\x07\u202eEND"
+        contexts = scan.source_contexts([source], "Capacity 30")
+        line = contexts["matches"][0]
+        self.assertTrue(line["controls_escaped"])
+        self.assertNotIn("\x1b", line["text"])
+        self.assertNotIn("\u202e", line["text"])
+        self.assertIn("\\u001b", line["text"])
+        payload = {"sources": [source], "output": "Capacity 30"}
+        for suffix in ([], ["--json"]):
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--stdin-json", "--show-context", *suffix],
+                input=json.dumps(payload),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 0)
+            self.assertNotIn("\x1b", result.stdout)
+            self.assertNotIn("\u202e", result.stdout)
+
     def test_cli_requires_comparison_and_does_not_write_source_files(self):
         with tempfile.TemporaryDirectory() as directory:
             folder = Path(directory)

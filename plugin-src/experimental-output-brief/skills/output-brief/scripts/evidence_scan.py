@@ -25,6 +25,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 from pathlib import Path
 
 KNOWN_BLIND_SPOTS = [
@@ -565,20 +566,33 @@ def source_contexts(sources: list[str], output: str) -> dict:
     for source_index, source in enumerate(sources, 1):
         for line_number, line in enumerate(source.splitlines(), 1):
             line_dates, line_numbers = tokens(line)
-            values = [("date", fmt_date(d)) for d in dates & line_dates]
-            values.extend(("number", n) for n in numbers & line_numbers)
-            for kind, value in sorted(values):
+            values = {
+                (
+                    "date",
+                    fmt_date(d),
+                    "same_year" if d[0] is not None and d[0] == source_date[0] else "year_missing",
+                )
+                for d in dates
+                for source_date in line_dates
+                if d[1:] == source_date[1:]
+                and (d[0] == source_date[0] or d[0] is None or source_date[0] is None)
+            }
+            values.update(("number", n, "normalized") for n in numbers & line_numbers)
+            for kind, value, match_type in sorted(values):
                 seen.add((kind, value))
                 if len(matches) >= 30:
                     omitted += 1
                     continue
+                visible, escaped = _escape_controls(line) if len(line) <= 1000 else (None, False)
                 matches.append(
                     {
                         "kind": kind,
                         "value": value,
                         "source": source_index,
                         "line": line_number,
-                        "text": line if len(line) <= 1000 else None,
+                        "match_type": match_type,
+                        "text": visible,
+                        "controls_escaped": escaped,
                     }
                 )
     return {
@@ -589,6 +603,20 @@ def source_contexts(sources: list[str], output: str) -> dict:
             {"kind": kind, "value": value} for kind, value in sorted(expected - seen)
         ],
     }
+
+
+def _escape_controls(text: str) -> tuple[str, bool]:
+    """Render terminal and bidirectional controls visibly, including in JSON."""
+    result = []
+    escaped = False
+    for character in text:
+        if unicodedata.category(character) in {"Cc", "Cf", "Cs"}:
+            code = ord(character)
+            result.append(f"\\u{code:04x}" if code <= 0xFFFF else f"\\U{code:08x}")
+            escaped = True
+        else:
+            result.append(character)
+    return "".join(result), escaped
 
 
 def render(res: dict) -> str:
@@ -638,8 +666,10 @@ def render(res: dict) -> str:
             source_line = match["text"] if match["text"] is not None else "[line too long to show]"
             lines.append(
                 f"  {match['kind']} {match['value']}, source {match['source']} "
-                f"line {match['line']}: {source_line}"
+                f"line {match['line']} ({match['match_type']}): {source_line}"
             )
+            if match["controls_escaped"]:
+                lines.append("  Control characters were escaped for display.")
         if contexts["additional_matches_not_shown"]:
             lines.append(
                 f"  Additional matches not shown: {contexts['additional_matches_not_shown']}"

@@ -65,7 +65,9 @@ the host may retain tool output. A line containing a value does not prove the
 claim, entity, period, or source is correct. Long lines and excess matches may be
 omitted; say so instead of implying the displayed context is complete. Keep
 source context for the requester unless the user explicitly wants it in the
-recipient's artifact.
+recipient's artifact. A date match with a missing year is labeled. Control
+characters in source lines are escaped for display, so displayed text can differ
+from the original bytes.
 
 The scan compares surface patterns, not meaning or external truth. A matched
 number or date can still refer to the wrong thing, and a correct derived value

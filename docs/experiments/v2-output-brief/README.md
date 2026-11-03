@@ -94,6 +94,9 @@ can contain private information and the host may retain tool output. A matching
 line is not proof that it supports the claim. Lines longer than 1,000 characters
 and matches beyond the first 30 are not displayed; a missing match is not a
 truth verdict. This feature does not identify all claims or check entailment.
+Date matches with a missing year are labeled as such. Terminal and directional
+control characters in a displayed line are escaped rather than executed, so the
+displayed text is not necessarily a byte-for-byte representation of the source.
 
 The [negation examples](cases/negation.json) were written by Claude while
 designing the matching rule. They are regression cases, not an independent
