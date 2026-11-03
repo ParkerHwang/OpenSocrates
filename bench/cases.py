@@ -227,9 +227,14 @@ def _validate_rule_shape(check: Mapping[str, Any], label: str) -> list[str]:
         errors.extend(_section(section, label, allow_combined=True))
         if not isinstance(check.get("text"), str) or not check.get("text"):
             errors.append(f"{label} text must be a non-empty string")
-    elif rule in {"require_any_text", "require_all_text", "forbid_text"}:
+    elif rule in {"require_any_text", "require_all_text"}:
         errors.extend(_section(section, label, allow_combined=True))
         errors.extend(_pattern_list(check.get("patterns"), label))
+    elif rule == "forbid_text":
+        errors.extend(_section(section, label, allow_combined=True))
+        errors.extend(_pattern_list(check.get("patterns"), label))
+        errors.extend(_optional_string_list(check, "clear_exceptions", label))
+        errors.extend(_optional_string_list(check, "ambiguous_cues", label))
     elif rule == "forbid_unlisted_dates":
         errors.extend(_section(section, label, allow_combined=True))
         allowed = check.get("allowed")
@@ -295,6 +300,15 @@ def _section(value: object, label: str, *, allow_combined: bool) -> list[str]:
         allowed |= {"either", "both"}
     if value not in allowed:
         return [f"{label} section must be one of {', '.join(sorted(allowed))}"]
+    return []
+
+
+def _optional_string_list(check: Mapping[str, Any], key: str, label: str) -> list[str]:
+    if key not in check or check.get(key) is None:
+        return []
+    value = check.get(key)
+    if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+        return [f"{label} {key} must be a list of non-empty strings"]
     return []
 
 

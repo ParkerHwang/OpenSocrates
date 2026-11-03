@@ -42,9 +42,9 @@ The [bench README](../../../bench/README.md) records the comparison.
 
 | Slot | Bytes used here | Live execution in this PR |
 | --- | --- | --- |
-| `baseline` | No skill. | Not run. |
+| `baseline` | No skill text. There is no one-line general-instruction control in this harness. | Not run. |
 | `output_brief` | Fixture copy of the PR #164 skill, pinned in [SKILL.md](../../../bench/conditions/output_brief/SKILL.md). | Not run. The copy is not a merge of `codex/v2-output-brief`. |
-| `reader_1x` | [plugin-src/shared/reader/guide.en.md](../../../plugin-src/shared/reader/guide.en.md) from this checkout. The guide already covers audience, evidence, uncertainty, and commitments; PR #164 itself says much of that ground is already there. | Not run. The file is fingerprinted. |
+| `reader_1x` | Only [plugin-src/shared/reader/guide.en.md](../../../plugin-src/shared/reader/guide.en.md). The file is fingerprinted and not executed. It is not a complete OpenSocrates 1.5.3 install or runtime. | Not run. |
 | `opensocrates_v2` | None. The slot is reserved. | Not run. |
 
 `make bench` finishes without a live result for every slot. A missing output
@@ -59,6 +59,16 @@ Claude review, commit `2775bf9beea5e802f94339ae7f8bd7c875c0ae25`, blob
 Claude need to agree before that comparison version replaces the pin. `make
 bench` checks the documented blob and does not fetch the tip.
 
+## Author claim on adapter requests
+
+`build_request` puts the case's `public_synthetic` value on the JSON stdin
+object. `true` is the author's claim. It does not prove the materials are
+public or synthetic. The case loader in this harness still requires the claim
+to be `true` before a case is scored. If the field is missing or `false`, an
+experimental adapter may refuse the run. That refusal must be an explicit
+non-zero exit or an explicit error status, not a silent success or a
+fabricated envelope. This branch does not implement that adapter.
+
 ## Model-call evidence
 
 `process_started` and `envelope_received` record that a command ran and that
@@ -67,6 +77,25 @@ its stdout parsed as a bench envelope. `model_called` and
 attestation after its own client call. A local script that prints an envelope,
 or a command that exits non-zero, does not verify model use. No host client
 is wired up here, so verified model calls stay at zero.
+
+## Adversarial observation
+
+Claude's comparison used synthetic sentences, not model outputs, and it is
+not a general performance estimate. The bench rule scorer stays separate from
+any product evidence scanner. Scanner flags are not bench pass or fail.
+
+`forbid_text` was raw substring membership. That made `예약이 확정` fail the
+honest denial `예약이 확정되지 않았습니다`, and made `35명` fail a warning
+that the old figure is stale. The earlier pass fixture avoided the first
+match by writing `예약은 아직 확정되지 않았습니다`. Listed exceptions now
+accept those two clear shapes. A nearby cue outside a listed exception becomes
+`needs_human_review` instead of pass or fail. Bare assertions still fail.
+A denial that begins more than 16 characters after the matched span is outside
+this window.
+
+Paraphrases that do not contain the literal pattern, including `잡아
+두었습니다`, `삼십오 명`, and `채택되었습니다`, are still missed. A literal
+pass on those sentences is a blind spot, not a solved semantic check.
 
 ## Arithmetic and pretended verification
 
@@ -113,6 +142,17 @@ Parker의 설계 수정을 반영했습니다. 채점은 스킬에 영어 제목
 `output_brief` 기본값은 `d6091b4` / blob `06dfbc5a`입니다. 팁 `2775bf9` /
 blob `f5ed6cf9`는 불러오지 않습니다. 프로세스 실행과 봉투 수신은 모델 호출
 확인과 별개이며, 호스트 증거가 없으면 모델 호출은 미확인입니다.
+
+`public_synthetic: true`는 작성자의 주장이지, 공개·가상 자료라는 인증이
+아닙니다. 요청 JSON에 포함되며, 없거나 `false`이면 실험용 어댑터는 명시적
+오류로 거부할 수 있습니다.
+
+`baseline`은 스킬 없음이고, 한 줄 일반 지시 조건은 없습니다. `reader_1x`는
+영어 독자 가이드 파일만이며 1.5.3 전체 설치가 아닙니다. `예약이 확정되지
+않았습니다`와 오래된 `35명` 경고는 거짓 실패였고, 이제 예외로 통과합니다.
+주변 단서가 애매하면 사람 검토입니다. 다른 말로 바꾼 주장은 글자 규칙이
+놓치며, 그 통과는 의미 판정이 아닙니다. 제품 스캐너는 벤치의 유일한 판정자가
+아닙니다.
 
 자료에 있는 수로 비율을 계산하는 것은 허용됩니다. 확인할 수단이 없는데
 검증했다고 말하면 실패입니다. 효과 크기는 계산하지 않습니다.

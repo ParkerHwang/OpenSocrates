@@ -31,6 +31,9 @@ _SECTION_FIELDS = {
     "either": ("body", "requester_notes"),
     "both": ("body", "requester_notes"),
 }
+# Characters around a forbid match where a cue withholds an automatic fail.
+_CUE_BEFORE = 12
+_CUE_AFTER = 16
 
 
 class ScorerError(Exception):
@@ -38,51 +41,85 @@ class ScorerError(Exception):
 
 
 def score_envelope(case: Mapping[str, Any], envelope: Mapping[str, str]) -> dict[str, Any]:
-    """Score one envelope. Return pass, condition_fail, or scorer_error."""
+    """Score one envelope.
 
-    failed: list[dict[str, str]] = []
+    A decidable miss is ``condition_fail``. A forbid match that is neither a
+    clear exception nor a bare assertion is ``needs_human_review``. It is not
+    folded into pass or fail.
+    """
+
     try:
-        checks = case.get("checks")
-        if not isinstance(checks, list):
-            raise ScorerError("case checks are missing")
-        for check in checks:
-            if not isinstance(check, Mapping):
-                raise ScorerError("check is not an object")
-            details = evaluate_check(envelope, check)
-            if details:
-                check_id = check.get("id")
-                failed.append(
-                    {
-                        "id": str(check_id),
-                        "detail": "; ".join(details),
-                    }
-                )
+        failed, unresolved = _collect_checks(case, envelope)
     except ScorerError as exc:
-        return {
-            "status": "scorer_error",
-            "reason": str(exc),
-            "failed_checks": [],
-        }
+        return _score_result("scorer_error", str(exc), [], [])
+    return _status_from_checks(failed, unresolved)
+
+
+def _collect_checks(
+    case: Mapping[str, Any],
+    envelope: Mapping[str, str],
+) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    checks = case.get("checks")
+    if not isinstance(checks, list):
+        raise ScorerError("case checks are missing")
+    failed: list[dict[str, str]] = []
+    unresolved: list[dict[str, str]] = []
+    for check in checks:
+        if not isinstance(check, Mapping):
+            raise ScorerError("check is not an object")
+        outcome = evaluate_check(envelope, check)
+        record = {"id": str(check.get("id")), "detail": "; ".join(outcome["details"])}
+        if outcome["state"] == "fail":
+            failed.append(record)
+        elif outcome["state"] == "unresolved":
+            unresolved.append(record)
+        elif outcome["state"] != "ok":
+            raise ScorerError(f"unknown check state: {outcome['state']!r}")
+    return failed, unresolved
+
+
+def _status_from_checks(
+    failed: list[dict[str, str]],
+    unresolved: list[dict[str, str]],
+) -> dict[str, Any]:
     if failed:
         names = ", ".join(item["id"] for item in failed)
-        return {
-            "status": "condition_fail",
-            "reason": f"failed checks: {names}",
-            "failed_checks": failed,
-        }
-    return {
-        "status": "pass",
-        "reason": "all rule checks passed",
-        "failed_checks": [],
-    }
+        reason = f"failed checks: {names}"
+        if unresolved:
+            pending = ", ".join(item["id"] for item in unresolved)
+            reason = f"{reason}; unresolved checks: {pending}"
+        return _score_result("condition_fail", reason, failed, unresolved)
+    if unresolved:
+        names = ", ".join(item["id"] for item in unresolved)
+        return _score_result("needs_human_review", f"unresolved checks: {names}", [], unresolved)
+    return _score_result("pass", "all rule checks passed", [], [])
 
 
-def evaluate_check(envelope: Mapping[str, str], check: Mapping[str, Any]) -> list[str]:
+def evaluate_check(envelope: Mapping[str, str], check: Mapping[str, Any]) -> dict[str, Any]:
     rule = check.get("rule")
     handler = _RULES.get(rule) if isinstance(rule, str) else None
     if handler is None:
         raise ScorerError(f"unknown rule: {rule!r}")
-    return handler(envelope, check)
+    result = handler(envelope, check)
+    if isinstance(result, Mapping) and "state" in result:
+        details = result.get("details") or []
+        return {"state": str(result["state"]), "details": [str(item) for item in details]}
+    details = [str(item) for item in result]
+    return {"state": "fail" if details else "ok", "details": details}
+
+
+def _score_result(
+    status: str,
+    reason: str,
+    failed: list[dict[str, str]],
+    unresolved: list[dict[str, str]],
+) -> dict[str, Any]:
+    return {
+        "status": status,
+        "reason": reason,
+        "failed_checks": failed,
+        "unresolved_checks": unresolved,
+    }
 
 
 def _fields(check: Mapping[str, Any]) -> tuple[str, ...]:
@@ -166,15 +203,98 @@ def _require_all(
     return [f"missing {pattern!r}" for pattern in patterns if pattern.casefold() not in haystack]
 
 
-def _forbid_text(envelope: Mapping[str, str], check: Mapping[str, Any]) -> list[str]:
+def _forbid_text(envelope: Mapping[str, str], check: Mapping[str, Any]) -> dict[str, Any]:
     patterns = _patterns(check)
+    exceptions = _optional_strings(check, "clear_exceptions")
+    cues = _optional_strings(check, "ambiguous_cues")
     failures: list[str] = []
+    unresolved: list[str] = []
     for name in _fields(check):
         haystack = _text(envelope, name).casefold()
-        failures.extend(
-            f"{pattern!r} in {name}" for pattern in patterns if pattern.casefold() in haystack
-        )
-    return failures
+        exception_spans = _find_spans(haystack, exceptions)
+        cue_spans = _find_spans(haystack, cues)
+        for pattern in patterns:
+            for start, end in _find_spans(haystack, [pattern]):
+                kind = _classify_forbid_span(start, end, exception_spans, cue_spans, len(haystack))
+                if kind == "ok":
+                    continue
+                detail = f"{pattern!r} in {name}"
+                if kind == "unresolved":
+                    unresolved.append(f"{detail} needs human review")
+                else:
+                    failures.append(detail)
+    if failures:
+        return {"state": "fail", "details": failures}
+    if unresolved:
+        return {"state": "unresolved", "details": unresolved}
+    return {"state": "ok", "details": []}
+
+
+def _optional_strings(check: Mapping[str, Any], key: str) -> list[str]:
+    value = check.get(key, [])
+    if value is None:
+        return []
+    if not isinstance(value, list) or not all(isinstance(item, str) and item for item in value):
+        raise ScorerError(f"{key} must be a list of non-empty strings")
+    return list(value)
+
+
+def _find_spans(haystack: str, needles: list[str]) -> list[tuple[int, int]]:
+    spans: list[tuple[int, int]] = []
+    for needle in needles:
+        folded = needle.casefold()
+        if not folded:
+            continue
+        start = 0
+        while True:
+            index = haystack.find(folded, start)
+            if index < 0:
+                break
+            spans.append((index, index + len(folded)))
+            start = index + 1
+    return spans
+
+
+def _classify_forbid_span(
+    start: int,
+    end: int,
+    exception_spans: list[tuple[int, int]],
+    cue_spans: list[tuple[int, int]],
+    length: int,
+) -> str:
+    """Return ok, unresolved, or fail for one literal match."""
+
+    covering = [span for span in exception_spans if _contains(span, (start, end))]
+    window = (max(0, start - _CUE_BEFORE), min(length, end + _CUE_AFTER))
+    cue_outside = _cue_outside_exceptions(window, covering, cue_spans)
+    cue_near = any(_overlaps(span, window) for span in cue_spans)
+    if covering and not cue_outside:
+        return "ok"
+    if cue_near or cue_outside:
+        return "unresolved"
+    return "fail"
+
+
+def _cue_outside_exceptions(
+    window: tuple[int, int],
+    covering: list[tuple[int, int]],
+    cue_spans: list[tuple[int, int]],
+) -> bool:
+    for cue in cue_spans:
+        if not _overlaps(cue, window):
+            continue
+        if any(_contains(span, cue) for span in covering):
+            continue
+        return True
+    return False
+
+
+def _contains(outer: tuple[int, int], inner: tuple[int, int]) -> bool:
+    return outer[0] <= inner[0] and inner[1] <= outer[1]
+
+
+def _overlaps(left: tuple[int, int], right: tuple[int, int]) -> bool:
+    return left[0] < right[1] and right[0] < left[1]
 
 
 def _forbid_unlisted_dates(envelope: Mapping[str, str], check: Mapping[str, Any]) -> list[str]:

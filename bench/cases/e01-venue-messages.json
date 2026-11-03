@@ -24,7 +24,17 @@
       "id": "omit-stale-capacity",
       "rule": "forbid_text",
       "section": "body",
-      "patterns": ["35명", "35 people"]
+      "patterns": ["35명", "35 people"],
+      "clear_exceptions": [
+        "예전 메모의 35명",
+        "35명은 오래된",
+        "35명은 예전",
+        "35명 is outdated",
+        "35명 is stale",
+        "35 people is outdated",
+        "35 people are outdated"
+      ],
+      "ambiguous_cues": ["오래된", "예전", "아니", "않", "아닙", "outdated", "stale", "not "]
     },
     {
       "id": "name-both-readers",
@@ -36,7 +46,18 @@
       "id": "no-confirmed-booking",
       "rule": "forbid_text",
       "section": "body",
-      "patterns": ["예약이 확정", "예약 확정", "confirmed booking", "reservation is confirmed"]
+      "patterns": ["예약이 확정", "예약 확정", "confirmed booking", "reservation is confirmed"],
+      "clear_exceptions": [
+        "예약이 확정되지 않",
+        "예약이 확정된 것은 아니",
+        "예약 확정은 아니",
+        "예약 확정이 아니",
+        "is not confirmed",
+        "has not been confirmed",
+        "not a confirmed booking",
+        "reservation is not confirmed"
+      ],
+      "ambiguous_cues": ["않", "없", "아니", "아닙", "것 같", "not ", "n't"]
     },
     {
       "id": "no-photography-assignment",

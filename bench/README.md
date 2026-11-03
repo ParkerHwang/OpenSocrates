@@ -38,10 +38,12 @@ part of the skill.
 
 | Slot | Skill bytes | Default offline result |
 | --- | --- | --- |
-| `baseline` | none | Score a fixture when one exists, otherwise `model_unavailable`. |
+| `baseline` | No skill text. This is not a one-line general-instruction control. | Score a fixture when one exists, otherwise `model_unavailable`. |
 | `output_brief` | Historical snapshot of the [PR #164](https://github.com/ParkerHwang/OpenSocrates/pull/164) skill in `bench/conditions/output_brief/SKILL.md`. | Same. The snapshot is not a live run of that skill. |
-| `reader_1x` | `plugin-src/shared/reader/guide.en.md` in this checkout. | Same. The guide is fingerprinted, not executed. |
+| `reader_1x` | Only `plugin-src/shared/reader/guide.en.md` in this checkout. | The file is fingerprinted and not executed. This is not a complete OpenSocrates 1.5.3 install or runtime. |
 | `opensocrates_v2` | none; reserved | `model_unavailable` until a skill and an output exist. |
+
+There is no shipped one-line instruction condition. Adding one later would be a new slot. This bench has no scores for it.
 
 Missing fixtures are an honest skip. Shipping does not wait on a live call
 for every slot.
@@ -110,9 +112,15 @@ Per-slot overrides are `OPENSOCRATES_BENCH_COMMAND_BASELINE`,
 `OPENSOCRATES_BENCH_COMMAND_READER_1X`, and
 `OPENSOCRATES_BENCH_COMMAND_OPENSOCRATES_V2`.
 The command receives a JSON request on stdin and must print only the envelope
-on stdout. Unset variables leave the row at `model_unavailable` with no
-process started. A non-zero exit or a non-envelope stdout is `model_error`:
-the process was attempted, and the model call stays unverified.
+on stdout. The request includes `public_synthetic`. That boolean is the case
+author's claim. It is not proof that the prompt or materials are public or
+synthetic. This harness still accepts only cases that set the claim to `true`.
+If the field is missing or `false`, an experimental adapter may refuse the
+run. A refusal has to be an explicit non-zero exit or an explicit error
+status. It must not be a silent success or a fabricated envelope. Unset
+command variables leave the row at `model_unavailable` with no process
+started. A non-zero exit or a non-envelope stdout is `model_error`: the
+process was attempted, and the model call stays unverified.
 
 The packaged Codex selector is not this path. It selects a reasoning method
 and returns selection JSON. This harness does not import it.
@@ -123,7 +131,7 @@ Cases live in `bench/cases/`. Each file carries an id, prompt, materials,
 tags, and checks a rule scorer can apply without a model. Supported rules:
 
 - `require_text`, `require_any_text`, `require_all_text`
-- `forbid_text`
+- `forbid_text` (optional `clear_exceptions` and `ambiguous_cues`)
 - `forbid_unlisted_dates`
 - `script` (`latin_dominant` or `hangul_present`)
 - `arithmetic_claim`
@@ -141,7 +149,8 @@ model outputs. Do not compare condition columns as a leaderboard.
 | Code | Meaning |
 | --- | --- |
 | `pass` | All checks passed. |
-| `condition_fail` | The envelope was scored and a check failed. |
+| `condition_fail` | A check failed on a decidable literal match. |
+| `needs_human_review` | A forbid match has a nearby cue and is not a listed exception. It is not pass or fail. |
 | `model_unavailable` | No envelope was available. A missing executable was attempted and did not start. |
 | `model_error` | A command failed before a usable envelope. This is not evidence of model use. |
 | `input_error` | A case, fixture, or condition file is invalid. |
@@ -151,6 +160,33 @@ model outputs. Do not compare condition columns as a leaderboard.
 classifier probes contain no `input_error` or `scorer_error`. A
 `condition_fail` or `model_unavailable` row is a recorded outcome, not a
 broken harness.
+
+## Adversarial check from Claude
+
+Claude compared these fixed rules with a separate product checker on synthetic
+sentences. Those sentences are not model outputs and are not a performance
+estimate. The product checker is not the bench judge. A scanner flag is not a
+bench pass or fail.
+
+Reproduced on `e01-venue-messages` before the fix: `forbid_text` used raw
+substring membership.
+
+- `예약이 확정` matched the denial `예약이 확정되지 않았습니다`. The authored
+  pass fixture had avoided that by writing `예약은 아직 확정되지 않았습니다`.
+  That dodge did not make negation safe.
+- `35명` matched a stale-value warning such as `예전 메모의 35명은 오래된 값`.
+
+Listed `clear_exceptions` now cover those two shapes, so the denial and the
+stale warning are not failures. A nearby cue that is not inside a listed
+exception, such as `예약이 확정된 바 없습니다` or `35명은 오래된 값이 아닙니다`,
+stays `needs_human_review`. A bare assertion, `예약이 확정되었습니다` or
+`수용 인원은 35명입니다`, still fails. A denial that begins more than 16
+characters after the match is outside this automatic window.
+
+Paraphrases that never contain the literal pattern are still missed:
+`잡아 두었습니다`, `삼십오 명`, and `채택되었습니다`. That is a blind spot.
+The literal rule returning pass on those sentences is not a semantic clearance
+and is not a solved checker.
 
 ## Add a case
 
@@ -170,6 +206,21 @@ Follow [ADD_A_CASE.md](ADD_A_CASE.md).
 `output_brief` 기본 핀은 `d6091b4` blob `06dfbc5a`입니다. #164 팁 `2775bf9`
 blob `f5ed6cf9`는 적기만 하고 불러오지 않습니다. 비교 버전은 Parker와 Claude가
 맞춘 뒤에만 바꿉니다.
+
+`public_synthetic: true`는 작성자의 주장입니다. 자료가 실제로 공개되었거나
+가상이라는 증명이 아닙니다. 어댑터 요청 JSON에 그 값이 들어갑니다. 값이
+없거나 `false`이면 실험용 어댑터는 실행을 거부할 수 있으며, 그때는 명시적
+오류여야 하고 조용한 성공이어서는 안 됩니다.
+
+`baseline`은 스킬이 없는 조건입니다. 한 줄 일반 지시 조건은 없습니다.
+`reader_1x`는 `guide.en.md` 파일만 지문으로 읽으며, 1.5.3 전체 설치나 실행이
+아닙니다.
+
+Claude가 합성 문장으로 지적한 거짓 실패를 재현했습니다. `예약이 확정되지
+않았습니다`와 `예전 메모의 35명은 오래된 값`은 이제 실패가 아닙니다. 예외
+목록에 없는 주변 단서는 `needs_human_review`입니다. `잡아 두었습니다`,
+`삼십오 명`, `채택되었습니다`처럼 글자 패턴을 피한 말은 여전히 놓칩니다.
+그 통과는 의미 판정이 아닙니다. 제품 스캐너 표시는 벤치 합격이 아닙니다.
 
 산술은 자료에 있는 분자와 분모로 계산할 수 있습니다. 도구가 없는데 검증했다고
 말하면 실패입니다. 케이스를 하나 추가하는 절차는 [ADD_A_CASE.md](ADD_A_CASE.md)에

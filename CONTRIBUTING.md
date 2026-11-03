@@ -129,14 +129,20 @@ request instead of claiming it passed.
 ## Public synthetic bench
 
 The offline harness in [bench/README.md](bench/README.md) scores public synthetic
-cases with deterministic rules. `make bench` does not call a model. The first
+cases with deterministic rules. `public_synthetic: true` is the case author's
+claim, not a certification, and it is copied into the adapter request. `make bench` does not call a model. The first
 external contribution this harness asks for is one new case; use the checklist
 in [bench/ADD_A_CASE.md](bench/ADD_A_CASE.md).
 
 Scoring reads a bench-only envelope (`body` and `requester_notes`). Do not
 require the headings "Recipient body" or "Requester memo" in a case or skill.
 An authored fixture shows that a rule can pass or fail. It is not a model
-result. A command envelope does not verify a model call; `model_called` stays
+result. `baseline` attaches no skill; there is no one-line instruction
+condition. `reader_1x` is only the English reader guide file, not a full 1.5.3
+install. Literal `forbid_text` misses paraphrases, and a nearby cue that is
+not a listed exception is `needs_human_review` rather than pass or fail. A
+product evidence scanner is not the bench judge. A command envelope does not
+verify a model call; `model_called` stays
 false without a host attestation recorded by the harness. The `output_brief`
 slot keeps its documented #164 snapshot until the comparison version is
 agreed. Do not publish fixture row counts as an effect size. A percentage
