@@ -563,20 +563,13 @@ def source_contexts(sources: list[str], output: str) -> dict:
     omitted = 0
     expected = {("date", fmt_date(d)) for d in dates} | {("number", n) for n in numbers}
     seen = set()
+    dates_by_day: dict[tuple[int, int], set] = {}
+    for date in dates:
+        dates_by_day.setdefault(date[1:], set()).add(date)
     for source_index, source in enumerate(sources, 1):
         for line_number, line in enumerate(source.splitlines(), 1):
             line_dates, line_numbers = tokens(line)
-            values = {
-                (
-                    "date",
-                    fmt_date(d),
-                    "same_year" if d[0] is not None and d[0] == source_date[0] else "year_missing",
-                )
-                for d in dates
-                for source_date in line_dates
-                if d[1:] == source_date[1:]
-                and (d[0] == source_date[0] or d[0] is None or source_date[0] is None)
-            }
+            values = _matching_dates(dates, dates_by_day, line_dates)
             values.update(("number", n, "normalized") for n in numbers & line_numbers)
             for kind, value, match_type in sorted(values):
                 seen.add((kind, value))
@@ -603,6 +596,26 @@ def source_contexts(sources: list[str], output: str) -> dict:
             {"kind": kind, "value": value} for kind, value in sorted(expected - seen)
         ],
     }
+
+
+def _matching_dates(dates: set, dates_by_day: dict, line_dates: set) -> set:
+    """Use exact lookups for dated sources and a day index for yearless ones."""
+    matches = set()
+    for source_date in line_dates:
+        if source_date[0] is None:
+            candidates = dates_by_day.get(source_date[1:], ())
+        else:
+            candidates = (
+                candidate
+                for candidate in (source_date, (None, *source_date[1:]))
+                if candidate in dates
+            )
+        for date in candidates:
+            kind = (
+                "same_year" if date[0] is not None and date[0] == source_date[0] else "year_missing"
+            )
+            matches.add(("date", fmt_date(date), kind))
+    return matches
 
 
 def _escape_controls(text: str) -> tuple[str, bool]:

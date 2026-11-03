@@ -128,6 +128,13 @@ class EvidenceScanChecks(unittest.TestCase):
         other = scan.source_contexts(["Deadline: March 1, 2026."], "Deadline: March 1, 2027.")
         self.assertEqual(other["matches"], [])
 
+    def test_yearless_source_matches_multiple_draft_years_without_implying_support(self):
+        contexts = scan.source_contexts(
+            ["Deadline: March 1."], "Dates considered: March 1, 2026 and March 1, 2027."
+        )
+        self.assertEqual({m["value"] for m in contexts["matches"]}, {"2026-03-01", "2027-03-01"})
+        self.assertEqual({m["match_type"] for m in contexts["matches"]}, {"year_missing"})
+
     def test_context_escapes_terminal_and_bidirectional_controls(self):
         source = "Capacity 30\x1b]52;c;Zm9v\x07\u202eEND"
         contexts = scan.source_contexts([source], "Capacity 30")
