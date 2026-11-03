@@ -1,8 +1,8 @@
 """Keep the experiment separate from the existing 1.x marketplace contract."""
 
 import json
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
