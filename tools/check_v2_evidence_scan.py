@@ -50,6 +50,19 @@ class EvidenceScanChecks(unittest.TestCase):
         report = scan.analyze([source], "", "The venue is not yet confirmed.")
         self.assertNotIn("commitment", {f["kind"] for f in report["findings"]})
 
+    def test_korean_words_are_not_mistaken_for_negation(self):
+        for draft in ("전체 일정이 확정되었습니다.", "미팅 일정이 확정되었습니다."):
+            report = scan.analyze(["일정은 미정입니다."], "", draft)
+            self.assertIn("commitment", {f["kind"] for f in report["findings"]}, draft)
+        report = scan.analyze(["일정은 미정입니다."], "", "일정은 미확정입니다.")
+        self.assertNotIn("commitment", {f["kind"] for f in report["findings"]})
+
+    def test_full_draft_in_source_is_marked_as_potentially_circular(self):
+        draft = "The venue is confirmed for 25 people on 2027-03-01."
+        report = scan.analyze(["Source includes the draft: " + draft], "", draft)
+        self.assertIn("draft_in_source", {f["kind"] for f in report["findings"]})
+        self.assertFalse(report["verified"])
+
     def test_known_correct_arithmetic_can_be_flagged(self):
         report = scan.analyze(["There are 24 seats; 3 are reserved."], "", "21 seats remain.")
         self.assertIn("novel_number", {f["kind"] for f in report["findings"]})
@@ -128,6 +141,17 @@ class EvidenceScanChecks(unittest.TestCase):
         self.assertFalse(report["input_summary"]["prompt_used_as_source"])
         with self.assertRaises(ValueError):
             scan.analyze([], f"Please check: {draft}", draft)
+
+    def test_missing_source_is_reported_as_not_run(self):
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT), "--stdin-json", "--json"],
+            input=json.dumps({"sources": [], "prompt": "Check this draft", "output": "Draft"}),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(json.loads(result.stdout)["ran"])
 
 
 if __name__ == "__main__":

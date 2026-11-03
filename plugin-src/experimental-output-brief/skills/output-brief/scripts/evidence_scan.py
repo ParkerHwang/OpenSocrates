@@ -28,6 +28,7 @@ import sys
 from pathlib import Path
 
 KNOWN_BLIND_SPOTS = [
+    "SOURCE AUTHORITY: a value appearing only in an old, rejected, or proposed source is still treated as present",
     "STATUS BINDING: 'booked' / 'confirmed' attached to the wrong item is only caught in simple English "
     "sentences with capitalised or numeric item names (status_binding, INFO); not in Korean or paraphrases",
     "VALUE/UNIT BINDING: a number moved to another unit or item is only caught when a unit or label sits "
@@ -89,7 +90,8 @@ COMMIT = [  # (regex, label)
     (r"체결", "체결"),
 ]
 NEG = re.compile(
-    r"(\bnot\b|\bno\b|n't|\bnever\b|\byet\b|\bun|\bwithout\b|아직|않|못|미|없|전)", re.I
+    r"(\bnot\b|\bno\b|n't|\bnever\b|\byet\b|\bun|\bwithout\b|아직|않|못|없|미\s*확정|확정\s*전)",
+    re.I,
 )
 UNCERTAIN = re.compile(
     r"\b(tentative(ly)?|tbd|pending|not yet|not confirmed|still being considered|under consideration|"
@@ -384,7 +386,7 @@ def status_binding_findings(material: str, output: str) -> list[dict]:
 def _present(rx: str, text: str) -> bool:
     """marker occurs in text in at least one NON-negated place."""
     for m in re.finditer(rx, text, re.I):
-        window = text[max(0, m.start() - 24) : m.start()] + text[m.end() : m.end() + 12]
+        window = text[max(0, m.start() - 24) : m.end() + 12]
         if not NEG.search(window):
             return True
     return False
@@ -401,6 +403,15 @@ def analyze(  # noqa: C901 - keep each distinct advisory check visible
     od, on, ot = _scan(output)
     findings: list[dict] = []
     cov = {"dates": [], "numbers": [], "wording": []}
+
+    if output.strip() and any(output.strip() in source for source in sources):
+        findings.append(
+            {
+                "severity": "INFO",
+                "kind": "draft_in_source",
+                "message": "The full draft also appears in a source. The comparison may be circular; review the source selection.",
+            }
+        )
 
     for d in sorted(od, key=lambda x: (x[0] or 0, x[1], x[2])):
         st, detail = date_status(d, md)
@@ -479,6 +490,7 @@ def analyze(  # noqa: C901 - keep each distinct advisory check visible
             }
         )
     return {
+        "ran": True,
         "verified": False,
         "input_summary": {
             "source_characters": [len(source) for source in sources],
@@ -542,7 +554,16 @@ def render(res: dict) -> str:
     return "\n".join(lines)
 
 
-def main(argv=None) -> int:
+def _missing_sources(json_mode: bool) -> int:
+    message = "Scan not run: provide separated source material, not the whole request as a source."
+    if json_mode:
+        print(json.dumps({"ran": False, "verified": False, "reason": message}))
+    else:
+        print(message, file=sys.stderr)
+    return 2
+
+
+def main(argv=None) -> int:  # noqa: C901 - keep input modes and failure boundaries explicit
     ap = argparse.ArgumentParser(
         prog="factcheck",
         description=__doc__.split("\n")[0],
@@ -585,15 +606,17 @@ def main(argv=None) -> int:
         if not isinstance(prompt, str) or not isinstance(output, str):
             ap.error("prompt and output must be strings")
         if not any(s.strip() for s in sources):
-            ap.error("provide at least one nonempty source")
+            return _missing_sources(a.json)
     else:
-        if not a.output or not a.source:
-            ap.error("provide --output and at least one --source")
+        if not a.output:
+            ap.error("provide --output")
+        if not a.source:
+            return _missing_sources(a.json)
         sources = [rd(s) for s in a.source]
         prompt = rd(a.prompt) if a.prompt else ""
         output = rd(a.output)
         if not any(s.strip() for s in sources):
-            ap.error("provide at least one nonempty source")
+            return _missing_sources(a.json)
     res = analyze(sources, prompt, output, a.must)
     print(json.dumps(res, ensure_ascii=False, indent=2) if a.json else render(res))
     return 1 if a.strict and any(f["severity"] == "HIGH" for f in res["findings"]) else 0

@@ -58,6 +58,10 @@ does not treat the request text as evidence, because a request may quote the
 draft. If a request contains both, the host must separate the sources before
 scanning; if it cannot, it should not claim that the scan was completed. The
 scanner cannot guarantee that a provided source does not itself contain the draft.
+It flags an exact full-draft overlap as a possible circular comparison, but
+cannot detect every paraphrase or partial overlap. It also cannot decide which
+source is current, authoritative, rejected, or merely proposed; an old value
+may still appear to match by presence. Review source selection and meaning.
 
 ## Try it with a fictional request
 
