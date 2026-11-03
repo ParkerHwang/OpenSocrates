@@ -20,13 +20,24 @@ def write_archive(path: Path, entries: dict[str, Path]) -> None:
 
 def main() -> None:
     skill = SOURCE / "skills" / "output-brief" / "SKILL.md"
+    scanner = SOURCE / "skills" / "output-brief" / "scripts" / "evidence_scan.py"
     OUTPUT.mkdir(parents=True, exist_ok=True)
     claude = OUTPUT / "output-brief-claude-skill.zip"
     plugin = OUTPUT / "output-brief-openai-plugin.zip"
-    write_archive(claude, {"output-brief/SKILL.md": skill})
+    write_archive(
+        claude,
+        {
+            "output-brief/SKILL.md": skill,
+            "output-brief/scripts/evidence_scan.py": scanner,
+        },
+    )
     write_archive(
         plugin,
-        {"plugin.json": SOURCE / "plugin.json", "skills/output-brief/SKILL.md": skill},
+        {
+            "plugin.json": SOURCE / "plugin.json",
+            "skills/output-brief/SKILL.md": skill,
+            "skills/output-brief/scripts/evidence_scan.py": scanner,
+        },
     )
     print(f"Built {claude}")
     print(f"Built {plugin}")

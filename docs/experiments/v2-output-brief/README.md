@@ -3,7 +3,15 @@
 This is an experimental, self-contained skill candidate for drafting messages,
 reports, and decision documents for a reader. It asks an assistant to preserve
 material facts, uncertainty and the user's choices while producing a usable
-artifact. It does not send messages or persist user material.
+artifact. An optional Python text scan highlights some surface-level differences
+between supplied source files and a draft. Neither the skill nor the scan sends
+messages or saves source files; the host's own handling is separate.
+
+The scan cannot verify meaning or external facts. It can miss errors and flag
+correct derived values. A finding is a prompt for human or source-based review;
+no findings do not prove that a draft is correct. The scanner is adapted from
+Claude's synthetic `rulelab` prototype and has not yet been independently
+verified in this repository.
 
 The candidate is not an integrated 2.0 product or evidence of improved answers.
 The shared skill source is under

@@ -19,3 +19,20 @@ Before presenting the result, check the claims and commitments that matter to th
 Make the artifact usable by its intended reader on its own. Put working notes, questions for the requester, or delivery status outside it when they are not meant for the recipient. The user may explicitly request a different arrangement. Do not claim to have sent, verified, or obtained approval for anything that has not actually happened.
 
 Use the lightest check suited to the task. Do not add an audit, warnings, questions, or method labels to a simple request when they do not help. Do not disclose or persist the user's source material beyond the task's permissions.
+
+## Optional text scan
+
+When comparing an existing draft with supplied source files, and the host can run
+Python, the bundled `scripts/evidence_scan.py` can flag some literal mismatches:
+`python3 scripts/evidence_scan.py --source SOURCE --output DRAFT`. Paths in the
+command are relative to the current working directory; use the actual path to
+the bundled script and the files. Multiple `--source` options are allowed, and
+`--prompt` can provide the request as a text file. Run only on material the user
+has made available for this task. Use a direct source review when the script is
+unavailable or would not help.
+
+The scan compares surface patterns, not meaning or external truth. A matched
+number or date can still refer to the wrong thing, and a correct derived value
+can be flagged. Treat findings as prompts for source-based review, not as
+verified errors; no findings do not establish that the draft is correct. Do not
+use it as a sending gate or silently alter the user's document.
