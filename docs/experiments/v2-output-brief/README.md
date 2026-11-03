@@ -62,6 +62,12 @@ It flags an exact full-draft overlap as a possible circular comparison, but
 cannot detect every paraphrase or partial overlap. It also cannot decide which
 source is current, authoritative, rejected, or merely proposed; an old value
 may still appear to match by presence. Review source selection and meaning.
+Conditional or future wording can still make an unauthorized promise even if
+the scan does not classify it as a present confirmation.
+
+The [negation examples](cases/negation.json) were written by Claude while
+designing the matching rule. They are regression cases, not an independent
+accuracy measurement or a representative sample of real writing.
 
 ## Try it with a fictional request
 

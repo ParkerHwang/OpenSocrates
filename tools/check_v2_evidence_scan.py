@@ -60,10 +60,32 @@ class EvidenceScanChecks(unittest.TestCase):
         self.assertNotIn("commitment", {f["kind"] for f in report["findings"]})
 
     def test_korean_words_are_not_mistaken_for_negation(self):
-        for draft in ("전체 일정이 확정되었습니다.", "미팅 일정이 확정되었습니다."):
+        for draft in (
+            "전체 일정이 확정되었습니다.",
+            "미팅 일정이 확정되었습니다.",
+            "문제없이 일정이 확정되었습니다.",
+            "일정은 미정이나 인원은 24명으로 확정했습니다.",
+        ):
             report = scan.analyze(["일정은 미정입니다."], "", draft)
             self.assertIn("commitment", {f["kind"] for f in report["findings"]}, draft)
         report = scan.analyze(["일정은 미정입니다."], "", "일정은 미확정입니다.")
+        self.assertNotIn("commitment", {f["kind"] for f in report["findings"]})
+
+    def test_authored_negation_examples(self):
+        path = ROOT / "docs/experiments/v2-output-brief/cases/negation.json"
+        examples = json.loads(path.read_text(encoding="utf-8"))
+        for group in examples["sets"].values():
+            for case in group:
+                with self.subTest(text=case["text"]):
+                    observed = any(
+                        scan._present(pattern, case["text"]) for pattern, _ in scan.COMMIT
+                    )
+                    self.assertEqual(observed, case["expected_affirmed"])
+
+    def test_conditional_confirmation_is_not_an_assertion(self):
+        source = "예약은 아직 확정되지 않았습니다."
+        draft = "예약이 확정되면 안내드리겠습니다."
+        report = scan.analyze([source], "", draft)
         self.assertNotIn("commitment", {f["kind"] for f in report["findings"]})
 
     def test_full_draft_in_source_is_marked_as_potentially_circular(self):

@@ -29,6 +29,7 @@ from pathlib import Path
 
 KNOWN_BLIND_SPOTS = [
     "SOURCE AUTHORITY: a value appearing only in an old, rejected, or proposed source is still treated as present",
+    "CONDITIONAL PROMISES: conditional or future wording may still be an unauthorized promise",
     "STATUS BINDING: 'booked' / 'confirmed' attached to the wrong item is only caught in simple English "
     "sentences with capitalised or numeric item names (status_binding, INFO); not in Korean or paraphrases",
     "VALUE/UNIT BINDING: a number moved to another unit or item is only caught when a unit or label sits "
@@ -89,9 +90,41 @@ COMMIT = [  # (regex, label)
     (r"동의(했|하였|받았)", "동의"),
     (r"체결", "체결"),
 ]
-NEG = re.compile(
-    r"(\bnot\b|\bno\b|n't|\bnever\b|\byet\b|\bun|\bwithout\b|아직|않|못|없|미\s*확정|확정\s*전)",
+SENTENCE_END = re.compile(r"[.!?。;\n]")
+EN_NEG_PRE = re.compile(
+    r"\b(?:not|never|no|nothing|none|neither|nor|without|cannot)\b|n't\b|\byet to\b",
     re.I,
+)
+EN_COND_PRE = re.compile(
+    r"\b(?:to be|will be|would be|once|if|when|until|unless|pending|awaiting|subject to)\s+(?:\w+\s+){0,2}$",
+    re.I,
+)
+KO_NEG_PRE = re.compile(r"(?:^|[^가-힣])(?:미|불)$|(?:^|[^가-힣])(?:아직은|아직도|아직|안|못)\s*$")
+KO_TAIL_NEG = re.compile(
+    r"""^\s*(?:
+        (?:은|이|가|는|도)?\s*(?:되|하|돼|됐|했)?(?:지|진)(?:는|도|를)?\s*(?:않|못|아니)
+      | (?:은|이|가|는|도)?\s*(?:안|못)\s*(?:됐|됨|되|돼|했|함)
+      | (?:은|이|가|는)?\s*(?:아[니닙]|아님)
+      | (?:된|한)\s*(?:것|건|게|바|내용|사항|사실)\S{0,3}\s*(?:아[니닙]|없)
+      | (?:이전|전)(?:(?![가-힣])|입니다|이다|이라|이며|인|이고|이지만|에는|까지)
+      | (?:가능\s*)?(?:여부|보류|대기|미정)
+      | (?:이라고|라고)?\s*(?:보기|하기|말하기)\s*어렵
+      | (?:되었|됐|했)(?:는지|을지|나요?)
+      | (?:을|를|은|는)?\s*(?:요청|부탁|문의)
+    )""",
+    re.X,
+)
+KO_TAIL_COND = re.compile(
+    r"""^\s*(?:
+        (?:되|하|돼)?(?:면|려면)
+      | (?:되|하)는\s*(?:대로|즉시)
+      | (?:되|하)기\s*(?:전|까지)
+      | (?:되어야|돼야|하여야|해야)
+      | (?:될|할)(?![가-힣]*\s*수\s*있)
+      | 시(?![가-힣])
+      | 예정
+    )""",
+    re.X,
 )
 UNCERTAIN = re.compile(
     r"\b(tentative(ly)?|tbd|pending|not yet|not confirmed|still being considered|under consideration|"
@@ -390,11 +423,15 @@ def status_binding_findings(material: str, output: str) -> list[dict]:
 
 # ---- main check ----------------------------------------------------------------------------------
 def _present(rx: str, text: str) -> bool:
-    """marker occurs in text in at least one NON-negated place."""
+    """Look for an affirmed marker; ambiguous or unsupported forms remain cues."""
     for m in re.finditer(rx, text, re.I):
-        window = text[max(0, m.start() - 24) : m.end() + 12]
-        if not NEG.search(window):
-            return True
+        before = SENTENCE_END.split(text[max(0, m.start() - 24) : m.start()])[-1]
+        after = SENTENCE_END.split(text[m.end() : m.end() + 32])[0]
+        if EN_NEG_PRE.search(before) or KO_NEG_PRE.search(before) or KO_TAIL_NEG.match(after):
+            continue
+        if EN_COND_PRE.search(before) or KO_TAIL_COND.match(after):
+            continue
+        return True
     return False
 
 
