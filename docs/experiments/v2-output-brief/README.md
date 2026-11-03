@@ -42,6 +42,10 @@ release. Their generation does not install or enable anything.
 Neither archive has yet been qualified for installation, discovery, or use on a
 real host. Availability can vary by plan, account, organization, and surface.
 
+Contributors can run `make v2-candidate-check` for the offline scanner, adapter,
+process-boundary, and synthetic-benchmark checks. This command does not call a
+model or validate host installation.
+
 Once a compatible host has loaded the skill, a user can ask it to compare a
 draft with material supplied in the conversation. On a host that can run Python
 and provide standard input, the scan accepts the material without first saving
