@@ -1,5 +1,9 @@
 # OpenSocrates 2.0 master plan
 
+> **Earlier plan:** The owner has authorized reconsideration of the 2.0 direction
+> and prior product conditions. Preserve this document as context; its scope is
+> not binding on the [current experiment](../experiments/v2-output-brief/README.md).
+
 Status: preparation and proposed execution architecture, 29 October 2026. The owner selected 2.0 as the target and explicitly withdrew the standalone 1.6 track. This document is an implementation handoff, not proof of delivered behavior or release qualification.
 
 ## Product outcome

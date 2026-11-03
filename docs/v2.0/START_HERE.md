@@ -1,5 +1,9 @@
 # Development start and handoff
 
+> **Earlier plan:** The owner has authorized reconsideration of the 2.0 direction
+> and prior product conditions. Preserve this handoff as context; its product
+> scope is not binding on the [current experiment](../experiments/v2-output-brief/README.md).
+
 This packet prepares development. No runtime behavior is changed by the packet. The owner requested the 2.0 target, mandated Cursor support, requested easy installation and automatic updates, and withdrew the standalone 1.6 track. The work may start without restarting discovery from this conversation.
 
 ## First session

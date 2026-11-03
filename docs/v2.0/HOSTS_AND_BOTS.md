@@ -1,5 +1,9 @@
 # Host integration and Bot research for OpenSocrates 2.0
 
+> **Earlier plan:** The owner has authorized reconsideration of the 2.0 direction
+> and prior product conditions, including host scope. Preserve this research as
+> context, not a binding target for the [current experiment](../experiments/v2-output-brief/README.md).
+
 Research snapshot: 2026-10-29. This document sets implementation and qualification targets; it does not claim OpenSocrates 2.0 is implemented, installed, or verified on any host. Vendor documentation is capability evidence, not evidence of this product's actual delivery or usefulness. Recheck host versions and linked contracts before implementation.
 
 ## Scope and integration contract
